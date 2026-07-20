@@ -42,3 +42,51 @@ create policy "Insertar cotizaciones desde el sitio"
 
 -- Nadie puede leer las cotizaciones desde el cliente (solo tú, desde el dashboard
 -- de Supabase o con la service_role key en un backend propio)
+
+-- === Panel de administración (/admin) ===
+
+-- Gestión de productos solo para usuarios autenticados (el admin)
+create policy "Admin puede insertar productos"
+  on productos for insert
+  to authenticated
+  with check (true);
+
+create policy "Admin puede editar productos"
+  on productos for update
+  to authenticated
+  using (true);
+
+create policy "Admin puede borrar productos"
+  on productos for delete
+  to authenticated
+  using (true);
+
+-- Lectura y borrado de cotizaciones solo para el admin autenticado
+create policy "Admin puede leer cotizaciones"
+  on cotizaciones for select
+  to authenticated
+  using (true);
+
+create policy "Admin puede borrar cotizaciones"
+  on cotizaciones for delete
+  to authenticated
+  using (true);
+
+-- Bucket público para imágenes de productos
+insert into storage.buckets (id, name, public)
+values ('productos-imagenes', 'productos-imagenes', true)
+on conflict (id) do nothing;
+
+create policy "Lectura pública de imágenes"
+  on storage.objects for select
+  using (bucket_id = 'productos-imagenes');
+
+create policy "Admin puede subir imágenes"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'productos-imagenes');
+
+create policy "Admin puede borrar imágenes"
+  on storage.objects for delete
+  to authenticated
+  using (bucket_id = 'productos-imagenes');
