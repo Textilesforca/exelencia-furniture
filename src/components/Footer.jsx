@@ -10,6 +10,7 @@ export default function Footer() {
         </div>
         <div className="font-mono text-xs uppercase tracking-wide space-y-1">
           <p>Taller y showroom con cita previa</p>
+          <p>14709 S Western Ave, Gardena, CA 90249</p>
           <p>hola@exelenciafurniture.mx · WhatsApp 55 0000 0000</p>
         </div>
         <p className="text-xs">© {new Date().getFullYear()} Exelencia Furniture. Todos los derechos reservados.</p>

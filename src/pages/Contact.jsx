@@ -16,6 +16,7 @@ export default function Contact() {
         </div>
         <div className="font-mono text-xs uppercase tracking-widest text-muted space-y-2">
           <p>Taller y showroom con cita previa</p>
+          <p>14709 S Western Ave, Gardena, CA 90249</p>
           <p>hola@exelenciafurniture.mx</p>
           <p>WhatsApp 55 0000 0000</p>
         </div>
