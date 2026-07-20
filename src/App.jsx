@@ -6,6 +6,8 @@ import Catalog from './pages/Catalog'
 import ProductDetail from './pages/ProductDetail'
 import Contact from './pages/Contact'
 import Admin from './pages/Admin'
+import PaymentSuccess from './pages/PaymentSuccess'
+import PaymentCancel from './pages/PaymentCancel'
 
 export default function App() {
   return (
@@ -18,6 +20,8 @@ export default function App() {
           <Route path="/catalogo/:id" element={<ProductDetail />} />
           <Route path="/contacto" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/pago/exito" element={<PaymentSuccess />} />
+          <Route path="/pago/cancelado" element={<PaymentCancel />} />
         </Routes>
       </main>
       <Footer />

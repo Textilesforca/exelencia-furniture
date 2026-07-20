@@ -10,6 +10,8 @@ export default function ProductDetail() {
   const [producto, setProducto] = useState(() => sampleProducts.find((p) => p.id === id))
   const [cargando, setCargando] = useState(!producto)
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [comprando, setComprando] = useState(false)
+  const [errorCompra, setErrorCompra] = useState('')
 
   useEffect(() => {
     if (producto) return
@@ -20,6 +22,30 @@ export default function ProductDetail() {
     }
     cargar()
   }, [id, producto])
+
+  async function handleComprar() {
+    setComprando(true)
+    setErrorCompra('')
+
+    const { data, error } = await supabase.functions.invoke('create-checkout', {
+      body: { producto_id: producto.id },
+    })
+
+    if (error) {
+      let mensaje = error.message
+      try {
+        const cuerpo = await error.context.json()
+        if (cuerpo?.error) mensaje = cuerpo.error
+      } catch {
+        // sin body JSON, usamos el mensaje genérico
+      }
+      setErrorCompra(mensaje)
+      setComprando(false)
+      return
+    }
+
+    window.location.assign(data.url)
+  }
 
   if (cargando) {
     return <p className="max-w-6xl mx-auto px-6 py-16 font-mono text-sm text-muted">Cargando pieza…</p>
@@ -35,6 +61,8 @@ export default function ProductDetail() {
       </div>
     )
   }
+
+  const esProductoReal = UUID_REGEX.test(producto.id)
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16 grid sm:grid-cols-2 gap-12">
@@ -75,16 +103,35 @@ export default function ProductDetail() {
           Desde ${Number(producto.precio_desde).toLocaleString('es-MX')} MXN
         </p>
 
-        <Link
-          to="/contacto"
-          className="inline-block bg-brass text-ink font-body font-medium px-6 py-3 rounded-sm hover:bg-walnut2 transition-colors"
-        >
-          Cotizar esta pieza
-        </Link>
+        {errorCompra && <p className="text-sm text-red-400 mb-3">{errorCompra}</p>}
+
+        <div className="flex flex-wrap gap-3">
+          {esProductoReal && (
+            <button
+              type="button"
+              onClick={handleComprar}
+              disabled={comprando}
+              className="inline-block bg-brass text-ink font-body font-medium px-6 py-3 rounded-sm hover:bg-walnut2 transition-colors disabled:opacity-50"
+            >
+              {comprando
+                ? 'Redirigiendo…'
+                : `Comprar esta pieza — $${Number(producto.precio_desde).toLocaleString('es-MX')} (medida estándar)`}
+            </button>
+          )}
+
+          <Link
+            to="/contacto"
+            className="inline-block border border-line text-parchment font-body font-medium px-6 py-3 rounded-sm hover:border-brass/60 transition-colors"
+          >
+            Cotizar a mi medida
+          </Link>
+        </div>
       </div>
     </section>
   )
 }
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function Dimension({ label, valor }) {
   return (

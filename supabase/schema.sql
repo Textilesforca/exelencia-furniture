@@ -241,3 +241,57 @@ create policy "Con permiso pueden subir imágenes"
 create policy "Con permiso pueden borrar imágenes"
   on storage.objects for delete to authenticated
   using (bucket_id = 'productos-imagenes' and has_permission('productos'));
+
+-- === Pagos con Stripe (agregado 2026-07-20) ===
+
+create table if not exists public.pedidos (
+  id uuid primary key default gen_random_uuid(),
+  producto_id uuid references public.productos(id) on delete set null,
+  producto_nombre text not null,
+  monto numeric not null,
+  nombre_cliente text,
+  email_cliente text,
+  stripe_session_id text unique not null,
+  estado text not null default 'pendiente' check (estado in ('pendiente', 'pagado', 'cancelado')),
+  creado_en timestamptz default now()
+);
+
+alter table public.pedidos enable row level security;
+-- Sin policies de select/insert/update: toda escritura pasa por las Edge
+-- Functions con la service_role key. Lectura pública solo vía la función
+-- de abajo (filtra por session_id, un token opaco de la URL, no por usuario).
+
+alter table public.cotizaciones
+  add column if not exists anticipo_monto numeric,
+  add column if not exists anticipo_estado text check (anticipo_estado in ('pendiente', 'pagado', 'cancelado')),
+  add column if not exists stripe_session_id text unique;
+
+create or replace function public.get_pedido_by_session(p_session_id text)
+returns table (nombre_producto text, monto numeric, estado text)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select producto_nombre, monto, estado
+  from public.pedidos
+  where stripe_session_id = p_session_id
+  limit 1;
+$$;
+
+grant execute on function public.get_pedido_by_session(text) to anon, authenticated;
+
+create or replace function public.get_cotizacion_pago_by_session(p_session_id text)
+returns table (nombre text, monto numeric, estado text)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select nombre, anticipo_monto, anticipo_estado
+  from public.cotizaciones
+  where stripe_session_id = p_session_id
+  limit 1;
+$$;
+
+grant execute on function public.get_cotizacion_pago_by_session(text) to anon, authenticated;
