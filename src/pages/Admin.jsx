@@ -1,15 +1,31 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession } from '../hooks/useSession'
+import { useProfile } from '../hooks/useProfile'
 import { supabase } from '../lib/supabaseClient'
 import LoginForm from '../components/admin/LoginForm'
 import ProductManager from '../components/admin/ProductManager'
 import QuotesList from '../components/admin/QuotesList'
+import UserManager from '../components/admin/UserManager'
 
 export default function Admin() {
   const { session, cargando } = useSession()
-  const [tab, setTab] = useState('productos')
+  const { profile, cargando: cargandoPerfil } = useProfile(session)
+  const [tab, setTab] = useState(null)
 
-  if (cargando) {
+  const esAdmin = profile?.role === 'admin'
+  const tabsDisponibles = [
+    (esAdmin || profile?.permisos?.productos) && 'productos',
+    (esAdmin || profile?.permisos?.cotizaciones) && 'cotizaciones',
+    esAdmin && 'usuarios',
+  ].filter(Boolean)
+
+  useEffect(() => {
+    if (!tab && tabsDisponibles.length > 0) {
+      setTab(tabsDisponibles[0])
+    }
+  }, [tabsDisponibles, tab])
+
+  if (cargando || (session && cargandoPerfil)) {
     return <p className="max-w-6xl mx-auto px-6 py-16 font-mono text-sm text-muted">Cargando…</p>
   }
 
@@ -32,16 +48,35 @@ export default function Admin() {
         </button>
       </div>
 
-      <div className="flex gap-6 border-b border-line mb-10">
-        <TabButton active={tab === 'productos'} onClick={() => setTab('productos')}>
-          Productos
-        </TabButton>
-        <TabButton active={tab === 'cotizaciones'} onClick={() => setTab('cotizaciones')}>
-          Cotizaciones
-        </TabButton>
-      </div>
+      {tabsDisponibles.length === 0 ? (
+        <p className="font-mono text-sm text-muted">
+          No tienes permisos asignados. Contacta al administrador.
+        </p>
+      ) : (
+        <>
+          <div className="flex gap-6 border-b border-line mb-10">
+            {tabsDisponibles.includes('productos') && (
+              <TabButton active={tab === 'productos'} onClick={() => setTab('productos')}>
+                Productos
+              </TabButton>
+            )}
+            {tabsDisponibles.includes('cotizaciones') && (
+              <TabButton active={tab === 'cotizaciones'} onClick={() => setTab('cotizaciones')}>
+                Cotizaciones
+              </TabButton>
+            )}
+            {tabsDisponibles.includes('usuarios') && (
+              <TabButton active={tab === 'usuarios'} onClick={() => setTab('usuarios')}>
+                Usuarios
+              </TabButton>
+            )}
+          </div>
 
-      {tab === 'productos' ? <ProductManager /> : <QuotesList />}
+          {tab === 'productos' && <ProductManager />}
+          {tab === 'cotizaciones' && <QuotesList />}
+          {tab === 'usuarios' && <UserManager />}
+        </>
+      )}
     </section>
   )
 }

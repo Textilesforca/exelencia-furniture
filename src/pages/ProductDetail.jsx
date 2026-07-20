@@ -3,11 +3,13 @@ import { useParams, Link } from 'react-router-dom'
 import { sampleProducts } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import BlueprintDivider from '../components/BlueprintDivider'
+import ImageLightbox from '../components/ImageLightbox'
 
 export default function ProductDetail() {
   const { id } = useParams()
   const [producto, setProducto] = useState(() => sampleProducts.find((p) => p.id === id))
   const [cargando, setCargando] = useState(!producto)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   useEffect(() => {
     if (producto) return
@@ -37,8 +39,21 @@ export default function ProductDetail() {
   return (
     <section className="max-w-6xl mx-auto px-6 py-16 grid sm:grid-cols-2 gap-12">
       <div className="aspect-[4/3] bg-surface2 rounded-sm overflow-hidden">
-        <img src={producto.imagen} alt={producto.nombre} className="w-full h-full object-cover" />
+        <button
+          type="button"
+          onClick={() => setLightboxOpen(true)}
+          className="w-full h-full cursor-zoom-in"
+        >
+          <img src={producto.imagen} alt={producto.nombre} className="w-full h-full object-cover" />
+        </button>
       </div>
+
+      <ImageLightbox
+        open={lightboxOpen}
+        src={producto.imagen}
+        alt={producto.nombre}
+        onClose={() => setLightboxOpen(false)}
+      />
 
       <div>
         <p className="font-mono text-[11px] tracking-widest text-brass uppercase">{producto.categoria}</p>
