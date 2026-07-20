@@ -1,0 +1,44 @@
+import { Link } from 'react-router-dom'
+
+export default function ProductCard({ producto }) {
+  return (
+    <Link
+      to={`/catalogo/${producto.id}`}
+      className="group block bg-surface border border-line rounded-sm overflow-hidden hover:border-brass/60 transition-colors"
+    >
+      <div className="relative aspect-[4/3] overflow-hidden bg-surface2">
+        <img
+          src={producto.imagen}
+          alt={producto.nombre}
+          loading="lazy"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-ink/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+          <p className="font-mono text-[11px] tracking-widest text-brass uppercase mb-2">Ficha técnica</p>
+          <div className="grid grid-cols-3 gap-2 font-mono text-xs text-parchment/90">
+            <div>
+              <p className="text-muted">Ancho</p>
+              <p>{producto.ancho} cm</p>
+            </div>
+            <div>
+              <p className="text-muted">Alto</p>
+              <p>{producto.alto} cm</p>
+            </div>
+            <div>
+              <p className="text-muted">Fondo</p>
+              <p>{producto.profundidad} cm</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="p-4">
+        <p className="font-mono text-[10px] tracking-widest text-brass uppercase">{producto.categoria}</p>
+        <h3 className="font-display text-xl text-parchment mt-1">{producto.nombre}</h3>
+        <p className="text-sm text-muted mt-1">{producto.material}</p>
+        <p className="font-mono text-sm text-walnut2 mt-3">
+          Desde ${Number(producto.precio_desde).toLocaleString('es-MX')} MXN
+        </p>
+      </div>
+    </Link>
+  )
+}
