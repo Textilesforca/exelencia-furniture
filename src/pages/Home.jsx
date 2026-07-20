@@ -3,8 +3,10 @@ import Hero from '../components/Hero'
 import BlueprintDivider from '../components/BlueprintDivider'
 import ProductCard from '../components/ProductCard'
 import { sampleProducts } from '../data/products'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Home() {
+  const { t } = useLanguage()
   const destacados = sampleProducts.slice(0, 3)
 
   return (
@@ -12,7 +14,7 @@ export default function Home() {
       <Hero />
 
       <section className="max-w-6xl mx-auto px-6 py-6">
-        <BlueprintDivider label="Piezas destacadas" />
+        <BlueprintDivider label={t('home.destacadas')} />
       </section>
 
       <section className="max-w-6xl mx-auto px-6 pb-20 grid sm:grid-cols-3 gap-6">
@@ -22,30 +24,18 @@ export default function Home() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 pb-24 grid sm:grid-cols-3 gap-10">
-        <Step
-          numero="01"
-          titulo="Levantamiento"
-          texto="Medimos tu espacio y escuchamos cómo lo usas antes de dibujar nada."
-        />
-        <Step
-          numero="02"
-          titulo="Plano y material"
-          texto="Aprobamos contigo dimensiones, madera y acabado en un plano acotado."
-        />
-        <Step
-          numero="03"
-          titulo="Taller y entrega"
-          texto="Construimos en taller propio y entregamos con instalación incluida."
-        />
+        <Step numero="01" titulo={t('home.paso1Titulo')} texto={t('home.paso1Texto')} />
+        <Step numero="02" titulo={t('home.paso2Titulo')} texto={t('home.paso2Texto')} />
+        <Step numero="03" titulo={t('home.paso3Titulo')} texto={t('home.paso3Texto')} />
       </section>
 
       <section className="max-w-6xl mx-auto px-6 pb-24 text-center">
-        <p className="font-display text-3xl text-parchment mb-6">¿Tienes un espacio en mente?</p>
+        <p className="font-display text-3xl text-parchment mb-6">{t('home.ctaTitulo')}</p>
         <Link
           to="/contacto"
           className="inline-block bg-brass text-ink font-body font-medium px-8 py-3 rounded-sm hover:bg-walnut2 transition-colors"
         >
-          Cuéntanos tu proyecto
+          {t('home.ctaBoton')}
         </Link>
       </section>
     </>

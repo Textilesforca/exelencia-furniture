@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 const estadoInicial = {
   email: '',
@@ -20,6 +21,7 @@ async function mensajeDeError(error) {
 }
 
 export default function UserManager() {
+  const { t } = useLanguage()
   const [usuarios, setUsuarios] = useState([])
   const [cargando, setCargando] = useState(true)
   const [form, setForm] = useState(estadoInicial)
@@ -111,7 +113,7 @@ export default function UserManager() {
   }
 
   async function handleEliminar(id) {
-    if (!window.confirm('¿Eliminar este usuario? Perderá acceso de inmediato.')) return
+    if (!window.confirm(t('userManager.confirmarEliminar'))) return
     setError('')
     const { error } = await supabase.functions.invoke('manage-user', {
       body: { action: 'delete', userId: id },
@@ -128,11 +130,11 @@ export default function UserManager() {
   return (
     <div className="grid lg:grid-cols-2 gap-10">
       <div>
-        <h2 className="font-display text-2xl text-parchment mb-6">Nuevo usuario</h2>
+        <h2 className="font-display text-2xl text-parchment mb-6">{t('userManager.nuevoUsuario')}</h2>
 
         <form onSubmit={handleSubmit} className="grid gap-5">
           <Field
-            label="Correo"
+            label={t('userManager.correo')}
             name="email"
             type="email"
             value={form.email}
@@ -141,41 +143,43 @@ export default function UserManager() {
             required
           />
           <PasswordField
-            label="Contraseña"
+            label={t('userManager.contrasena')}
             name="password"
             value={form.password}
             onChange={handleChange}
             visible={mostrarPassword}
             onToggleVisible={() => setMostrarPassword((v) => !v)}
+            mostrarLabel={t('userManager.mostrarPassword')}
+            ocultarLabel={t('userManager.ocultarPassword')}
             required
           />
 
           <label className="block">
-            <span className="font-mono text-[11px] tracking-widest text-muted uppercase">Rol</span>
+            <span className="font-mono text-[11px] tracking-widest text-muted uppercase">{t('userManager.rol')}</span>
             <select
               name="role"
               value={form.role}
               onChange={handleChange}
               className="mt-2 w-full bg-surface border border-line rounded-sm px-4 py-3 text-parchment focus:border-brass outline-none transition-colors"
             >
-              <option value="usuario">Usuario estándar</option>
-              <option value="admin">Admin</option>
+              <option value="usuario">{t('userManager.usuarioEstandar')}</option>
+              <option value="admin">{t('userManager.adminRol')}</option>
             </select>
           </label>
 
           {form.role === 'usuario' && (
             <div>
               <span className="font-mono text-[11px] tracking-widest text-muted uppercase">
-                Acceso a secciones
+                {t('userManager.accesoSecciones')}
               </span>
               <div className="mt-2 flex gap-6">
                 <PermisoCheckbox
-                  label="Productos"
+                  label={t('userManager.productos')}
                   checked={form.permisos.productos}
                   onChange={(checked) => handlePermisoChange('productos', checked)}
                 />
                 <PermisoCheckbox
-                  label="Cotizaciones"
+                  label={t('userManager.cotizaciones')}
                   checked={form.permisos.cotizaciones}
                   onChange={(checked) => handlePermisoChange('cotizaciones', checked)}
                 />
@@ -190,17 +194,17 @@ export default function UserManager() {
             disabled={creando}
             className="bg-brass text-ink font-body font-medium px-6 py-3 rounded-sm hover:bg-walnut2 transition-colors disabled:opacity-50 w-fit"
           >
-            {creando ? 'Creando…' : 'Crear usuario'}
+            {creando ? t('userManager.creando') : t('userManager.crearUsuario')}
           </button>
         </form>
       </div>
 
       <div>
-        <h2 className="font-display text-2xl text-parchment mb-6">Usuarios existentes</h2>
+        <h2 className="font-display text-2xl text-parchment mb-6">{t('userManager.usuariosExistentes')}</h2>
         {cargando ? (
-          <p className="font-mono text-sm text-muted">Cargando…</p>
+          <p className="font-mono text-sm text-muted">{t('userManager.cargando')}</p>
         ) : usuarios.length === 0 ? (
-          <p className="font-mono text-sm text-muted">Aún no hay usuarios.</p>
+          <p className="font-mono text-sm text-muted">{t('userManager.vacio')}</p>
         ) : (
           <ul className="grid gap-3">
             {usuarios.map((u) => (
@@ -213,19 +217,19 @@ export default function UserManager() {
                     onChange={(e) => handleRoleChange(u.id, e.target.value)}
                     className="bg-surface2 border border-line rounded-sm px-3 py-2 text-sm text-parchment focus:border-brass outline-none transition-colors"
                   >
-                    <option value="usuario">Usuario estándar</option>
-                    <option value="admin">Admin</option>
+                    <option value="usuario">{t('userManager.usuarioEstandar')}</option>
+                    <option value="admin">{t('userManager.adminRol')}</option>
                   </select>
 
                   {u.role === 'usuario' && (
                     <>
                       <PermisoCheckbox
-                        label="Productos"
+                        label={t('userManager.productos')}
                         checked={!!u.permisos?.productos}
                         onChange={(checked) => handleRowPermisoChange(u.id, 'productos', checked)}
                       />
                       <PermisoCheckbox
-                        label="Cotizaciones"
+                        label={t('userManager.cotizaciones')}
                         checked={!!u.permisos?.cotizaciones}
                         onChange={(checked) => handleRowPermisoChange(u.id, 'cotizaciones', checked)}
                       />
@@ -239,13 +243,13 @@ export default function UserManager() {
                     disabled={guardandoId === u.id}
                     className="font-mono text-xs uppercase tracking-widest text-brass hover:underline disabled:opacity-50"
                   >
-                    {guardandoId === u.id ? 'Guardando…' : 'Guardar'}
+                    {guardandoId === u.id ? t('userManager.guardando') : t('userManager.guardar')}
                   </button>
                   <button
                     onClick={() => handleEliminar(u.id)}
                     className="font-mono text-xs uppercase tracking-widest text-red-400 hover:underline"
                   >
-                    Eliminar
+                    {t('userManager.eliminar')}
                   </button>
                 </div>
               </li>
@@ -274,7 +278,7 @@ function Field({ label, name, value, onChange, type = 'text', required, autoComp
   )
 }
 
-function PasswordField({ label, name, value, onChange, required, visible, onToggleVisible }) {
+function PasswordField({ label, name, value, onChange, required, visible, onToggleVisible, mostrarLabel, ocultarLabel }) {
   return (
     <label className="block">
       <span className="font-mono text-[11px] tracking-widest text-muted uppercase">{label}</span>
@@ -291,7 +295,7 @@ function PasswordField({ label, name, value, onChange, required, visible, onTogg
         <button
           type="button"
           onClick={onToggleVisible}
-          aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+          aria-label={visible ? ocultarLabel : mostrarLabel}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-brass transition-colors"
         >
           {visible ? (

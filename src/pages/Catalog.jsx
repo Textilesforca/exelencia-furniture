@@ -4,8 +4,10 @@ import CategoryFilter from '../components/CategoryFilter'
 import BlueprintDivider from '../components/BlueprintDivider'
 import { sampleProducts, categorias } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Catalog() {
+  const { t } = useLanguage()
   const [productos, setProductos] = useState(sampleProducts)
   const [activa, setActiva] = useState('Todos')
   const [cargando, setCargando] = useState(true)
@@ -27,8 +29,8 @@ export default function Catalog() {
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
-      <p className="font-mono text-xs tracking-[0.25em] text-brass uppercase mb-3">Catálogo completo</p>
-      <h1 className="font-display text-4xl text-parchment mb-8">Piezas listas para adaptarse a tu espacio</h1>
+      <p className="font-mono text-xs tracking-[0.25em] text-brass uppercase mb-3">{t('catalog.kicker')}</p>
+      <h1 className="font-display text-4xl text-parchment mb-8">{t('catalog.titulo')}</h1>
 
       <BlueprintDivider />
 
@@ -37,9 +39,9 @@ export default function Catalog() {
       </div>
 
       {cargando ? (
-        <p className="font-mono text-sm text-muted">Cargando catálogo…</p>
+        <p className="font-mono text-sm text-muted">{t('catalog.cargando')}</p>
       ) : filtrados.length === 0 ? (
-        <p className="font-mono text-sm text-muted">Aún no hay piezas en esta categoría.</p>
+        <p className="font-mono text-sm text-muted">{t('catalog.vacio')}</p>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtrados.map((p) => (

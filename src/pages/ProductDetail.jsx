@@ -4,9 +4,12 @@ import { sampleProducts } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import BlueprintDivider from '../components/BlueprintDivider'
 import ImageLightbox from '../components/ImageLightbox'
+import { useLanguage } from '../i18n/LanguageContext'
+import { traducirCategoria, campoTraducido } from '../i18n/translations'
 
 export default function ProductDetail() {
   const { id } = useParams()
+  const { lang, t } = useLanguage()
   const [producto, setProducto] = useState(() => sampleProducts.find((p) => p.id === id))
   const [cargando, setCargando] = useState(!producto)
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -48,21 +51,24 @@ export default function ProductDetail() {
   }
 
   if (cargando) {
-    return <p className="max-w-6xl mx-auto px-6 py-16 font-mono text-sm text-muted">Cargando pieza…</p>
+    return <p className="max-w-6xl mx-auto px-6 py-16 font-mono text-sm text-muted">{t('productDetail.cargando')}</p>
   }
 
   if (!producto) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-16">
-        <p className="font-display text-2xl text-parchment mb-4">No encontramos esta pieza.</p>
+        <p className="font-display text-2xl text-parchment mb-4">{t('productDetail.noEncontrada')}</p>
         <Link to="/catalogo" className="text-brass underline underline-offset-4">
-          Volver al catálogo
+          {t('productDetail.volverCatalogo')}
         </Link>
       </div>
     )
   }
 
   const esProductoReal = UUID_REGEX.test(producto.id)
+  const nombre = campoTraducido(producto, 'nombre', lang)
+  const material = campoTraducido(producto, 'material', lang)
+  const descripcion = campoTraducido(producto, 'descripcion', lang)
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16 grid sm:grid-cols-2 gap-12">
@@ -72,35 +78,37 @@ export default function ProductDetail() {
           onClick={() => setLightboxOpen(true)}
           className="w-full h-full cursor-zoom-in"
         >
-          <img src={producto.imagen} alt={producto.nombre} className="w-full h-full object-cover" />
+          <img src={producto.imagen} alt={nombre} className="w-full h-full object-cover" />
         </button>
       </div>
 
       <ImageLightbox
         open={lightboxOpen}
         src={producto.imagen}
-        alt={producto.nombre}
+        alt={nombre}
         onClose={() => setLightboxOpen(false)}
       />
 
       <div>
-        <p className="font-mono text-[11px] tracking-widest text-brass uppercase">{producto.categoria}</p>
-        <h1 className="font-display text-4xl text-parchment mt-2">{producto.nombre}</h1>
-        <p className="text-muted mt-3">{producto.material}</p>
-        <p className="text-parchment/80 mt-6">{producto.descripcion}</p>
+        <p className="font-mono text-[11px] tracking-widest text-brass uppercase">
+          {traducirCategoria(producto.categoria, lang)}
+        </p>
+        <h1 className="font-display text-4xl text-parchment mt-2">{nombre}</h1>
+        <p className="text-muted mt-3">{material}</p>
+        <p className="text-parchment/80 mt-6">{descripcion}</p>
 
         <div className="my-8">
-          <BlueprintDivider label="Ficha técnica" />
+          <BlueprintDivider label={t('productDetail.fichaTecnica')} />
         </div>
 
         <div className="grid grid-cols-3 gap-4 font-mono text-sm mb-8">
-          <Dimension label="Ancho" valor={producto.ancho} />
-          <Dimension label="Alto" valor={producto.alto} />
-          <Dimension label="Fondo" valor={producto.profundidad} />
+          <Dimension label={t('productDetail.ancho')} valor={producto.ancho} />
+          <Dimension label={t('productDetail.alto')} valor={producto.alto} />
+          <Dimension label={t('productDetail.fondo')} valor={producto.profundidad} />
         </div>
 
         <p className="font-mono text-lg text-walnut2 mb-8">
-          Desde ${Number(producto.precio_desde).toLocaleString('es-MX')} MXN
+          {t('productDetail.desde')} ${Number(producto.precio_desde).toLocaleString('es-MX')} MXN
         </p>
 
         {errorCompra && <p className="text-sm text-red-400 mb-3">{errorCompra}</p>}
@@ -114,8 +122,8 @@ export default function ProductDetail() {
               className="inline-block bg-brass text-ink font-body font-medium px-6 py-3 rounded-sm hover:bg-walnut2 transition-colors disabled:opacity-50"
             >
               {comprando
-                ? 'Redirigiendo…'
-                : `Comprar esta pieza — $${Number(producto.precio_desde).toLocaleString('es-MX')} (medida estándar)`}
+                ? t('productDetail.redirigiendo')
+                : `${t('productDetail.comprar')} — $${Number(producto.precio_desde).toLocaleString('es-MX')} (${t('productDetail.medidaEstandar')})`}
             </button>
           )}
 
@@ -123,7 +131,7 @@ export default function ProductDetail() {
             to="/contacto"
             className="inline-block border border-line text-parchment font-body font-medium px-6 py-3 rounded-sm hover:border-brass/60 transition-colors"
           >
-            Cotizar a mi medida
+            {t('productDetail.cotizarMedida')}
           </Link>
         </div>
       </div>

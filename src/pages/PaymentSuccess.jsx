@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function PaymentSuccess() {
+  const { t } = useLanguage()
   const [searchParams] = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const tipo = searchParams.get('tipo')
@@ -27,28 +29,28 @@ export default function PaymentSuccess() {
 
   return (
     <section className="max-w-2xl mx-auto px-6 py-24 text-center">
-      <p className="font-mono text-xs tracking-[0.25em] text-brass uppercase mb-3">Pago recibido</p>
-      <h1 className="font-display text-4xl text-parchment mb-6">¡Gracias por tu pago!</h1>
+      <p className="font-mono text-xs tracking-[0.25em] text-brass uppercase mb-3">{t('paymentSuccess.kicker')}</p>
+      <h1 className="font-display text-4xl text-parchment mb-6">{t('paymentSuccess.titulo')}</h1>
 
       {cargando ? (
-        <p className="font-mono text-sm text-muted">Confirmando…</p>
+        <p className="font-mono text-sm text-muted">{t('paymentSuccess.confirmando')}</p>
       ) : resultado ? (
         <div className="font-mono text-sm text-parchment/90 space-y-2">
           <p>{resultado.nombre_producto ?? resultado.nombre}</p>
           <p className="text-walnut2">${Number(resultado.monto).toLocaleString('es-MX')} MXN</p>
-          <p className="text-muted uppercase tracking-widest text-xs">Estado: {resultado.estado}</p>
+          <p className="text-muted uppercase tracking-widest text-xs">
+            {t('paymentSuccess.estado')}: {resultado.estado}
+          </p>
         </div>
       ) : (
-        <p className="font-mono text-sm text-muted">
-          No pudimos encontrar el detalle de este pago, pero si tu banco confirmó el cargo, ya lo recibimos.
-        </p>
+        <p className="font-mono text-sm text-muted">{t('paymentSuccess.noEncontrado')}</p>
       )}
 
       <Link
         to="/catalogo"
         className="inline-block mt-10 bg-brass text-ink font-body font-medium px-6 py-3 rounded-sm hover:bg-walnut2 transition-colors"
       >
-        Volver al catálogo
+        {t('paymentSuccess.volverCatalogo')}
       </Link>
     </section>
   )

@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function ImageLightbox({ open, src, alt, onClose }) {
+  const { t } = useLanguage()
   useEffect(() => {
     if (!open) return
 
@@ -31,7 +33,7 @@ export default function ImageLightbox({ open, src, alt, onClose }) {
         onClick={onClose}
         className="absolute top-6 right-6 font-mono text-xs uppercase tracking-widest text-parchment hover:text-brass transition-colors"
       >
-        Cerrar ✕
+        {t('lightbox.cerrar')}
       </button>
       <img
         src={src}

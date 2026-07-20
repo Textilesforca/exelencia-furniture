@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useLanguage } from '../i18n/LanguageContext'
 
 const estadoInicial = {
   nombre: '',
@@ -11,6 +12,7 @@ const estadoInicial = {
 }
 
 export default function QuoteForm() {
+  const { t } = useLanguage()
   const [form, setForm] = useState(estadoInicial)
   const [estado, setEstado] = useState('idle') // idle | enviando | ok | error
 
@@ -34,10 +36,8 @@ export default function QuoteForm() {
   if (estado === 'ok') {
     return (
       <div className="border border-brass/50 rounded-sm p-6">
-        <p className="font-mono text-xs tracking-widest text-brass uppercase mb-2">Solicitud recibida</p>
-        <p className="text-parchment/80">
-          Gracias, {form.nombre || ''}. Te contactaremos en menos de 24 horas para afinar medidas y materiales.
-        </p>
+        <p className="font-mono text-xs tracking-widest text-brass uppercase mb-2">{t('quoteForm.exitoTitulo')}</p>
+        <p className="text-parchment/80">{t('quoteForm.exitoTexto', { nombre: form.nombre || '' })}</p>
       </div>
     )
   }
@@ -45,33 +45,41 @@ export default function QuoteForm() {
   return (
     <form onSubmit={handleSubmit} className="grid gap-5">
       <div className="grid sm:grid-cols-2 gap-5">
-        <Field label="Nombre" name="nombre" value={form.nombre} onChange={handleChange} required />
-        <Field label="Teléfono / WhatsApp" name="telefono" value={form.telefono} onChange={handleChange} required />
+        <Field label={t('quoteForm.nombre')} name="nombre" value={form.nombre} onChange={handleChange} required />
+        <Field label={t('quoteForm.telefono')} name="telefono" value={form.telefono} onChange={handleChange} required />
       </div>
-      <Field label="Correo (opcional)" name="email" type="email" value={form.email} onChange={handleChange} />
-      <Field label="Tipo de mueble" name="tipo_mueble" value={form.tipo_mueble} onChange={handleChange} placeholder="Ej. mesa de comedor, clóset, sala" />
+      <Field label={t('quoteForm.correo')} name="email" type="email" value={form.email} onChange={handleChange} />
+      <Field
+        label={t('quoteForm.tipoMueble')}
+        name="tipo_mueble"
+        value={form.tipo_mueble}
+        onChange={handleChange}
+        placeholder={t('quoteForm.tipoMueblePlaceholder')}
+      />
       <Field
         as="textarea"
-        label="Cuéntanos qué necesitas"
+        label={t('quoteForm.descripcion')}
         name="descripcion"
         value={form.descripcion}
         onChange={handleChange}
-        placeholder="Medidas del espacio, estilo, material preferido, fotos de referencia (puedes enviarlas luego por WhatsApp)"
+        placeholder={t('quoteForm.descripcionPlaceholder')}
       />
-      <Field label="Presupuesto aproximado" name="presupuesto" value={form.presupuesto} onChange={handleChange} placeholder="Ej. $15,000 - $25,000 MXN" />
+      <Field
+        label={t('quoteForm.presupuesto')}
+        name="presupuesto"
+        value={form.presupuesto}
+        onChange={handleChange}
+        placeholder={t('quoteForm.presupuestoPlaceholder')}
+      />
 
-      {estado === 'error' && (
-        <p className="text-sm text-red-400">
-          No se pudo enviar tu solicitud. Verifica tu conexión e inténtalo de nuevo.
-        </p>
-      )}
+      {estado === 'error' && <p className="text-sm text-red-400">{t('quoteForm.errorEnvio')}</p>}
 
       <button
         type="submit"
         disabled={estado === 'enviando'}
         className="bg-brass text-ink font-body font-medium px-6 py-3 rounded-sm hover:bg-walnut2 transition-colors disabled:opacity-50 w-fit"
       >
-        {estado === 'enviando' ? 'Enviando…' : 'Solicitar cotización'}
+        {estado === 'enviando' ? t('quoteForm.enviando') : t('quoteForm.solicitar')}
       </button>
     </form>
   )

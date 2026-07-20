@@ -1,12 +1,15 @@
 import { Link, NavLink } from 'react-router-dom'
-
-const links = [
-  { to: '/', label: 'Inicio' },
-  { to: '/catalogo', label: 'Catálogo' },
-  { to: '/contacto', label: 'Cotizar' },
-]
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Navbar() {
+  const { lang, setLang, t } = useLanguage()
+
+  const links = [
+    { to: '/', label: t('navbar.inicio') },
+    { to: '/catalogo', label: t('navbar.catalogo') },
+    { to: '/contacto', label: t('navbar.cotizar') },
+  ]
+
   return (
     <header className="sticky top-0 z-40 bg-ink/90 backdrop-blur border-b border-line">
       <nav className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -32,12 +35,26 @@ export default function Navbar() {
             </li>
           ))}
         </ul>
-        <Link
-          to="/contacto"
-          className="sm:hidden text-xs font-mono uppercase tracking-widest text-brass border border-brass/50 px-3 py-2 rounded-sm"
-        >
-          Cotizar
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setLang(lang === 'es' ? 'en' : 'es')}
+            aria-label="Cambiar idioma / Change language"
+            className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-parchment/80 hover:text-brass transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-5 h-5">
+              <circle cx="12" cy="12" r="9" />
+              <path strokeLinecap="round" d="M3 12h18M12 3c2.5 2.6 3.8 5.8 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.8-3.8-9S9.5 5.6 12 3z" />
+            </svg>
+            {t('idioma.cambiarA')}
+          </button>
+          <Link
+            to="/contacto"
+            className="sm:hidden text-xs font-mono uppercase tracking-widest text-brass border border-brass/50 px-3 py-2 rounded-sm"
+          >
+            {t('navbar.cotizar')}
+          </Link>
+        </div>
       </nav>
     </header>
   )

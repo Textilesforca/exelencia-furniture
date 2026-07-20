@@ -1,38 +1,38 @@
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Hero() {
+  const { t } = useLanguage()
+
   return (
     <section className="max-w-6xl mx-auto px-6 pt-16 pb-10 grid sm:grid-cols-2 gap-12 items-center">
       <div>
         <p className="font-mono text-xs tracking-[0.25em] text-brass uppercase mb-4">
-          Diseño · Medida · Materia
+          {t('hero.kicker')}
         </p>
         <h1 className="font-display text-5xl sm:text-6xl leading-[1.05] text-parchment">
-          Muebles dibujados para tu espacio,
-          <span className="text-walnut2"> no al revés.</span>
+          {t('hero.tituloL1')}
+          <span className="text-walnut2"> {t('hero.tituloL2')}</span>
         </h1>
-        <p className="mt-6 text-parchment/70 text-lg max-w-md">
-          Cada pieza empieza como un plano acotado a tus paredes, tu luz y tu forma de vivir.
-          Carpintería de autor, hecha en taller, sin catálogos genéricos.
-        </p>
+        <p className="mt-6 text-parchment/70 text-lg max-w-md">{t('hero.texto')}</p>
         <div className="mt-8 flex flex-wrap gap-4">
           <Link
             to="/catalogo"
             className="bg-brass text-ink font-body font-medium px-6 py-3 rounded-sm hover:bg-walnut2 transition-colors"
           >
-            Ver catálogo
+            {t('hero.verCatalogo')}
           </Link>
           <Link
             to="/contacto"
             className="border border-line text-parchment font-body px-6 py-3 rounded-sm hover:border-brass hover:text-brass transition-colors"
           >
-            Pedir cotización
+            {t('hero.pedirCotizacion')}
           </Link>
         </div>
       </div>
 
       <div className="relative">
-        <svg viewBox="0 0 420 340" className="w-full h-auto" role="img" aria-label="Boceto acotado de un sillón a medida">
+        <svg viewBox="0 0 420 340" className="w-full h-auto" role="img" aria-label={t('hero.bocetoAlt')}>
           {/* silueta del sillón */}
           <path
             d="M90 250 V150 Q90 120 120 120 H260 Q290 120 290 150 V250 M90 250 H70 V270 H310 V250 H290 M90 210 H290"
@@ -66,7 +66,7 @@ export default function Hero() {
 
           {/* etiqueta de nota */}
           <text x="20" y="30" fontFamily="Space Mono, monospace" fontSize="11" fill="#9A9186">
-            REF. SILLÓN BERGEN — ESC 1:12
+            {t('hero.refSillon')}
           </text>
         </svg>
       </div>

@@ -1,6 +1,11 @@
+import { useLanguage } from '../i18n/LanguageContext'
+import { traducirCategoria } from '../i18n/translations'
+
 export default function CategoryFilter({ categorias, activa, onChange }) {
+  const { lang, t } = useLanguage()
+
   return (
-    <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filtrar por categoría">
+    <div className="flex flex-wrap gap-2" role="tablist" aria-label={t('catalog.filtroAria')}>
       {categorias.map((cat) => (
         <button
           key={cat}
@@ -13,7 +18,7 @@ export default function CategoryFilter({ categorias, activa, onChange }) {
               : 'border-line text-parchment/70 hover:border-brass hover:text-brass'
           }`}
         >
-          {cat}
+          {traducirCategoria(cat, lang)}
         </button>
       ))}
     </div>

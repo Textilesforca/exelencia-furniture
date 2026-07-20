@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 async function mensajeDeError(error) {
   if (!error) return ''
@@ -13,6 +14,7 @@ async function mensajeDeError(error) {
 }
 
 export default function QuotesList() {
+  const { t } = useLanguage()
   const [cotizaciones, setCotizaciones] = useState([])
   const [cargando, setCargando] = useState(true)
   const [montos, setMontos] = useState({})
@@ -35,7 +37,7 @@ export default function QuotesList() {
   }, [])
 
   async function handleEliminar(id) {
-    if (!window.confirm('¿Eliminar esta cotización?')) return
+    if (!window.confirm(t('quotesList.confirmarEliminar'))) return
     const { error } = await supabase.from('cotizaciones').delete().eq('id', id)
     if (!error) cargar()
   }
@@ -43,7 +45,7 @@ export default function QuotesList() {
   async function handleGenerarLink(cotizacionId) {
     const monto = montos[cotizacionId]
     if (!monto || Number(monto) <= 0) {
-      setErrores({ ...errores, [cotizacionId]: 'Ingresa un monto válido.' })
+      setErrores({ ...errores, [cotizacionId]: t('quotesList.montoInvalido') })
       return
     }
 
@@ -70,11 +72,11 @@ export default function QuotesList() {
   }
 
   if (cargando) {
-    return <p className="font-mono text-sm text-muted">Cargando…</p>
+    return <p className="font-mono text-sm text-muted">{t('quotesList.cargando')}</p>
   }
 
   if (cotizaciones.length === 0) {
-    return <p className="font-mono text-sm text-muted">Aún no hay solicitudes de cotización.</p>
+    return <p className="font-mono text-sm text-muted">{t('quotesList.vacio')}</p>
   }
 
   return (
@@ -92,15 +94,15 @@ export default function QuotesList() {
               onClick={() => handleEliminar(c.id)}
               className="font-mono text-xs uppercase tracking-widest text-red-400 hover:underline shrink-0"
             >
-              Eliminar
+              {t('quotesList.eliminar')}
             </button>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1 mt-4 text-sm text-parchment/90">
-            <p><span className="text-muted">Teléfono: </span>{c.telefono}</p>
-            {c.email && <p><span className="text-muted">Correo: </span>{c.email}</p>}
-            {c.tipo_mueble && <p><span className="text-muted">Tipo de mueble: </span>{c.tipo_mueble}</p>}
-            {c.presupuesto && <p><span className="text-muted">Presupuesto: </span>{c.presupuesto}</p>}
+            <p><span className="text-muted">{t('quotesList.telefono')} </span>{c.telefono}</p>
+            {c.email && <p><span className="text-muted">{t('quotesList.correo')} </span>{c.email}</p>}
+            {c.tipo_mueble && <p><span className="text-muted">{t('quotesList.tipoMueble')} </span>{c.tipo_mueble}</p>}
+            {c.presupuesto && <p><span className="text-muted">{t('quotesList.presupuesto')} </span>{c.presupuesto}</p>}
           </div>
 
           {c.descripcion && (
@@ -110,14 +112,14 @@ export default function QuotesList() {
           <div className="mt-4 border-t border-line pt-4">
             {c.anticipo_estado === 'pagado' ? (
               <p className="font-mono text-xs uppercase tracking-widest text-brass">
-                Anticipo recibido ✓ — ${Number(c.anticipo_monto).toLocaleString('es-MX')} MXN
+                {t('quotesList.anticipoRecibido')} ${Number(c.anticipo_monto).toLocaleString('es-MX')} MXN
               </p>
             ) : (
               <div className="flex flex-wrap items-center gap-3">
                 <input
                   type="number"
                   min="1"
-                  placeholder="Monto del anticipo (MXN)"
+                  placeholder={t('quotesList.montoPlaceholder')}
                   value={montos[c.id] ?? ''}
                   onChange={(e) => setMontos({ ...montos, [c.id]: e.target.value })}
                   className="bg-surface2 border border-line rounded-sm px-3 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors w-52"
@@ -127,7 +129,7 @@ export default function QuotesList() {
                   disabled={generandoId === c.id}
                   className="font-mono text-xs uppercase tracking-widest text-brass hover:underline disabled:opacity-50"
                 >
-                  {generandoId === c.id ? 'Generando…' : 'Generar link de pago'}
+                  {generandoId === c.id ? t('quotesList.generando') : t('quotesList.generarLink')}
                 </button>
 
                 {linksGenerados[c.id] && (
@@ -141,7 +143,7 @@ export default function QuotesList() {
                       onClick={() => copiarLink(linksGenerados[c.id])}
                       className="font-mono text-xs uppercase tracking-widest text-brass hover:underline shrink-0"
                     >
-                      Copiar
+                      {t('quotesList.copiar')}
                     </button>
                   </div>
                 )}
