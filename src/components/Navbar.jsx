@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
-import { traducirCategoria } from '../i18n/translations'
-import { categorias } from '../data/products'
+import { traducirCategoria, traducirSubcategoria } from '../i18n/translations'
+import { categorias, subcategoriasSalas } from '../data/products'
 
 const categoriasNav = categorias.filter((c) => c !== 'Todos')
 
@@ -10,6 +10,7 @@ export default function Navbar() {
   const { lang, setLang, t } = useLanguage()
   const navigate = useNavigate()
   const [busqueda, setBusqueda] = useState('')
+  const [salasAbierto, setSalasAbierto] = useState(false)
 
   const links = [
     { to: '/', label: t('navbar.inicio') },
@@ -25,7 +26,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 bg-ink/90 backdrop-blur border-b border-line">
+    <header className="relative sticky top-0 z-40 bg-ink/90 backdrop-blur border-b border-line">
       <nav className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between gap-6">
         <Link to="/" className="font-display text-lg tracking-tight leading-none shrink-0">
           <span className="block text-parchment">Custom &amp; Designs</span>
@@ -94,16 +95,29 @@ export default function Navbar() {
 
       <div className="border-t border-line/60">
         <ul className="max-w-6xl mx-auto px-6 h-12 flex items-center gap-6 overflow-x-auto font-mono text-xs uppercase tracking-widest text-parchment/70">
-          {categoriasNav.map((cat) => (
-            <li key={cat} className="shrink-0">
-              <Link
-                to={`/catalogo?categoria=${encodeURIComponent(cat)}`}
-                className="hover:text-brass transition-colors"
+          {categoriasNav.map((cat) =>
+            cat === 'Salas' ? (
+              <li
+                key={cat}
+                className="shrink-0"
+                onMouseEnter={() => setSalasAbierto(true)}
+                onMouseLeave={() => setSalasAbierto(false)}
               >
-                {traducirCategoria(cat, lang)}
-              </Link>
-            </li>
-          ))}
+                <Link to="/catalogo?categoria=Salas" className="hover:text-brass transition-colors">
+                  {traducirCategoria(cat, lang)}
+                </Link>
+              </li>
+            ) : (
+              <li key={cat} className="shrink-0">
+                <Link
+                  to={`/catalogo?categoria=${encodeURIComponent(cat)}`}
+                  className="hover:text-brass transition-colors"
+                >
+                  {traducirCategoria(cat, lang)}
+                </Link>
+              </li>
+            )
+          )}
           <li className="shrink-0">
             <Link to="/entrega" className="hover:text-brass transition-colors">
               {t('navbar.delivery')}
@@ -116,6 +130,27 @@ export default function Navbar() {
           </li>
         </ul>
       </div>
+
+      {salasAbierto && (
+        <div
+          onMouseEnter={() => setSalasAbierto(true)}
+          onMouseLeave={() => setSalasAbierto(false)}
+          className="absolute left-0 right-0 top-full bg-surface border-b border-brass/40 shadow-lg z-50"
+        >
+          <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-2 gap-x-12 gap-y-3">
+            {subcategoriasSalas.map((sub) => (
+              <Link
+                key={sub}
+                to={`/catalogo?categoria=Salas&subcategoria=${encodeURIComponent(sub)}`}
+                onClick={() => setSalasAbierto(false)}
+                className="font-body normal-case tracking-normal text-sm text-parchment/80 hover:text-brass transition-colors"
+              >
+                {traducirSubcategoria(sub, lang)}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </header>
   )
 }

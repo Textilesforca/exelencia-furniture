@@ -76,3 +76,18 @@ export const sampleProducts = [
 ]
 
 export const categorias = ['Todos', 'Salas', 'Comedores', 'Recámaras', 'Piezas a medida']
+
+export const subcategoriasSalas = [
+  'Todas las Salas',
+  'Sala Modular',
+  'Juego de Salas',
+  'Sala con reclinable',
+  'Sofá 3 plazas',
+  'Sofá 2 plazas',
+  'Sala de Tela',
+  'Sala de Piel y Ecopiel',
+  'Sofá Camas',
+  'Sillones',
+  'Taburetes',
+  'Sillones Reclinables',
+]

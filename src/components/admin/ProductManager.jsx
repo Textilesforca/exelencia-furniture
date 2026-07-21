@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
-import { categorias } from '../../data/products'
+import { categorias, subcategoriasSalas } from '../../data/products'
 import { useLanguage } from '../../i18n/LanguageContext'
-import { traducirCategoria } from '../../i18n/translations'
+import { traducirCategoria, traducirSubcategoria } from '../../i18n/translations'
 
 const categoriasForm = categorias.filter((c) => c !== 'Todos')
+const subcategoriasSalasForm = subcategoriasSalas.filter((s) => s !== 'Todas las Salas')
 
 const estadoInicial = {
   nombre: '',
   nombre_en: '',
   categoria: categoriasForm[0] ?? '',
+  subcategoria: '',
   material: '',
   material_en: '',
   ancho: '',
@@ -52,6 +54,7 @@ export default function ProductManager() {
       nombre: producto.nombre ?? '',
       nombre_en: producto.nombre_en ?? '',
       categoria: producto.categoria ?? categoriasForm[0] ?? '',
+      subcategoria: producto.subcategoria ?? '',
       material: producto.material ?? '',
       material_en: producto.material_en ?? '',
       ancho: producto.ancho ?? '',
@@ -109,6 +112,7 @@ export default function ProductManager() {
       nombre: form.nombre,
       nombre_en: form.nombre_en || null,
       categoria: form.categoria,
+      subcategoria: form.categoria === 'Salas' ? form.subcategoria || null : null,
       material: form.material,
       material_en: form.material_en || null,
       ancho: form.ancho ? Number(form.ancho) : null,
@@ -161,6 +165,27 @@ export default function ProductManager() {
               ))}
             </select>
           </label>
+
+          {form.categoria === 'Salas' && (
+            <label className="block">
+              <span className="font-mono text-[11px] tracking-widest text-muted uppercase">
+                {t('productManager.subcategoria')}
+              </span>
+              <select
+                name="subcategoria"
+                value={form.subcategoria}
+                onChange={handleChange}
+                className="mt-2 w-full bg-surface border border-line rounded-sm px-4 py-3 text-parchment focus:border-brass outline-none transition-colors"
+              >
+                <option value="">{t('productManager.sinSubcategoria')}</option>
+                {subcategoriasSalasForm.map((s) => (
+                  <option key={s} value={s}>
+                    {traducirSubcategoria(s, lang)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
 
           <Field label={t('productManager.material')} name="material" value={form.material} onChange={handleChange} />
           <Field label={t('productManager.materialEn')} name="material_en" value={form.material_en} onChange={handleChange} />

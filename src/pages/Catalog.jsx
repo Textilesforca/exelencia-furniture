@@ -25,19 +25,25 @@ export default function Catalog() {
   }, [])
 
   const activa = searchParams.get('categoria') || 'Todos'
+  const subcategoria = searchParams.get('subcategoria') || ''
   const busqueda = searchParams.get('buscar') || ''
 
   const porCategoria =
     activa === 'Todos' ? productos : productos.filter((p) => p.categoria === activa)
 
+  const porSubcategoria =
+    subcategoria && subcategoria !== 'Todas las Salas'
+      ? porCategoria.filter((p) => p.subcategoria === subcategoria)
+      : porCategoria
+
   const textoBusqueda = busqueda.trim().toLowerCase()
   const filtrados = textoBusqueda
-    ? porCategoria.filter((p) =>
+    ? porSubcategoria.filter((p) =>
         [p.nombre, p.nombre_en, p.descripcion, p.descripcion_en]
           .filter(Boolean)
           .some((campo) => campo.toLowerCase().includes(textoBusqueda))
       )
-    : porCategoria
+    : porSubcategoria
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">

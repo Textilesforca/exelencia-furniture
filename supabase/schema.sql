@@ -302,3 +302,8 @@ alter table public.productos
   add column if not exists nombre_en text,
   add column if not exists descripcion_en text,
   add column if not exists material_en text;
+
+-- === Subcategoría de Salas (agregado 2026-07-21) ===
+
+alter table public.productos
+  add column if not exists subcategoria text;

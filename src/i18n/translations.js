@@ -52,6 +52,20 @@ export const translations = {
       Recámaras: 'Recámaras',
       'Piezas a medida': 'Piezas a medida',
     },
+    subcategoriasSalas: {
+      'Todas las Salas': 'Todas las Salas',
+      'Sala Modular': 'Sala Modular',
+      'Juego de Salas': 'Juego de Salas',
+      'Sala con reclinable': 'Sala con reclinable',
+      'Sofá 3 plazas': 'Sofá 3 plazas',
+      'Sofá 2 plazas': 'Sofá 2 plazas',
+      'Sala de Tela': 'Sala de Tela',
+      'Sala de Piel y Ecopiel': 'Sala de Piel y Ecopiel',
+      'Sofá Camas': 'Sofá Camas',
+      Sillones: 'Sillones',
+      Taburetes: 'Taburetes',
+      'Sillones Reclinables': 'Sillones Reclinables',
+    },
     productCard: {
       fichaTecnica: 'Ficha técnica',
       ancho: 'Ancho',
@@ -168,6 +182,8 @@ export const translations = {
       nombre: 'Nombre',
       nombreEn: 'Nombre (inglés)',
       categoria: 'Categoría',
+      subcategoria: 'Subcategoría',
+      sinSubcategoria: 'Sin subcategoría',
       material: 'Material',
       materialEn: 'Material (inglés)',
       anchoCm: 'Ancho (cm)',
@@ -281,6 +297,20 @@ export const translations = {
       Comedores: 'Dining Rooms',
       Recámaras: 'Bedrooms',
       'Piezas a medida': 'Custom Pieces',
+    },
+    subcategoriasSalas: {
+      'Todas las Salas': 'All Living Rooms',
+      'Sala Modular': 'Modular Living Room',
+      'Juego de Salas': 'Living Room Set',
+      'Sala con reclinable': 'Reclining Living Room',
+      'Sofá 3 plazas': '3-Seat Sofa',
+      'Sofá 2 plazas': '2-Seat Sofa',
+      'Sala de Tela': 'Fabric Living Room',
+      'Sala de Piel y Ecopiel': 'Leather & Faux Leather Living Room',
+      'Sofá Camas': 'Sofa Beds',
+      Sillones: 'Armchairs',
+      Taburetes: 'Stools',
+      'Sillones Reclinables': 'Recliners',
     },
     productCard: {
       fichaTecnica: 'Specs',
@@ -398,6 +428,8 @@ export const translations = {
       nombre: 'Name',
       nombreEn: 'Name (English)',
       categoria: 'Category',
+      subcategoria: 'Subcategory',
+      sinSubcategoria: 'No subcategory',
       material: 'Material',
       materialEn: 'Material (English)',
       anchoCm: 'Width (cm)',
@@ -462,6 +494,10 @@ export const translations = {
 
 export function traducirCategoria(categoria, lang) {
   return translations[lang]?.categorias?.[categoria] ?? categoria
+}
+
+export function traducirSubcategoria(subcategoria, lang) {
+  return translations[lang]?.subcategoriasSalas?.[subcategoria] ?? subcategoria
 }
 
 export function campoTraducido(producto, campo, lang) {
