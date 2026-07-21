@@ -19,7 +19,7 @@ export default function Home() {
         <BlueprintDivider label={t('home.destacadas')} />
       </section>
 
-      <section className="max-w-6xl mx-auto px-6 pb-20 grid sm:grid-cols-3 gap-6">
+      <section className="max-w-6xl mx-auto px-6 pb-20 grid gap-4">
         {destacados.map((p) => (
           <ProductCard key={p.id} producto={p} />
         ))}

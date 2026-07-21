@@ -56,7 +56,7 @@ export default function Catalog() {
       ) : filtrados.length === 0 ? (
         <p className="font-mono text-sm text-muted mt-8">{t('catalog.vacio')}</p>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div className="grid gap-4 mt-8">
           {filtrados.map((p) => (
             <ProductCard key={p.id} producto={p} />
           ))}

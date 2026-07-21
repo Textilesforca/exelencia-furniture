@@ -109,6 +109,7 @@ export const translations = {
       alto: 'Alto',
       fondo: 'Fondo',
       desde: 'Desde',
+      disponibleEn: 'Disponible en:',
     },
     productDetail: {
       cargando: 'Cargando pieza…',
@@ -396,6 +397,7 @@ export const translations = {
       alto: 'Height',
       fondo: 'Depth',
       desde: 'From',
+      disponibleEn: 'Available in:',
     },
     productDetail: {
       cargando: 'Loading piece…',

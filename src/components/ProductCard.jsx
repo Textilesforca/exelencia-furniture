@@ -10,52 +10,58 @@ export default function ProductCard({ producto }) {
   return (
     <Link
       to={`/catalogo/${producto.id}`}
-      className="group block bg-surface border border-line rounded-sm overflow-hidden hover:border-brass/60 transition-colors"
+      className="group flex flex-col sm:flex-row bg-surface border border-line rounded-sm overflow-hidden hover:border-brass/60 transition-colors"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-surface2">
+      <div className="relative w-full sm:w-56 aspect-[4/3] sm:aspect-square shrink-0 overflow-hidden bg-surface2">
         <img
           src={producto.imagen}
           alt={nombre}
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-ink/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-          <p className="font-mono text-[11px] tracking-widest text-brass uppercase mb-2">{t('productCard.fichaTecnica')}</p>
-          <div className="grid grid-cols-3 gap-2 font-mono text-xs text-parchment/90">
-            <div>
-              <p className="text-muted">{t('productCard.ancho')}</p>
-              <p>{producto.ancho} cm</p>
-            </div>
-            <div>
-              <p className="text-muted">{t('productCard.alto')}</p>
-              <p>{producto.alto} cm</p>
-            </div>
-            <div>
-              <p className="text-muted">{t('productCard.fondo')}</p>
-              <p>{producto.profundidad} cm</p>
-            </div>
-          </div>
-        </div>
       </div>
-      <div className="p-4">
+
+      <div className="p-5 flex-1 min-w-0">
         <p className="font-mono text-[10px] tracking-widest text-brass uppercase">
           {traducirCategoria(producto.categoria, lang)}
         </p>
         <h3 className="font-display text-xl text-parchment mt-1">{nombre}</h3>
         <p className="text-sm text-muted mt-1">{material}</p>
-        <p className="font-mono text-sm text-walnut2 mt-3">
+
+        <div className="grid grid-cols-3 gap-2 font-mono text-xs text-parchment/80 mt-4 max-w-xs">
+          <div>
+            <p className="text-muted">{t('productCard.ancho')}</p>
+            <p>{producto.ancho} cm</p>
+          </div>
+          <div>
+            <p className="text-muted">{t('productCard.alto')}</p>
+            <p>{producto.alto} cm</p>
+          </div>
+          <div>
+            <p className="text-muted">{t('productCard.fondo')}</p>
+            <p>{producto.profundidad} cm</p>
+          </div>
+        </div>
+
+        <p className="font-mono text-sm text-walnut2 mt-4">
           {t('productCard.desde')} ${Number(producto.precio_desde).toLocaleString('en-US')} USD
         </p>
+
         {producto.colores?.length > 0 && (
-          <div className="flex items-center gap-1.5 mt-3">
-            {producto.colores.map((color) => (
-              <span
-                key={color.nombre}
-                title={color.nombre}
-                style={{ backgroundColor: color.hex }}
-                className="w-4 h-4 rounded-full border border-line"
-              />
-            ))}
+          <div className="mt-3">
+            <p className="font-mono text-[10px] tracking-widest text-muted uppercase mb-1.5">
+              {t('productCard.disponibleEn')}
+            </p>
+            <div className="flex items-center gap-1.5">
+              {producto.colores.map((color) => (
+                <span
+                  key={color.nombre}
+                  title={color.nombre}
+                  style={{ backgroundColor: color.hex }}
+                  className="w-4 h-4 rounded-full border border-line"
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
