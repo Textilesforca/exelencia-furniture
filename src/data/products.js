@@ -105,7 +105,26 @@ export const subcategoriasComedores = [
   'Comedores de jardín',
 ]
 
+export const subcategoriasRecamaras = [
+  'Todas las recámaras',
+  'Recámara 3 piezas',
+  'Recámara 4 piezas',
+  'Recámara 5 piezas',
+  'Camas',
+  'Cabeceras',
+  'Bases para Cama',
+  'Burós',
+  'Cajoneras',
+  'Armario o Clóset',
+  'Baúl o Pie de cama',
+  'Muebles de T.V',
+  'Espejos para Recámara',
+  'Set cajonera y espejo',
+  'Iluminación',
+]
+
 export const subcategoriasPorCategoria = {
   Salas: subcategoriasSalas,
   Comedores: subcategoriasComedores,
+  Recámaras: subcategoriasRecamaras,
 }
