@@ -91,3 +91,21 @@ export const subcategoriasSalas = [
   'Taburetes',
   'Sillones Reclinables',
 ]
+
+export const subcategoriasComedores = [
+  'Todos los comedores',
+  'Mesa + 4 sillas',
+  'Mesa + 6 sillas',
+  'Mesa de Comedor',
+  'Bar',
+  'Sillas',
+  'Bancas',
+  'Bancos',
+  'Aparador & Vitrina',
+  'Comedores de jardín',
+]
+
+export const subcategoriasPorCategoria = {
+  Salas: subcategoriasSalas,
+  Comedores: subcategoriasComedores,
+}

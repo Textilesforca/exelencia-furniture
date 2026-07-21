@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import { traducirCategoria, traducirSubcategoria } from '../i18n/translations'
-import { categorias, subcategoriasSalas } from '../data/products'
+import { categorias, subcategoriasPorCategoria } from '../data/products'
 
 const categoriasNav = categorias.filter((c) => c !== 'Todos')
 
@@ -10,7 +10,7 @@ export default function Navbar() {
   const { lang, setLang, t } = useLanguage()
   const navigate = useNavigate()
   const [busqueda, setBusqueda] = useState('')
-  const [salasAbierto, setSalasAbierto] = useState(false)
+  const [categoriaAbierta, setCategoriaAbierta] = useState(null)
 
   const links = [
     { to: '/', label: t('navbar.inicio') },
@@ -24,6 +24,8 @@ export default function Navbar() {
     if (busqueda.trim()) params.set('buscar', busqueda.trim())
     navigate(`/catalogo${params.toString() ? `?${params.toString()}` : ''}`)
   }
+
+  const subcategoriasActivas = categoriaAbierta ? subcategoriasPorCategoria[categoriaAbierta] : null
 
   return (
     <header className="relative sticky top-0 z-40 bg-ink/90 backdrop-blur border-b border-line">
@@ -97,14 +99,17 @@ export default function Navbar() {
         <div className="relative max-w-6xl mx-auto px-6">
           <ul className="h-12 flex items-center gap-6 overflow-x-auto font-mono text-xs uppercase tracking-widest text-parchment/70">
             {categoriasNav.map((cat) =>
-              cat === 'Salas' ? (
+              subcategoriasPorCategoria[cat] ? (
                 <li
                   key={cat}
                   className="h-full flex items-center shrink-0"
-                  onMouseEnter={() => setSalasAbierto(true)}
-                  onMouseLeave={() => setSalasAbierto(false)}
+                  onMouseEnter={() => setCategoriaAbierta(cat)}
+                  onMouseLeave={() => setCategoriaAbierta(null)}
                 >
-                  <Link to="/catalogo?categoria=Salas" className="hover:text-brass transition-colors">
+                  <Link
+                    to={`/catalogo?categoria=${encodeURIComponent(cat)}`}
+                    className="hover:text-brass transition-colors"
+                  >
                     {traducirCategoria(cat, lang)}
                   </Link>
                 </li>
@@ -131,21 +136,29 @@ export default function Navbar() {
             </li>
           </ul>
 
-          {salasAbierto && (
+          {subcategoriasActivas && (
             <div
-              onMouseEnter={() => setSalasAbierto(true)}
-              onMouseLeave={() => setSalasAbierto(false)}
+              onMouseEnter={() => setCategoriaAbierta(categoriaAbierta)}
+              onMouseLeave={() => setCategoriaAbierta(null)}
               className="absolute left-0 top-full pt-1 z-50"
             >
-              <div className="bg-surface border border-brass/40 rounded-sm shadow-lg px-5 py-4 grid grid-cols-2 gap-x-6 gap-y-1 w-[360px]">
-                {subcategoriasSalas.map((sub) => (
+              <div
+                className={`bg-surface border border-brass/40 rounded-sm shadow-lg px-5 py-4 grid gap-x-6 gap-y-1 ${
+                  subcategoriasActivas.length > 12 ? 'grid-cols-3 w-[520px]' : 'grid-cols-2 w-[360px]'
+                }`}
+              >
+                {subcategoriasActivas.map((sub) => (
                   <Link
                     key={sub}
-                    to={`/catalogo?categoria=Salas&subcategoria=${encodeURIComponent(sub)}`}
-                    onClick={() => setSalasAbierto(false)}
+                    to={
+                      sub === subcategoriasActivas[0]
+                        ? `/catalogo?categoria=${encodeURIComponent(categoriaAbierta)}`
+                        : `/catalogo?categoria=${encodeURIComponent(categoriaAbierta)}&subcategoria=${encodeURIComponent(sub)}`
+                    }
+                    onClick={() => setCategoriaAbierta(null)}
                     className="font-body normal-case tracking-normal text-xs text-parchment/80 hover:text-brass transition-colors py-1"
                   >
-                    {traducirSubcategoria(sub, lang)}
+                    {traducirSubcategoria(sub, lang, categoriaAbierta)}
                   </Link>
                 ))}
               </div>

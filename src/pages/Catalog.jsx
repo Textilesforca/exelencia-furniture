@@ -31,10 +31,9 @@ export default function Catalog() {
   const porCategoria =
     activa === 'Todos' ? productos : productos.filter((p) => p.categoria === activa)
 
-  const porSubcategoria =
-    subcategoria && subcategoria !== 'Todas las Salas'
-      ? porCategoria.filter((p) => p.subcategoria === subcategoria)
-      : porCategoria
+  const porSubcategoria = subcategoria
+    ? porCategoria.filter((p) => p.subcategoria === subcategoria)
+    : porCategoria
 
   const textoBusqueda = busqueda.trim().toLowerCase()
   const filtrados = textoBusqueda

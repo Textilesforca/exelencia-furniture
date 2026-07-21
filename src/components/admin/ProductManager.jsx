@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
-import { categorias, subcategoriasSalas } from '../../data/products'
+import { categorias, subcategoriasPorCategoria } from '../../data/products'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { traducirCategoria, traducirSubcategoria } from '../../i18n/translations'
 
 const categoriasForm = categorias.filter((c) => c !== 'Todos')
-const subcategoriasSalasForm = subcategoriasSalas.filter((s) => s !== 'Todas las Salas')
 
 const estadoInicial = {
   nombre: '',
@@ -105,7 +104,7 @@ export default function ProductManager() {
     const payload = {
       nombre: form.nombre,
       categoria: form.categoria,
-      subcategoria: form.categoria === 'Salas' ? form.subcategoria || null : null,
+      subcategoria: subcategoriasPorCategoria[form.categoria] ? form.subcategoria || null : null,
       material: form.material,
       ancho: form.ancho ? Number(form.ancho) : null,
       alto: form.alto ? Number(form.alto) : null,
@@ -156,7 +155,7 @@ export default function ProductManager() {
             </select>
           </label>
 
-          {form.categoria === 'Salas' && (
+          {subcategoriasPorCategoria[form.categoria] && (
             <label className="block">
               <span className="font-mono text-[11px] tracking-widest text-muted uppercase">
                 {t('productManager.subcategoria')}
@@ -168,9 +167,9 @@ export default function ProductManager() {
                 className="mt-2 w-full bg-surface border border-line rounded-sm px-4 py-3 text-parchment focus:border-brass outline-none transition-colors"
               >
                 <option value="">{t('productManager.sinSubcategoria')}</option>
-                {subcategoriasSalasForm.map((s) => (
+                {subcategoriasPorCategoria[form.categoria].slice(1).map((s) => (
                   <option key={s} value={s}>
-                    {traducirSubcategoria(s, lang)}
+                    {traducirSubcategoria(s, lang, form.categoria)}
                   </option>
                 ))}
               </select>
