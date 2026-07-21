@@ -99,7 +99,7 @@ export default function Navbar() {
             cat === 'Salas' ? (
               <li
                 key={cat}
-                className="shrink-0"
+                className="h-full flex items-center shrink-0"
                 onMouseEnter={() => setSalasAbierto(true)}
                 onMouseLeave={() => setSalasAbierto(false)}
               >
@@ -135,15 +135,15 @@ export default function Navbar() {
         <div
           onMouseEnter={() => setSalasAbierto(true)}
           onMouseLeave={() => setSalasAbierto(false)}
-          className="absolute left-0 right-0 top-full bg-surface border-b border-brass/40 shadow-lg z-50"
+          className="absolute left-0 top-full pl-6 pt-1 z-50"
         >
-          <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-2 gap-x-12 gap-y-3">
+          <div className="bg-surface border border-brass/40 rounded-sm shadow-lg px-5 py-4 grid grid-cols-2 gap-x-6 gap-y-1 w-[360px]">
             {subcategoriasSalas.map((sub) => (
               <Link
                 key={sub}
                 to={`/catalogo?categoria=Salas&subcategoria=${encodeURIComponent(sub)}`}
                 onClick={() => setSalasAbierto(false)}
-                className="font-body normal-case tracking-normal text-sm text-parchment/80 hover:text-brass transition-colors"
+                className="font-body normal-case tracking-normal text-xs text-parchment/80 hover:text-brass transition-colors py-1"
               >
                 {traducirSubcategoria(sub, lang)}
               </Link>
