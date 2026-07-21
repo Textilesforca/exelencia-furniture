@@ -17,6 +17,8 @@ const estadoInicial = {
   precio_desde: '',
   descripcion: '',
   imagen: '',
+  imagenes: [],
+  colores: [],
 }
 
 export default function ProductManager() {
@@ -26,6 +28,7 @@ export default function ProductManager() {
   const [form, setForm] = useState(estadoInicial)
   const [editandoId, setEditandoId] = useState(null)
   const [archivo, setArchivo] = useState(null)
+  const [archivosGaleria, setArchivosGaleria] = useState([])
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
 
@@ -57,8 +60,11 @@ export default function ProductManager() {
       precio_desde: producto.precio_desde ?? '',
       descripcion: producto.descripcion ?? '',
       imagen: producto.imagen ?? '',
+      imagenes: producto.imagenes ?? [],
+      colores: producto.colores ?? [],
     })
     setArchivo(null)
+    setArchivosGaleria([])
     setError('')
   }
 
@@ -66,7 +72,25 @@ export default function ProductManager() {
     setEditandoId(null)
     setForm(estadoInicial)
     setArchivo(null)
+    setArchivosGaleria([])
     setError('')
+  }
+
+  function handleAgregarColor() {
+    setForm({ ...form, colores: [...form.colores, { nombre: '', hex: '#8B5A2B' }] })
+  }
+
+  function handleColorChange(index, campo, valor) {
+    const colores = form.colores.map((c, i) => (i === index ? { ...c, [campo]: valor } : c))
+    setForm({ ...form, colores })
+  }
+
+  function handleQuitarColor(index) {
+    setForm({ ...form, colores: form.colores.filter((_, i) => i !== index) })
+  }
+
+  function handleQuitarFotoGaleria(index) {
+    setForm({ ...form, imagenes: form.imagenes.filter((_, i) => i !== index) })
   }
 
   async function handleEliminar(id) {
@@ -101,6 +125,28 @@ export default function ProductManager() {
       imagenUrl = publicUrlData.publicUrl
     }
 
+    let imagenesGaleria = form.imagenes
+
+    if (archivosGaleria.length > 0) {
+      const urlsNuevas = []
+      for (const archivoGaleria of archivosGaleria) {
+        const ruta = `${Date.now()}-${archivoGaleria.name}`
+        const { error: uploadError } = await supabase.storage
+          .from('productos-imagenes')
+          .upload(ruta, archivoGaleria)
+
+        if (uploadError) {
+          setError('No se pudo subir una foto de la galería: ' + uploadError.message)
+          setGuardando(false)
+          return
+        }
+
+        const { data: publicUrlData } = supabase.storage.from('productos-imagenes').getPublicUrl(ruta)
+        urlsNuevas.push(publicUrlData.publicUrl)
+      }
+      imagenesGaleria = [...form.imagenes, ...urlsNuevas]
+    }
+
     const payload = {
       nombre: form.nombre,
       categoria: form.categoria,
@@ -112,6 +158,8 @@ export default function ProductManager() {
       precio_desde: form.precio_desde ? Number(form.precio_desde) : null,
       descripcion: form.descripcion,
       imagen: imagenUrl,
+      imagenes: imagenesGaleria,
+      colores: form.colores.filter((c) => c.nombre.trim()),
     }
 
     const { error: guardarError } = editandoId
@@ -210,6 +258,74 @@ export default function ProductManager() {
               />
             )}
           </label>
+
+          <label className="block">
+            <span className="font-mono text-[11px] tracking-widest text-muted uppercase">
+              {t('productManager.galeria')}
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => setArchivosGaleria(Array.from(e.target.files ?? []))}
+              className="mt-2 w-full text-sm text-parchment file:mr-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:bg-brass file:text-ink file:font-medium"
+            />
+            {form.imagenes.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {form.imagenes.map((url, i) => (
+                  <div key={url} className="relative">
+                    <img src={url} alt="" className="h-16 w-16 object-cover rounded-sm border border-line" />
+                    <button
+                      type="button"
+                      onClick={() => handleQuitarFotoGaleria(i)}
+                      className="absolute -top-2 -right-2 bg-ink border border-line rounded-full w-5 h-5 text-xs text-red-400 leading-none"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </label>
+
+          <div>
+            <span className="font-mono text-[11px] tracking-widest text-muted uppercase">
+              {t('productManager.colores')}
+            </span>
+            <div className="mt-2 grid gap-3">
+              {form.colores.map((color, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={color.hex}
+                    onChange={(e) => handleColorChange(i, 'hex', e.target.value)}
+                    className="w-10 h-10 rounded-sm border border-line bg-surface"
+                  />
+                  <input
+                    type="text"
+                    value={color.nombre}
+                    onChange={(e) => handleColorChange(i, 'nombre', e.target.value)}
+                    placeholder={t('productManager.colorNombrePlaceholder')}
+                    className="flex-1 bg-surface border border-line rounded-sm px-4 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleQuitarColor(i)}
+                    className="font-mono text-xs uppercase tracking-widest text-red-400 hover:underline shrink-0"
+                  >
+                    {t('productManager.eliminar')}
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={handleAgregarColor}
+              className="mt-3 font-mono text-xs uppercase tracking-widest text-brass hover:underline"
+            >
+              {t('productManager.agregarColor')}
+            </button>
+          </div>
 
           {error && <p className="text-sm text-red-400">{error}</p>}
 

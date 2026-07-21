@@ -3,11 +3,13 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import { traducirCategoria, traducirSubcategoria } from '../i18n/translations'
 import { categorias, subcategoriasPorCategoria } from '../data/products'
+import { useCart } from '../cart/CartContext'
 
 const categoriasNav = categorias.filter((c) => c !== 'Todos')
 
 export default function Navbar() {
   const { lang, setLang, t } = useLanguage()
+  const { total } = useCart()
   const navigate = useNavigate()
   const [busqueda, setBusqueda] = useState('')
   const [categoriaAbierta, setCategoriaAbierta] = useState(null)
@@ -78,13 +80,18 @@ export default function Navbar() {
             {t('idioma.cambiarA')}
           </button>
 
-          <span aria-label={t('navbar.carritoAria')} className="text-parchment/50">
+          <Link to="/carrito" aria-label={t('navbar.carritoAria')} className="relative text-parchment/80 hover:text-brass transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-5 h-5">
               <circle cx="9" cy="20" r="1.2" fill="currentColor" stroke="none" />
               <circle cx="18" cy="20" r="1.2" fill="currentColor" stroke="none" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.5 3h2l2.2 11.2a2 2 0 002 1.6h8.6a2 2 0 002-1.6L21 7H6" />
             </svg>
-          </span>
+            {total > 0 && (
+              <span className="absolute -top-2 -right-2 bg-brass text-ink text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center">
+                {total}
+              </span>
+            )}
+          </Link>
 
           <Link
             to="/contacto"

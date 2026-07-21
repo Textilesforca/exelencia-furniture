@@ -300,3 +300,9 @@ grant execute on function public.get_cotizacion_pago_by_session(text) to anon, a
 
 alter table public.productos
   add column if not exists subcategoria text;
+
+-- === Colores y galería de fotos (agregado 2026-07-21) ===
+
+alter table public.productos
+  add column if not exists colores jsonb default '[]'::jsonb,
+  add column if not exists imagenes text[] default '{}';

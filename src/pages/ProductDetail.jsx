@@ -6,15 +6,21 @@ import BlueprintDivider from '../components/BlueprintDivider'
 import ImageLightbox from '../components/ImageLightbox'
 import { useLanguage } from '../i18n/LanguageContext'
 import { traducirCategoria } from '../i18n/translations'
+import { useCart } from '../cart/CartContext'
 
 export default function ProductDetail() {
   const { id } = useParams()
   const { lang, t } = useLanguage()
+  const { agregar } = useCart()
   const [producto, setProducto] = useState(() => sampleProducts.find((p) => p.id === id))
   const [cargando, setCargando] = useState(!producto)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [comprando, setComprando] = useState(false)
   const [errorCompra, setErrorCompra] = useState('')
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(null)
+  const [colorSeleccionado, setColorSeleccionado] = useState(null)
+  const [cantidad, setCantidad] = useState(1)
+  const [agregado, setAgregado] = useState(false)
 
   useEffect(() => {
     if (producto) return
@@ -25,6 +31,13 @@ export default function ProductDetail() {
     }
     cargar()
   }, [id, producto])
+
+  useEffect(() => {
+    if (!producto) return
+    setImagenSeleccionada(producto.imagen)
+    setColorSeleccionado(producto.colores?.[0]?.nombre ?? null)
+    setCantidad(1)
+  }, [producto])
 
   async function handleComprar() {
     setComprando(true)
@@ -50,6 +63,12 @@ export default function ProductDetail() {
     window.location.assign(data.url)
   }
 
+  function handleAgregarCarrito() {
+    agregar(producto, cantidad, colorSeleccionado)
+    setAgregado(true)
+    setTimeout(() => setAgregado(false), 2000)
+  }
+
   if (cargando) {
     return <p className="max-w-6xl mx-auto px-6 py-16 font-mono text-sm text-muted">{t('productDetail.cargando')}</p>
   }
@@ -69,22 +88,42 @@ export default function ProductDetail() {
   const nombre = producto.nombre
   const material = producto.material
   const descripcion = producto.descripcion
+  const galeria = [producto.imagen, ...(producto.imagenes ?? [])].filter(Boolean)
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16 grid sm:grid-cols-2 gap-12">
-      <div className="aspect-[4/3] bg-surface2 rounded-sm overflow-hidden">
-        <button
-          type="button"
-          onClick={() => setLightboxOpen(true)}
-          className="w-full h-full cursor-zoom-in"
-        >
-          <img src={producto.imagen} alt={nombre} className="w-full h-full object-cover" />
-        </button>
+      <div>
+        <div className="aspect-[4/3] bg-surface2 rounded-sm overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setLightboxOpen(true)}
+            className="w-full h-full cursor-zoom-in"
+          >
+            <img src={imagenSeleccionada} alt={nombre} className="w-full h-full object-cover" />
+          </button>
+        </div>
+
+        {galeria.length > 1 && (
+          <div className="flex gap-3 mt-4">
+            {galeria.map((url, i) => (
+              <button
+                key={url + i}
+                type="button"
+                onClick={() => setImagenSeleccionada(url)}
+                className={`w-16 h-16 rounded-sm overflow-hidden border transition-colors ${
+                  imagenSeleccionada === url ? 'border-brass' : 'border-line hover:border-brass/60'
+                }`}
+              >
+                <img src={url} alt="" className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <ImageLightbox
         open={lightboxOpen}
-        src={producto.imagen}
+        src={imagenSeleccionada}
         alt={nombre}
         onClose={() => setLightboxOpen(false)}
       />
@@ -97,6 +136,29 @@ export default function ProductDetail() {
         <p className="text-muted mt-3">{material}</p>
         <p className="text-parchment/80 mt-6">{descripcion}</p>
 
+        {producto.colores?.length > 0 && (
+          <div className="mt-6">
+            <p className="font-mono text-[11px] tracking-widest text-muted uppercase mb-2">
+              {t('productDetail.color')}
+              {colorSeleccionado ? `: ${colorSeleccionado}` : ''}
+            </p>
+            <div className="flex items-center gap-2">
+              {producto.colores.map((color) => (
+                <button
+                  key={color.nombre}
+                  type="button"
+                  onClick={() => setColorSeleccionado(color.nombre)}
+                  title={color.nombre}
+                  style={{ backgroundColor: color.hex }}
+                  className={`w-7 h-7 rounded-full border-2 transition-colors ${
+                    colorSeleccionado === color.nombre ? 'border-brass' : 'border-transparent hover:border-line'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="my-8">
           <BlueprintDivider label={t('productDetail.fichaTecnica')} />
         </div>
@@ -107,9 +169,32 @@ export default function ProductDetail() {
           <Dimension label={t('productDetail.fondo')} valor={producto.profundidad} />
         </div>
 
-        <p className="font-mono text-lg text-walnut2 mb-8">
+        <p className="font-mono text-lg text-walnut2 mb-6">
           {t('productDetail.desde')} ${Number(producto.precio_desde).toLocaleString('en-US')} USD
         </p>
+
+        <div className="flex items-center gap-4 mb-6">
+          <span className="font-mono text-[11px] tracking-widest text-muted uppercase">
+            {t('productDetail.cantidad')}
+          </span>
+          <div className="flex items-center border border-line rounded-sm">
+            <button
+              type="button"
+              onClick={() => setCantidad((c) => Math.max(1, c - 1))}
+              className="w-9 h-9 text-parchment hover:text-brass transition-colors"
+            >
+              −
+            </button>
+            <span className="w-10 text-center font-mono text-parchment">{cantidad}</span>
+            <button
+              type="button"
+              onClick={() => setCantidad((c) => c + 1)}
+              className="w-9 h-9 text-parchment hover:text-brass transition-colors"
+            >
+              +
+            </button>
+          </div>
+        </div>
 
         {errorCompra && <p className="text-sm text-red-400 mb-3">{errorCompra}</p>}
 
@@ -117,13 +202,21 @@ export default function ProductDetail() {
           {esProductoReal && (
             <button
               type="button"
+              onClick={handleAgregarCarrito}
+              className="inline-block border border-brass text-brass font-body font-medium px-6 py-3 rounded-sm hover:bg-brass hover:text-ink transition-colors"
+            >
+              {agregado ? t('productDetail.agregado') : t('productDetail.agregarCarrito')}
+            </button>
+          )}
+
+          {esProductoReal && (
+            <button
+              type="button"
               onClick={handleComprar}
               disabled={comprando}
               className="inline-block bg-brass text-ink font-body font-medium px-6 py-3 rounded-sm hover:bg-walnut2 transition-colors disabled:opacity-50"
             >
-              {comprando
-                ? t('productDetail.redirigiendo')
-                : `${t('productDetail.comprar')} — $${Number(producto.precio_desde).toLocaleString('en-US')} USD (${t('productDetail.medidaEstandar')})`}
+              {comprando ? t('productDetail.redirigiendo') : t('productDetail.comprar')}
             </button>
           )}
 

@@ -46,6 +46,18 @@ export default function ProductCard({ producto }) {
         <p className="font-mono text-sm text-walnut2 mt-3">
           {t('productCard.desde')} ${Number(producto.precio_desde).toLocaleString('en-US')} USD
         </p>
+        {producto.colores?.length > 0 && (
+          <div className="flex items-center gap-1.5 mt-3">
+            {producto.colores.map((color) => (
+              <span
+                key={color.nombre}
+                title={color.nombre}
+                style={{ backgroundColor: color.hex }}
+                className="w-4 h-4 rounded-full border border-line"
+              />
+            ))}
+          </div>
+        )}
       </div>
     </Link>
   )
