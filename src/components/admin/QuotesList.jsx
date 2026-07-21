@@ -112,7 +112,7 @@ export default function QuotesList() {
           <div className="mt-4 border-t border-line pt-4">
             {c.anticipo_estado === 'pagado' ? (
               <p className="font-mono text-xs uppercase tracking-widest text-brass">
-                {t('quotesList.anticipoRecibido')} ${Number(c.anticipo_monto).toLocaleString('es-MX')} MXN
+                {t('quotesList.anticipoRecibido')} ${Number(c.anticipo_monto).toLocaleString('en-US')} USD
               </p>
             ) : (
               <div className="flex flex-wrap items-center gap-3">

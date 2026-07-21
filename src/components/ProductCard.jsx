@@ -44,7 +44,7 @@ export default function ProductCard({ producto }) {
         <h3 className="font-display text-xl text-parchment mt-1">{nombre}</h3>
         <p className="text-sm text-muted mt-1">{material}</p>
         <p className="font-mono text-sm text-walnut2 mt-3">
-          {t('productCard.desde')} ${Number(producto.precio_desde).toLocaleString('es-MX')} MXN
+          {t('productCard.desde')} ${Number(producto.precio_desde).toLocaleString('en-US')} USD
         </p>
       </div>
     </Link>

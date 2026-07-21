@@ -80,7 +80,7 @@ export default function Banner() {
           </p>
           <h2 className="font-display text-3xl sm:text-4xl text-parchment mb-4">{nombre}</h2>
           <p className="font-mono text-lg text-walnut2 mb-8">
-            {t('productCard.desde')} ${Number(producto.precio_desde).toLocaleString('es-MX')} MXN
+            {t('productCard.desde')} ${Number(producto.precio_desde).toLocaleString('en-US')} USD
           </p>
           <Link
             to={`/catalogo/${producto.id}`}

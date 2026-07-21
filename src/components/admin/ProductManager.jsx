@@ -18,7 +18,6 @@ const estadoInicial = {
   profundidad: '',
   precio_desde: '',
   descripcion: '',
-  descripcion_en: '',
   imagen: '',
 }
 
@@ -60,7 +59,6 @@ export default function ProductManager() {
       profundidad: producto.profundidad ?? '',
       precio_desde: producto.precio_desde ?? '',
       descripcion: producto.descripcion ?? '',
-      descripcion_en: producto.descripcion_en ?? '',
       imagen: producto.imagen ?? '',
     })
     setArchivo(null)
@@ -117,7 +115,6 @@ export default function ProductManager() {
       profundidad: form.profundidad ? Number(form.profundidad) : null,
       precio_desde: form.precio_desde ? Number(form.precio_desde) : null,
       descripcion: form.descripcion,
-      descripcion_en: form.descripcion_en || null,
       imagen: imagenUrl,
     }
 
@@ -201,7 +198,6 @@ export default function ProductManager() {
           />
 
           <Field as="textarea" label={t('productManager.descripcion')} name="descripcion" value={form.descripcion} onChange={handleChange} />
-          <Field as="textarea" label={t('productManager.descripcionEn')} name="descripcion_en" value={form.descripcion_en} onChange={handleChange} />
 
           <label className="block">
             <span className="font-mono text-[11px] tracking-widest text-muted uppercase">{t('productManager.imagen')}</span>

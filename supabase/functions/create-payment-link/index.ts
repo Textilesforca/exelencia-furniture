@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
     line_items: [
       {
         price_data: {
-          currency: 'mxn',
+          currency: 'usd',
           unit_amount: montoCentavos,
           product_data: {
             name: `Anticipo — ${cotizacion.nombre}`,

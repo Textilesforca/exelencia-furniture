@@ -108,7 +108,7 @@ export default function ProductDetail() {
         </div>
 
         <p className="font-mono text-lg text-walnut2 mb-8">
-          {t('productDetail.desde')} ${Number(producto.precio_desde).toLocaleString('es-MX')} MXN
+          {t('productDetail.desde')} ${Number(producto.precio_desde).toLocaleString('en-US')} USD
         </p>
 
         {errorCompra && <p className="text-sm text-red-400 mb-3">{errorCompra}</p>}
@@ -123,7 +123,7 @@ export default function ProductDetail() {
             >
               {comprando
                 ? t('productDetail.redirigiendo')
-                : `${t('productDetail.comprar')} — $${Number(producto.precio_desde).toLocaleString('es-MX')} (${t('productDetail.medidaEstandar')})`}
+                : `${t('productDetail.comprar')} — $${Number(producto.precio_desde).toLocaleString('en-US')} USD (${t('productDetail.medidaEstandar')})`}
             </button>
           )}
 

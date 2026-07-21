@@ -37,7 +37,7 @@ export default function PaymentSuccess() {
       ) : resultado ? (
         <div className="font-mono text-sm text-parchment/90 space-y-2">
           <p>{resultado.nombre_producto ?? resultado.nombre}</p>
-          <p className="text-walnut2">${Number(resultado.monto).toLocaleString('es-MX')} MXN</p>
+          <p className="text-walnut2">${Number(resultado.monto).toLocaleString('en-US')} USD</p>
           <p className="text-muted uppercase tracking-widest text-xs">
             {t('paymentSuccess.estado')}: {resultado.estado}
           </p>
