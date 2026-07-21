@@ -104,6 +104,16 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+          <li className="shrink-0">
+            <Link to="/entrega" className="hover:text-brass transition-colors">
+              {t('navbar.delivery')}
+            </Link>
+          </li>
+          <li className="shrink-0">
+            <Link to="/contacto" className="hover:text-brass transition-colors">
+              {t('navbar.contactUs')}
+            </Link>
+          </li>
         </ul>
       </div>
     </header>

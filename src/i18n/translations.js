@@ -6,6 +6,8 @@ export const translations = {
       cotizar: 'Cotizar',
       buscarPlaceholder: 'Busca aquí por todo el catálogo…',
       carritoAria: 'Carrito (próximamente)',
+      delivery: 'Entrega y recolección',
+      contactUs: 'Contáctanos',
     },
     banner: {
       boton: 'Ver esta pieza',
@@ -73,11 +75,41 @@ export const translations = {
     },
     lightbox: { cerrar: 'Cerrar ✕' },
     contact: {
-      kicker: 'Empecemos con un plano',
-      titulo: 'Cuéntanos qué mueble necesitas',
-      texto:
+      titulo: 'Contáctanos',
+      intro:
+        '¡El doble de buena vibra, el doble de ubicaciones! Visítanos en 14709 S Western Ave, Gardena, CA 90249. Gracias por tu interés, te responderemos lo antes posible. Si tienes una pregunta sobre un producto, por favor incluye el número de artículo. Gracias.',
+      losAngeles: 'Los Ángeles',
+      ontario: 'Ontario',
+      email: 'Escríbenos a:',
+      horario: 'Horario:',
+      horarioValor: 'Lun - Sáb: 10am - 7pm　　Dom: 10am - 4pm',
+      formTitulo: 'Cuéntanos qué mueble necesitas',
+      formTexto:
         'Cuanto más nos digas sobre el espacio, el uso diario y tus referencias, más preciso será el primer plano que te mostremos. Respondemos en menos de 24 horas.',
-      taller: 'Taller y showroom con cita previa',
+    },
+    delivery: {
+      titulo: 'Tus opciones de entrega',
+      intro: '¡Llévatelo hoy mismo! Con todo nuestro inventario de muebles y colchones en existencia.',
+      entregaTitulo: 'Entrega y ensamblaje',
+      entregaSubtitulo: 'Servicio completo de entrega desde $129',
+      entregaItems: [
+        'Colocación de la(s) pieza(s) en la habitación que elijas',
+        'Ensamblaje de todos los artículos',
+        'Retiro de cajas y escombros',
+        'Entrega el mismo día disponible en ciertas zonas para compras realizadas antes de las 12:00 pm',
+        'No incluye retiro o traslado de muebles existentes',
+        'Entrega máxima dentro de un radio de 100 millas desde la tienda',
+      ],
+      recoleccionTitulo: 'Recolección del cliente',
+      recoleccionSubtitulo: 'Recoge en nuestro almacén',
+      recoleccionItems: [
+        'Eliges tu fecha de recolección preferida al finalizar tu compra',
+        'Recolección el mismo día disponible',
+        'El pre-ensamblaje de muebles no está disponible',
+        'Solo la persona registrada en el pedido puede recoger sus artículos',
+        'Trae la siguiente documentación: impresión de tu recibo, identificación que coincida con la dirección de facturación, tarjeta de crédito + identificación correspondiente',
+        'Los horarios de recolección para clientes pueden variar',
+      ],
     },
     quoteForm: {
       exitoTitulo: 'Solicitud recibida',
@@ -204,6 +236,8 @@ export const translations = {
       cotizar: 'Get a Quote',
       buscarPlaceholder: 'Search the whole catalog…',
       carritoAria: 'Cart (coming soon)',
+      delivery: 'Delivery and Pickup',
+      contactUs: 'Contact Us',
     },
     banner: {
       boton: 'View this piece',
@@ -271,11 +305,41 @@ export const translations = {
     },
     lightbox: { cerrar: 'Close ✕' },
     contact: {
-      kicker: "Let's start with a drawing",
-      titulo: 'Tell us what furniture you need',
-      texto:
-        "The more you tell us about the space, daily use, and references, the more accurate the first drawing we show you will be. We respond within 24 hours.",
-      taller: 'Workshop and showroom by appointment',
+      titulo: 'Contact Us',
+      intro:
+        'Double the vibes, double the locations! Visit us 14709 S Western Ave Gardena CA 90249, Thank you for your inquiry. We will get back to you as soon as possible. If you have a question about a product, please include the item number. Thanks',
+      losAngeles: 'Los Angeles',
+      ontario: 'Ontario',
+      email: 'Email us at:',
+      horario: 'Store Hours:',
+      horarioValor: 'Mon - Sat: 10am - 7pm　　Sun: 10am - 4pm',
+      formTitulo: 'Tell us what furniture you need',
+      formTexto:
+        'The more you tell us about the space, daily use, and references, the more accurate the first drawing we show you will be. We respond within 24 hours.',
+    },
+    delivery: {
+      titulo: 'Your Delivery Options',
+      intro: 'Take it home today! With our entire inventory of in-stock furniture and mattresses!',
+      entregaTitulo: 'Delivery & Assembly',
+      entregaSubtitulo: 'Full Service Delivery Starting From $129',
+      entregaItems: [
+        'Placement of item(s) in room(s) of choice',
+        'Assembly of all items',
+        'Removal of all boxes and debris',
+        'Same day delivery available in certain areas for purchases made before 12:00pm',
+        'Does not include removal or moving of existing furniture',
+        'Max Delivery is 100 mile radius from store location',
+      ],
+      recoleccionTitulo: 'Customer Pick-up',
+      recoleccionSubtitulo: 'Pick-up At Our Warehouse',
+      recoleccionItems: [
+        'You will select your preferred pickup date at checkout',
+        'Same day pick-up is available',
+        'Pre-assembly of furniture is not available',
+        'Only the person listed on the order can pick up their items',
+        'Please bring the following documentation; a printout of your receipt, identification that matches the billing address listed, credit card + matching ID',
+        'Customer pick-up hours of operation may vary',
+      ],
     },
     quoteForm: {
       exitoTitulo: 'Request received',
