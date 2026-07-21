@@ -1,18 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
-import CategoryFilter from '../components/CategoryFilter'
 import BlueprintDivider from '../components/BlueprintDivider'
-import { sampleProducts, categorias } from '../data/products'
+import { sampleProducts } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Catalog() {
   const { t } = useLanguage()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const [productos, setProductos] = useState(sampleProducts)
-  const [activa, setActiva] = useState(searchParams.get('categoria') || 'Todos')
-  const [busqueda, setBusqueda] = useState(searchParams.get('buscar') || '')
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
@@ -27,18 +24,8 @@ export default function Catalog() {
     cargarProductos()
   }, [])
 
-  useEffect(() => {
-    setActiva(searchParams.get('categoria') || 'Todos')
-    setBusqueda(searchParams.get('buscar') || '')
-  }, [searchParams])
-
-  function handleCambiarCategoria(cat) {
-    setActiva(cat)
-    const params = new URLSearchParams(searchParams)
-    if (cat === 'Todos') params.delete('categoria')
-    else params.set('categoria', cat)
-    setSearchParams(params)
-  }
+  const activa = searchParams.get('categoria') || 'Todos'
+  const busqueda = searchParams.get('buscar') || ''
 
   const porCategoria =
     activa === 'Todos' ? productos : productos.filter((p) => p.categoria === activa)
@@ -59,16 +46,12 @@ export default function Catalog() {
 
       <BlueprintDivider />
 
-      <div className="my-8">
-        <CategoryFilter categorias={categorias} activa={activa} onChange={handleCambiarCategoria} />
-      </div>
-
       {cargando ? (
-        <p className="font-mono text-sm text-muted">{t('catalog.cargando')}</p>
+        <p className="font-mono text-sm text-muted mt-8">{t('catalog.cargando')}</p>
       ) : filtrados.length === 0 ? (
-        <p className="font-mono text-sm text-muted">{t('catalog.vacio')}</p>
+        <p className="font-mono text-sm text-muted mt-8">{t('catalog.vacio')}</p>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {filtrados.map((p) => (
             <ProductCard key={p.id} producto={p} />
           ))}
