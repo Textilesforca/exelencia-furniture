@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
 import CategoryFilter from '../components/CategoryFilter'
 import BlueprintDivider from '../components/BlueprintDivider'
@@ -8,8 +9,10 @@ import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Catalog() {
   const { t } = useLanguage()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [productos, setProductos] = useState(sampleProducts)
-  const [activa, setActiva] = useState('Todos')
+  const [activa, setActiva] = useState(searchParams.get('categoria') || 'Todos')
+  const [busqueda, setBusqueda] = useState(searchParams.get('buscar') || '')
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
@@ -24,8 +27,30 @@ export default function Catalog() {
     cargarProductos()
   }, [])
 
-  const filtrados =
+  useEffect(() => {
+    setActiva(searchParams.get('categoria') || 'Todos')
+    setBusqueda(searchParams.get('buscar') || '')
+  }, [searchParams])
+
+  function handleCambiarCategoria(cat) {
+    setActiva(cat)
+    const params = new URLSearchParams(searchParams)
+    if (cat === 'Todos') params.delete('categoria')
+    else params.set('categoria', cat)
+    setSearchParams(params)
+  }
+
+  const porCategoria =
     activa === 'Todos' ? productos : productos.filter((p) => p.categoria === activa)
+
+  const textoBusqueda = busqueda.trim().toLowerCase()
+  const filtrados = textoBusqueda
+    ? porCategoria.filter((p) =>
+        [p.nombre, p.nombre_en, p.descripcion, p.descripcion_en]
+          .filter(Boolean)
+          .some((campo) => campo.toLowerCase().includes(textoBusqueda))
+      )
+    : porCategoria
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
@@ -35,7 +60,7 @@ export default function Catalog() {
       <BlueprintDivider />
 
       <div className="my-8">
-        <CategoryFilter categorias={categorias} activa={activa} onChange={setActiva} />
+        <CategoryFilter categorias={categorias} activa={activa} onChange={handleCambiarCategoria} />
       </div>
 
       {cargando ? (

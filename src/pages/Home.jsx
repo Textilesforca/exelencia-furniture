@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Hero from '../components/Hero'
+import Banner from '../components/Banner'
 import BlueprintDivider from '../components/BlueprintDivider'
 import ProductCard from '../components/ProductCard'
 import { sampleProducts } from '../data/products'
@@ -11,6 +12,7 @@ export default function Home() {
 
   return (
     <>
+      <Banner />
       <Hero />
 
       <section className="max-w-6xl mx-auto px-6 py-6">

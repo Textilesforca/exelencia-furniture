@@ -1,6 +1,18 @@
 export const translations = {
   es: {
-    navbar: { inicio: 'Inicio', catalogo: 'Catálogo', cotizar: 'Cotizar' },
+    navbar: {
+      inicio: 'Inicio',
+      catalogo: 'Catálogo',
+      cotizar: 'Cotizar',
+      buscarPlaceholder: 'Busca aquí por todo el catálogo…',
+      carritoAria: 'Carrito (próximamente)',
+    },
+    banner: {
+      kicker: 'Promoción',
+      titulo: 'Cotización sin costo',
+      texto: 'Escríbenos tu proyecto y recibe tu primer plano acotado sin costo ni compromiso.',
+      boton: 'Solicitar cotización',
+    },
     footer: {
       taller: 'Taller y showroom con cita previa',
       derechos: 'Todos los derechos reservados.',
@@ -189,7 +201,19 @@ export const translations = {
   },
 
   en: {
-    navbar: { inicio: 'Home', catalogo: 'Catalog', cotizar: 'Get a Quote' },
+    navbar: {
+      inicio: 'Home',
+      catalogo: 'Catalog',
+      cotizar: 'Get a Quote',
+      buscarPlaceholder: 'Search the whole catalog…',
+      carritoAria: 'Cart (coming soon)',
+    },
+    banner: {
+      kicker: 'Promotion',
+      titulo: 'Free quote',
+      texto: 'Tell us about your project and get your first dimensioned drawing at no cost, no strings attached.',
+      boton: 'Request a quote',
+    },
     footer: {
       taller: 'Workshop and showroom by appointment',
       derechos: 'All rights reserved.',
