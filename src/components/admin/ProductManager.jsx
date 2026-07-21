@@ -13,7 +13,6 @@ const estadoInicial = {
   categoria: categoriasForm[0] ?? '',
   subcategoria: '',
   material: '',
-  material_en: '',
   ancho: '',
   alto: '',
   profundidad: '',
@@ -56,7 +55,6 @@ export default function ProductManager() {
       categoria: producto.categoria ?? categoriasForm[0] ?? '',
       subcategoria: producto.subcategoria ?? '',
       material: producto.material ?? '',
-      material_en: producto.material_en ?? '',
       ancho: producto.ancho ?? '',
       alto: producto.alto ?? '',
       profundidad: producto.profundidad ?? '',
@@ -114,7 +112,6 @@ export default function ProductManager() {
       categoria: form.categoria,
       subcategoria: form.categoria === 'Salas' ? form.subcategoria || null : null,
       material: form.material,
-      material_en: form.material_en || null,
       ancho: form.ancho ? Number(form.ancho) : null,
       alto: form.alto ? Number(form.alto) : null,
       profundidad: form.profundidad ? Number(form.profundidad) : null,
@@ -188,7 +185,6 @@ export default function ProductManager() {
           )}
 
           <Field label={t('productManager.material')} name="material" value={form.material} onChange={handleChange} />
-          <Field label={t('productManager.materialEn')} name="material_en" value={form.material_en} onChange={handleChange} />
 
           <div className="grid grid-cols-3 gap-4">
             <Field label={t('productManager.anchoCm')} name="ancho" type="number" value={form.ancho} onChange={handleChange} />
