@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 import BlueprintDivider from '../components/BlueprintDivider'
 import ImageLightbox from '../components/ImageLightbox'
 import { useLanguage } from '../i18n/LanguageContext'
-import { traducirCategoria, campoTraducido } from '../i18n/translations'
+import { traducirCategoria } from '../i18n/translations'
 
 export default function ProductDetail() {
   const { id } = useParams()
@@ -66,9 +66,9 @@ export default function ProductDetail() {
   }
 
   const esProductoReal = UUID_REGEX.test(producto.id)
-  const nombre = campoTraducido(producto, 'nombre', lang)
-  const material = campoTraducido(producto, 'material', lang)
-  const descripcion = campoTraducido(producto, 'descripcion', lang)
+  const nombre = producto.nombre
+  const material = producto.material
+  const descripcion = producto.descripcion
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16 grid sm:grid-cols-2 gap-12">

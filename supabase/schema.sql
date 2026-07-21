@@ -296,13 +296,6 @@ $$;
 
 grant execute on function public.get_cotizacion_pago_by_session(text) to anon, authenticated;
 
--- === Traducción de productos al inglés (agregado 2026-07-20) ===
-
-alter table public.productos
-  add column if not exists nombre_en text,
-  add column if not exists descripcion_en text,
-  add column if not exists material_en text;
-
 -- === Subcategoría de Salas (agregado 2026-07-21) ===
 
 alter table public.productos

@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
-import { traducirCategoria, campoTraducido } from '../i18n/translations'
+import { traducirCategoria } from '../i18n/translations'
 
 export default function ProductCard({ producto }) {
   const { lang, t } = useLanguage()
-  const nombre = campoTraducido(producto, 'nombre', lang)
-  const material = campoTraducido(producto, 'material', lang)
+  const nombre = producto.nombre
+  const material = producto.material
 
   return (
     <Link

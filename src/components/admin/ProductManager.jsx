@@ -9,7 +9,6 @@ const subcategoriasSalasForm = subcategoriasSalas.filter((s) => s !== 'Todas las
 
 const estadoInicial = {
   nombre: '',
-  nombre_en: '',
   categoria: categoriasForm[0] ?? '',
   subcategoria: '',
   material: '',
@@ -50,7 +49,6 @@ export default function ProductManager() {
     setEditandoId(producto.id)
     setForm({
       nombre: producto.nombre ?? '',
-      nombre_en: producto.nombre_en ?? '',
       categoria: producto.categoria ?? categoriasForm[0] ?? '',
       subcategoria: producto.subcategoria ?? '',
       material: producto.material ?? '',
@@ -106,7 +104,6 @@ export default function ProductManager() {
 
     const payload = {
       nombre: form.nombre,
-      nombre_en: form.nombre_en || null,
       categoria: form.categoria,
       subcategoria: form.categoria === 'Salas' ? form.subcategoria || null : null,
       material: form.material,
@@ -142,7 +139,6 @@ export default function ProductManager() {
 
         <form onSubmit={handleSubmit} className="grid gap-5">
           <Field label={t('productManager.nombre')} name="nombre" value={form.nombre} onChange={handleChange} required />
-          <Field label={t('productManager.nombreEn')} name="nombre_en" value={form.nombre_en} onChange={handleChange} />
 
           <label className="block">
             <span className="font-mono text-[11px] tracking-widest text-muted uppercase">{t('productManager.categoria')}</span>

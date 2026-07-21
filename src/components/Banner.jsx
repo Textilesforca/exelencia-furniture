@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
-import { campoTraducido, traducirCategoria } from '../i18n/translations'
+import { traducirCategoria } from '../i18n/translations'
 
 export default function Banner() {
   const { lang, t } = useLanguage()
@@ -32,7 +32,7 @@ export default function Banner() {
   if (productos.length === 0) return null
 
   const producto = productos[indice]
-  const nombre = campoTraducido(producto, 'nombre', lang)
+  const nombre = producto.nombre
 
   function anterior() {
     setIndice((i) => (i - 1 + productos.length) % productos.length)

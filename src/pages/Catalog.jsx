@@ -39,7 +39,7 @@ export default function Catalog() {
   const textoBusqueda = busqueda.trim().toLowerCase()
   const filtrados = textoBusqueda
     ? porSubcategoria.filter((p) =>
-        [p.nombre, p.nombre_en, p.descripcion, p.descripcion_en]
+        [p.nombre, p.descripcion]
           .filter(Boolean)
           .some((campo) => campo.toLowerCase().includes(textoBusqueda))
       )

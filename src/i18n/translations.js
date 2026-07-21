@@ -180,18 +180,15 @@ export const translations = {
       editarPieza: 'Editar pieza',
       nuevaPieza: 'Nueva pieza',
       nombre: 'Nombre',
-      nombreEn: 'Nombre (inglés)',
       categoria: 'Categoría',
       subcategoria: 'Subcategoría',
       sinSubcategoria: 'Sin subcategoría',
       material: 'Material',
-      materialEn: 'Material (inglés)',
       anchoCm: 'Ancho (cm)',
       altoCm: 'Alto (cm)',
       fondoCm: 'Fondo (cm)',
       precioDesde: 'Precio desde (USD)',
       descripcion: 'Descripción',
-      descripcionEn: 'Descripción (inglés)',
       imagen: 'Imagen',
       imagenActualAlt: 'Actual',
       guardando: 'Guardando…',
@@ -426,18 +423,15 @@ export const translations = {
       editarPieza: 'Edit piece',
       nuevaPieza: 'New piece',
       nombre: 'Name',
-      nombreEn: 'Name (English)',
       categoria: 'Category',
       subcategoria: 'Subcategory',
       sinSubcategoria: 'No subcategory',
       material: 'Material',
-      materialEn: 'Material (English)',
       anchoCm: 'Width (cm)',
       altoCm: 'Height (cm)',
       fondoCm: 'Depth (cm)',
       precioDesde: 'Price from (USD)',
       descripcion: 'Description',
-      descripcionEn: 'Description (English)',
       imagen: 'Image',
       imagenActualAlt: 'Current',
       guardando: 'Saving…',
@@ -498,12 +492,4 @@ export function traducirCategoria(categoria, lang) {
 
 export function traducirSubcategoria(subcategoria, lang) {
   return translations[lang]?.subcategoriasSalas?.[subcategoria] ?? subcategoria
-}
-
-export function campoTraducido(producto, campo, lang) {
-  if (!producto) return ''
-  if (lang === 'en') {
-    return producto[`${campo}_en`] || producto[campo]
-  }
-  return producto[campo]
 }
