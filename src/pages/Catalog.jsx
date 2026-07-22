@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
+import ImageCarousel from '../components/ImageCarousel'
 import { sampleProducts, categorias } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -123,15 +124,8 @@ export default function Catalog() {
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
       {galeriaCategoria.length > 0 && (
-        <div className="flex gap-4 overflow-x-auto mb-10 pb-2">
-          {galeriaCategoria.map((img) => (
-            <img
-              key={img.id}
-              src={img.imagen}
-              alt=""
-              className="h-48 w-auto rounded-sm border border-line object-cover shrink-0"
-            />
-          ))}
+        <div className="mb-10">
+          <ImageCarousel imagenes={galeriaCategoria} />
         </div>
       )}
 
