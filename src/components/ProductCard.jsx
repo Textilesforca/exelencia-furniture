@@ -12,7 +12,7 @@ export default function ProductCard({ producto }) {
       to={`/catalogo/${producto.id}`}
       className="group flex flex-col sm:flex-row bg-surface border border-line rounded-sm overflow-hidden hover:border-brass/60 transition-colors"
     >
-      <div className="relative w-full sm:w-56 aspect-[4/3] sm:aspect-square shrink-0 overflow-hidden bg-surface2">
+      <div className="relative w-full sm:w-96 aspect-[4/3] shrink-0 overflow-hidden bg-surface2">
         <img
           src={producto.imagen}
           alt={nombre}
