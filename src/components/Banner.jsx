@@ -21,7 +21,9 @@ export default function Banner() {
 
   return (
     <section className="max-w-6xl mx-auto px-6 pt-10">
-      <ImageCarousel imagenes={slides} />
+      <div className="max-w-2xl mx-auto">
+        <ImageCarousel imagenes={slides} />
+      </div>
     </section>
   )
 }
