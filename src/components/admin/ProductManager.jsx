@@ -31,6 +31,7 @@ export default function ProductManager() {
   const [archivosGaleria, setArchivosGaleria] = useState([])
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
+  const [exito, setExito] = useState(false)
 
   async function cargarProductos() {
     setCargando(true)
@@ -66,6 +67,7 @@ export default function ProductManager() {
     setArchivo(null)
     setArchivosGaleria([])
     setError('')
+    setExito(false)
   }
 
   function handleCancelar() {
@@ -74,6 +76,7 @@ export default function ProductManager() {
     setArchivo(null)
     setArchivosGaleria([])
     setError('')
+    setExito(false)
   }
 
   function handleAgregarColor() {
@@ -106,6 +109,7 @@ export default function ProductManager() {
     e.preventDefault()
     setGuardando(true)
     setError('')
+    setExito(false)
 
     let imagenUrl = form.imagen
 
@@ -174,6 +178,7 @@ export default function ProductManager() {
 
     setGuardando(false)
     handleCancelar()
+    setExito(true)
     cargarProductos()
   }
 
@@ -306,6 +311,7 @@ export default function ProductManager() {
                     value={color.nombre}
                     onChange={(e) => handleColorChange(i, 'nombre', e.target.value)}
                     placeholder={t('productManager.colorNombrePlaceholder')}
+                    required
                     className="flex-1 bg-surface border border-line rounded-sm px-4 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors"
                   />
                   <button
@@ -328,6 +334,7 @@ export default function ProductManager() {
           </div>
 
           {error && <p className="text-sm text-red-400">{error}</p>}
+          {exito && <p className="text-sm text-brass">{t('productManager.guardadoExito')}</p>}
 
           <div className="flex gap-3">
             <button
