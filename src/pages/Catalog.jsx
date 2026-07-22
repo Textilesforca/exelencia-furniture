@@ -53,8 +53,8 @@ export default function Catalog() {
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
       {bannerCatalogo && (
-        <div className="aspect-[21/6] rounded-sm overflow-hidden border border-brass/40 mb-10">
-          <img src={bannerCatalogo.imagen} alt="" className="w-full h-full object-cover" />
+        <div className="rounded-sm overflow-hidden border border-brass/40 mb-10">
+          <img src={bannerCatalogo.imagen} alt="" className="w-full h-auto" />
         </div>
       )}
 
