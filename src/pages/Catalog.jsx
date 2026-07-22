@@ -121,24 +121,32 @@ export default function Catalog() {
     )
   }
 
+  if (busqueda) {
+    return (
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        {cargando ? (
+          <p className="font-mono text-sm text-muted">{t('catalog.cargando')}</p>
+        ) : filtrados.length === 0 ? (
+          <p className="font-mono text-sm text-muted">{t('catalog.vacio')}</p>
+        ) : (
+          <div className="grid gap-4">
+            {filtrados.map((p) => (
+              <ProductCard key={p.id} producto={p} />
+            ))}
+          </div>
+        )}
+      </section>
+    )
+  }
+
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
-      {galeriaCategoria.length > 0 && (
-        <div className="max-w-sm sm:max-w-md mx-auto mb-10">
+      {galeriaCategoria.length > 0 ? (
+        <div className="max-w-sm sm:max-w-md mx-auto">
           <ImageCarousel imagenes={galeriaCategoria} />
         </div>
-      )}
-
-      {cargando ? (
-        <p className="font-mono text-sm text-muted">{t('catalog.cargando')}</p>
-      ) : filtrados.length === 0 ? (
-        <p className="font-mono text-sm text-muted">{t('catalog.vacio')}</p>
       ) : (
-        <div className="grid gap-4">
-          {filtrados.map((p) => (
-            <ProductCard key={p.id} producto={p} />
-          ))}
-        </div>
+        <p className="font-mono text-sm text-muted">{t('catalog.sinFotos')}</p>
       )}
     </section>
   )

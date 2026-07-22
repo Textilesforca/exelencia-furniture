@@ -44,6 +44,7 @@ export const translations = {
     catalog: {
       cargando: 'Cargando catálogo…',
       vacio: 'Aún no hay piezas en esta categoría.',
+      sinFotos: 'Aún no hay fotos de catálogo en esta categoría.',
       filtroAria: 'Filtrar por categoría',
       verCatalogo: 'Ver catálogo',
     },
@@ -359,6 +360,7 @@ export const translations = {
     catalog: {
       cargando: 'Loading catalog…',
       vacio: 'No pieces in this category yet.',
+      sinFotos: 'No catalog photos in this category yet.',
       filtroAria: 'Filter by category',
       verCatalogo: 'View catalog',
     },
