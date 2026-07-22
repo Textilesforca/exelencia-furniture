@@ -15,6 +15,7 @@ export default function Catalog() {
   const [cargando, setCargando] = useState(true)
   const [bannerCatalogo, setBannerCatalogo] = useState(null)
   const [portadas, setPortadas] = useState([])
+  const [galeriaCategoria, setGaleriaCategoria] = useState([])
 
   useEffect(() => {
     async function cargarProductos() {
@@ -45,6 +46,22 @@ export default function Catalog() {
   const busqueda = searchParams.get('buscar') || ''
 
   const mostrarSelector = !activa && !busqueda
+
+  useEffect(() => {
+    if (!activa || activa === 'Todos') {
+      setGaleriaCategoria([])
+      return
+    }
+    async function cargarGaleria() {
+      const { data } = await supabase
+        .from('categoria_imagenes')
+        .select('*')
+        .eq('categoria', activa)
+        .order('orden', { ascending: true })
+      setGaleriaCategoria(data ?? [])
+    }
+    cargarGaleria()
+  }, [activa])
 
   const porCategoria =
     !activa || activa === 'Todos' ? productos : productos.filter((p) => p.categoria === activa)
@@ -105,6 +122,19 @@ export default function Catalog() {
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
+      {galeriaCategoria.length > 0 && (
+        <div className="flex gap-4 overflow-x-auto mb-10 pb-2">
+          {galeriaCategoria.map((img) => (
+            <img
+              key={img.id}
+              src={img.imagen}
+              alt=""
+              className="h-48 w-auto rounded-sm border border-line object-cover shrink-0"
+            />
+          ))}
+        </div>
+      )}
+
       {cargando ? (
         <p className="font-mono text-sm text-muted">{t('catalog.cargando')}</p>
       ) : filtrados.length === 0 ? (

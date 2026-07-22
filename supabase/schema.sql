@@ -358,3 +358,27 @@ create policy "Con permiso pueden actualizar portadas de categoría"
 create policy "Con permiso pueden borrar portadas de categoría"
   on categoria_portadas for delete to authenticated
   using (has_permission('productos'));
+
+-- === Galería de imágenes por categoría (agregado 2026-07-22) ===
+
+create table if not exists public.categoria_imagenes (
+  id uuid primary key default gen_random_uuid(),
+  categoria text not null,
+  imagen text not null,
+  orden integer not null default 0,
+  creado_en timestamptz default now()
+);
+
+alter table public.categoria_imagenes enable row level security;
+
+create policy "Lectura pública de galería de categoría"
+  on categoria_imagenes for select
+  using (true);
+
+create policy "Con permiso pueden insertar galería de categoría"
+  on categoria_imagenes for insert to authenticated
+  with check (has_permission('productos'));
+
+create policy "Con permiso pueden borrar galería de categoría"
+  on categoria_imagenes for delete to authenticated
+  using (has_permission('productos'));
