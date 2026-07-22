@@ -9,9 +9,6 @@ export const translations = {
       delivery: 'Entrega y recolección',
       contactUs: 'Contáctanos',
     },
-    banner: {
-      boton: 'Ver esta pieza',
-    },
     cart: {
       titulo: 'Tu carrito',
       vacio: 'Tu carrito está vacío.',
@@ -326,9 +323,6 @@ export const translations = {
       carritoAria: 'Cart',
       delivery: 'Delivery and Pickup',
       contactUs: 'Contact Us',
-    },
-    banner: {
-      boton: 'View this piece',
     },
     cart: {
       titulo: 'Your cart',

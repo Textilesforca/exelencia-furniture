@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
-import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Banner() {
-  const { t } = useLanguage()
   const [slides, setSlides] = useState([])
   const [indice, setIndice] = useState(0)
 
@@ -45,15 +42,6 @@ export default function Banner() {
       <div className="relative overflow-hidden rounded-sm border border-brass/40 bg-surface">
         <div className="relative">
           <img src={slide.imagen} alt="" className="w-full h-auto" />
-
-          <div className="absolute inset-0 bg-ink/30 flex items-end justify-center pb-8">
-            <Link
-              to="/catalogo"
-              className="inline-block bg-brass text-ink font-body font-medium px-8 py-3 rounded-sm hover:bg-walnut2 transition-colors"
-            >
-              {t('banner.boton')}
-            </Link>
-          </div>
 
           {slides.length > 1 && (
             <>
