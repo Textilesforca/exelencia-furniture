@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
-import CatalogViewer from '../components/CatalogViewer'
 import { sampleProducts, categorias } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -16,7 +15,6 @@ export default function Catalog() {
   const [cargando, setCargando] = useState(true)
   const [bannerCatalogo, setBannerCatalogo] = useState(null)
   const [portadas, setPortadas] = useState([])
-  const [galeriaCategoria, setGaleriaCategoria] = useState([])
 
   useEffect(() => {
     async function cargarProductos() {
@@ -42,30 +40,14 @@ export default function Catalog() {
     cargarPortadas()
   }, [])
 
-  const activa = searchParams.get('categoria') || ''
+  const activa = searchParams.get('categoria') || 'Todos'
   const subcategoria = searchParams.get('subcategoria') || ''
   const busqueda = searchParams.get('buscar') || ''
 
-  const mostrarSelector = !activa && !busqueda
-
-  useEffect(() => {
-    if (!activa || activa === 'Todos') {
-      setGaleriaCategoria([])
-      return
-    }
-    async function cargarGaleria() {
-      const { data } = await supabase
-        .from('categoria_imagenes')
-        .select('*')
-        .eq('categoria', activa)
-        .order('orden', { ascending: true })
-      setGaleriaCategoria(data ?? [])
-    }
-    cargarGaleria()
-  }, [activa])
+  const mostrarSelector = activa === 'Todos' && !busqueda
 
   const porCategoria =
-    !activa || activa === 'Todos' ? productos : productos.filter((p) => p.categoria === activa)
+    activa === 'Todos' ? productos : productos.filter((p) => p.categoria === activa)
 
   const porSubcategoria = subcategoria
     ? porCategoria.filter((p) => p.subcategoria === subcategoria)
@@ -95,7 +77,7 @@ export default function Catalog() {
             return (
               <Link
                 key={categoria}
-                to={`/catalogo?categoria=${encodeURIComponent(categoria)}`}
+                to={`/catalogo/galeria/${encodeURIComponent(categoria)}`}
                 className="group relative aspect-[4/5] rounded-sm overflow-hidden border border-line hover:border-brass/60 transition-colors bg-surface2"
               >
                 {portada && (
@@ -121,30 +103,18 @@ export default function Catalog() {
     )
   }
 
-  if (busqueda) {
-    return (
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        {cargando ? (
-          <p className="font-mono text-sm text-muted">{t('catalog.cargando')}</p>
-        ) : filtrados.length === 0 ? (
-          <p className="font-mono text-sm text-muted">{t('catalog.vacio')}</p>
-        ) : (
-          <div className="grid gap-4">
-            {filtrados.map((p) => (
-              <ProductCard key={p.id} producto={p} />
-            ))}
-          </div>
-        )}
-      </section>
-    )
-  }
-
   return (
-    <section className="max-w-4xl mx-auto px-6 py-16">
-      {galeriaCategoria.length > 0 ? (
-        <CatalogViewer imagenes={galeriaCategoria} categoria={activa} />
+    <section className="max-w-6xl mx-auto px-6 py-16">
+      {cargando ? (
+        <p className="font-mono text-sm text-muted">{t('catalog.cargando')}</p>
+      ) : filtrados.length === 0 ? (
+        <p className="font-mono text-sm text-muted">{t('catalog.vacio')}</p>
       ) : (
-        <p className="font-mono text-sm text-muted">{t('catalog.sinFotos')}</p>
+        <div className="grid gap-4">
+          {filtrados.map((p) => (
+            <ProductCard key={p.id} producto={p} />
+          ))}
+        </div>
       )}
     </section>
   )

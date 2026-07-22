@@ -4,6 +4,7 @@ import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
 import Home from './pages/Home'
 import Catalog from './pages/Catalog'
+import CatalogoGaleria from './pages/CatalogoGaleria'
 import ProductDetail from './pages/ProductDetail'
 import Contact from './pages/Contact'
 import Delivery from './pages/Delivery'
@@ -20,6 +21,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalog />} />
+          <Route path="/catalogo/galeria/:categoria" element={<CatalogoGaleria />} />
           <Route path="/catalogo/:id" element={<ProductDetail />} />
           <Route path="/contacto" element={<Contact />} />
           <Route path="/entrega" element={<Delivery />} />
