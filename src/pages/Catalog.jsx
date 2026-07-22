@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
-import ImageCarousel from '../components/ImageCarousel'
+import CatalogViewer from '../components/CatalogViewer'
 import { sampleProducts, categorias } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -140,11 +140,9 @@ export default function Catalog() {
   }
 
   return (
-    <section className="max-w-6xl mx-auto px-6 py-16">
+    <section className="max-w-4xl mx-auto px-6 py-16">
       {galeriaCategoria.length > 0 ? (
-        <div className="max-w-sm sm:max-w-md mx-auto">
-          <ImageCarousel imagenes={galeriaCategoria} />
-        </div>
+        <CatalogViewer imagenes={galeriaCategoria} categoria={activa} />
       ) : (
         <p className="font-mono text-sm text-muted">{t('catalog.sinFotos')}</p>
       )}
