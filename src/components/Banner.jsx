@@ -44,7 +44,7 @@ export default function Banner() {
     <section className="max-w-6xl mx-auto px-6 pt-10">
       <div className="relative overflow-hidden rounded-sm border border-brass/40 bg-surface">
         <div className="relative aspect-[21/9] bg-surface2">
-          <img src={slide.imagen} alt="" className="w-full h-full object-cover" />
+          <img src={slide.imagen} alt="" className="w-full h-full object-contain" />
 
           <div className="absolute inset-0 bg-ink/30 flex items-end justify-center pb-8">
             <Link
