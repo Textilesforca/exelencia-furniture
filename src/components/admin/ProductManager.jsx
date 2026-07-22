@@ -6,6 +6,16 @@ import { traducirCategoria, traducirSubcategoria } from '../../i18n/translations
 
 const categoriasForm = categorias.filter((c) => c !== 'Todos')
 
+const MARCAS_DIACRITICAS = /[̀-ͯ]/g
+
+function sanitizarNombreArchivo(nombre) {
+  return nombre
+    .normalize('NFD')
+    .replace(MARCAS_DIACRITICAS, '') // quita acentos (marcas diacríticas tras normalizar)
+    .replace(/[^a-zA-Z0-9.-]/g, '-') // reemplaza espacios y caracteres especiales
+    .replace(/-+/g, '-')
+}
+
 const estadoInicial = {
   nombre: '',
   categoria: categoriasForm[0] ?? '',
@@ -114,7 +124,7 @@ export default function ProductManager() {
     let imagenUrl = form.imagen
 
     if (archivo) {
-      const ruta = `${Date.now()}-${archivo.name}`
+      const ruta = `${Date.now()}-${sanitizarNombreArchivo(archivo.name)}`
       const { error: uploadError } = await supabase.storage
         .from('productos-imagenes')
         .upload(ruta, archivo)
@@ -134,7 +144,7 @@ export default function ProductManager() {
     if (archivosGaleria.length > 0) {
       const urlsNuevas = []
       for (const archivoGaleria of archivosGaleria) {
-        const ruta = `${Date.now()}-${archivoGaleria.name}`
+        const ruta = `${Date.now()}-${sanitizarNombreArchivo(archivoGaleria.name)}`
         const { error: uploadError } = await supabase.storage
           .from('productos-imagenes')
           .upload(ruta, archivoGaleria)
