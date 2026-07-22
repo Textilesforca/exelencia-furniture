@@ -124,7 +124,7 @@ export default function Catalog() {
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
       {galeriaCategoria.length > 0 && (
-        <div className="max-w-2xl mx-auto mb-10">
+        <div className="max-w-sm sm:max-w-md mx-auto mb-10">
           <ImageCarousel imagenes={galeriaCategoria} />
         </div>
       )}
