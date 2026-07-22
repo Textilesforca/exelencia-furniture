@@ -4,6 +4,7 @@ import { categorias, subcategoriasPorCategoria } from '../../data/products'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { traducirCategoria, traducirSubcategoria } from '../../i18n/translations'
 import { sanitizarNombreArchivo } from '../../lib/sanitizarNombreArchivo'
+import { eliminarArchivoStorage } from '../../lib/storage'
 
 const categoriasForm = categorias.filter((c) => c !== 'Todos')
 
@@ -30,6 +31,7 @@ export default function ProductManager() {
   const [editandoId, setEditandoId] = useState(null)
   const [archivo, setArchivo] = useState(null)
   const [archivosGaleria, setArchivosGaleria] = useState([])
+  const [imagenesOriginales, setImagenesOriginales] = useState([])
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
   const [exito, setExito] = useState(false)
@@ -67,6 +69,7 @@ export default function ProductManager() {
     })
     setArchivo(null)
     setArchivosGaleria([])
+    setImagenesOriginales(producto.imagenes ?? [])
     setError('')
     setExito(false)
   }
@@ -76,6 +79,7 @@ export default function ProductManager() {
     setForm(estadoInicial)
     setArchivo(null)
     setArchivosGaleria([])
+    setImagenesOriginales([])
     setError('')
     setExito(false)
   }
@@ -99,8 +103,15 @@ export default function ProductManager() {
 
   async function handleEliminar(id) {
     if (!window.confirm(t('productManager.confirmarEliminar'))) return
+    const producto = productos.find((p) => p.id === id)
     const { error } = await supabase.from('productos').delete().eq('id', id)
     if (!error) {
+      if (producto) {
+        await eliminarArchivoStorage(producto.imagen)
+        for (const url of producto.imagenes ?? []) {
+          await eliminarArchivoStorage(url)
+        }
+      }
       if (editandoId === id) handleCancelar()
       cargarProductos()
     }
@@ -112,6 +123,7 @@ export default function ProductManager() {
     setError('')
     setExito(false)
 
+    const imagenAnterior = form.imagen
     let imagenUrl = form.imagen
 
     if (archivo) {
@@ -175,6 +187,15 @@ export default function ProductManager() {
       setError('No se pudo guardar: ' + guardarError.message)
       setGuardando(false)
       return
+    }
+
+    if (archivo && imagenAnterior && imagenAnterior !== imagenUrl) {
+      await eliminarArchivoStorage(imagenAnterior)
+    }
+
+    const fotosQuitadas = imagenesOriginales.filter((url) => !imagenesGaleria.includes(url))
+    for (const url of fotosQuitadas) {
+      await eliminarArchivoStorage(url)
     }
 
     setGuardando(false)

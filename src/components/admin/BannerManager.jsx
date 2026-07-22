@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { sanitizarNombreArchivo } from '../../lib/sanitizarNombreArchivo'
+import { eliminarArchivoStorage } from '../../lib/storage'
 
 export default function BannerManager() {
   const { t } = useLanguage()
@@ -60,7 +61,9 @@ export default function BannerManager() {
 
   async function handleQuitarInicio(id) {
     if (!window.confirm(t('bannerManager.confirmarQuitar'))) return
+    const banner = bannersInicio.find((b) => b.id === id)
     await supabase.from('banners').delete().eq('id', id)
+    if (banner) await eliminarArchivoStorage(banner.imagen)
     cargarBanners()
   }
 
@@ -74,6 +77,7 @@ export default function BannerManager() {
       const url = await subirArchivo(archivo)
       if (bannerCatalogo) {
         await supabase.from('banners').delete().eq('id', bannerCatalogo.id)
+        await eliminarArchivoStorage(bannerCatalogo.imagen)
       }
       const { error: insertError } = await supabase
         .from('banners')
@@ -92,6 +96,7 @@ export default function BannerManager() {
     if (!bannerCatalogo) return
     if (!window.confirm(t('bannerManager.confirmarQuitar'))) return
     await supabase.from('banners').delete().eq('id', bannerCatalogo.id)
+    await eliminarArchivoStorage(bannerCatalogo.imagen)
     cargarBanners()
   }
 
