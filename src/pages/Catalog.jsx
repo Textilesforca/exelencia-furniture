@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
-import BlueprintDivider from '../components/BlueprintDivider'
 import { sampleProducts } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -11,6 +10,7 @@ export default function Catalog() {
   const [searchParams] = useSearchParams()
   const [productos, setProductos] = useState(sampleProducts)
   const [cargando, setCargando] = useState(true)
+  const [bannerCatalogo, setBannerCatalogo] = useState(null)
 
   useEffect(() => {
     async function cargarProductos() {
@@ -22,6 +22,12 @@ export default function Catalog() {
       setCargando(false)
     }
     cargarProductos()
+
+    async function cargarBanner() {
+      const { data } = await supabase.from('banners').select('*').eq('tipo', 'catalogo').limit(1).maybeSingle()
+      setBannerCatalogo(data)
+    }
+    cargarBanner()
   }, [])
 
   const activa = searchParams.get('categoria') || 'Todos'
@@ -46,17 +52,18 @@ export default function Catalog() {
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
-      <p className="font-mono text-xs tracking-[0.25em] text-brass uppercase mb-3">{t('catalog.kicker')}</p>
-      <h1 className="font-display text-4xl text-parchment mb-8">{t('catalog.titulo')}</h1>
-
-      <BlueprintDivider />
+      {bannerCatalogo && (
+        <div className="aspect-[21/6] rounded-sm overflow-hidden border border-brass/40 mb-10">
+          <img src={bannerCatalogo.imagen} alt="" className="w-full h-full object-cover" />
+        </div>
+      )}
 
       {cargando ? (
-        <p className="font-mono text-sm text-muted mt-8">{t('catalog.cargando')}</p>
+        <p className="font-mono text-sm text-muted">{t('catalog.cargando')}</p>
       ) : filtrados.length === 0 ? (
-        <p className="font-mono text-sm text-muted mt-8">{t('catalog.vacio')}</p>
+        <p className="font-mono text-sm text-muted">{t('catalog.vacio')}</p>
       ) : (
-        <div className="grid gap-4 mt-8">
+        <div className="grid gap-4">
           {filtrados.map((p) => (
             <ProductCard key={p.id} producto={p} />
           ))}

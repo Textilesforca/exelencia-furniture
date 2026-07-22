@@ -3,18 +3,9 @@ import { supabase } from '../../lib/supabaseClient'
 import { categorias, subcategoriasPorCategoria } from '../../data/products'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { traducirCategoria, traducirSubcategoria } from '../../i18n/translations'
+import { sanitizarNombreArchivo } from '../../lib/sanitizarNombreArchivo'
 
 const categoriasForm = categorias.filter((c) => c !== 'Todos')
-
-const MARCAS_DIACRITICAS = /[̀-ͯ]/g
-
-function sanitizarNombreArchivo(nombre) {
-  return nombre
-    .normalize('NFD')
-    .replace(MARCAS_DIACRITICAS, '') // quita acentos (marcas diacríticas tras normalizar)
-    .replace(/[^a-zA-Z0-9.-]/g, '-') // reemplaza espacios y caracteres especiales
-    .replace(/-+/g, '-')
-}
 
 const estadoInicial = {
   nombre: '',

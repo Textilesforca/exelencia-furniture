@@ -306,3 +306,27 @@ alter table public.productos
 alter table public.productos
   add column if not exists colores jsonb default '[]'::jsonb,
   add column if not exists imagenes text[] default '{}';
+
+-- === Banners administrables (agregado 2026-07-21) ===
+
+create table if not exists public.banners (
+  id uuid primary key default gen_random_uuid(),
+  tipo text not null check (tipo in ('inicio', 'catalogo')),
+  imagen text not null,
+  orden integer not null default 0,
+  creado_en timestamptz default now()
+);
+
+alter table public.banners enable row level security;
+
+create policy "Lectura pública de banners"
+  on banners for select
+  using (true);
+
+create policy "Con permiso pueden insertar banners"
+  on banners for insert to authenticated
+  with check (has_permission('productos'));
+
+create policy "Con permiso pueden borrar banners"
+  on banners for delete to authenticated
+  using (has_permission('productos'));

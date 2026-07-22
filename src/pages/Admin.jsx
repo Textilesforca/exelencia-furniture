@@ -6,6 +6,7 @@ import LoginForm from '../components/admin/LoginForm'
 import ProductManager from '../components/admin/ProductManager'
 import QuotesList from '../components/admin/QuotesList'
 import UserManager from '../components/admin/UserManager'
+import BannerManager from '../components/admin/BannerManager'
 import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Admin() {
@@ -18,6 +19,7 @@ export default function Admin() {
   const tabsDisponibles = [
     (esAdmin || profile?.permisos?.productos) && 'productos',
     (esAdmin || profile?.permisos?.cotizaciones) && 'cotizaciones',
+    (esAdmin || profile?.permisos?.productos) && 'banner',
     esAdmin && 'usuarios',
   ].filter(Boolean)
 
@@ -65,6 +67,11 @@ export default function Admin() {
                 {t('admin.tabCotizaciones')}
               </TabButton>
             )}
+            {tabsDisponibles.includes('banner') && (
+              <TabButton active={tab === 'banner'} onClick={() => setTab('banner')}>
+                {t('admin.tabBanner')}
+              </TabButton>
+            )}
             {tabsDisponibles.includes('usuarios') && (
               <TabButton active={tab === 'usuarios'} onClick={() => setTab('usuarios')}>
                 {t('admin.tabUsuarios')}
@@ -74,6 +81,7 @@ export default function Admin() {
 
           {tab === 'productos' && <ProductManager />}
           {tab === 'cotizaciones' && <QuotesList />}
+          {tab === 'banner' && <BannerManager />}
           {tab === 'usuarios' && <UserManager />}
         </>
       )}
