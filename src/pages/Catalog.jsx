@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
-import { sampleProducts } from '../data/products'
+import { sampleProducts, categorias } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
+import { traducirCategoria } from '../i18n/translations'
+
+const categoriasGrid = categorias.filter((c) => c !== 'Todos')
 
 export default function Catalog() {
-  const { t } = useLanguage()
+  const { lang, t } = useLanguage()
   const [searchParams] = useSearchParams()
   const [productos, setProductos] = useState(sampleProducts)
   const [cargando, setCargando] = useState(true)
   const [bannerCatalogo, setBannerCatalogo] = useState(null)
+  const [portadas, setPortadas] = useState([])
 
   useEffect(() => {
     async function cargarProductos() {
@@ -28,14 +32,22 @@ export default function Catalog() {
       setBannerCatalogo(data)
     }
     cargarBanner()
+
+    async function cargarPortadas() {
+      const { data } = await supabase.from('categoria_portadas').select('*')
+      setPortadas(data ?? [])
+    }
+    cargarPortadas()
   }, [])
 
-  const activa = searchParams.get('categoria') || 'Todos'
+  const activa = searchParams.get('categoria') || ''
   const subcategoria = searchParams.get('subcategoria') || ''
   const busqueda = searchParams.get('buscar') || ''
 
+  const mostrarSelector = !activa && !busqueda
+
   const porCategoria =
-    activa === 'Todos' ? productos : productos.filter((p) => p.categoria === activa)
+    !activa || activa === 'Todos' ? productos : productos.filter((p) => p.categoria === activa)
 
   const porSubcategoria = subcategoria
     ? porCategoria.filter((p) => p.subcategoria === subcategoria)
@@ -50,14 +62,49 @@ export default function Catalog() {
       )
     : porSubcategoria
 
+  if (mostrarSelector) {
+    return (
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        {bannerCatalogo && (
+          <div className="rounded-sm overflow-hidden border border-brass/40 mb-10">
+            <img src={bannerCatalogo.imagen} alt="" className="w-full h-auto" />
+          </div>
+        )}
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {categoriasGrid.map((categoria) => {
+            const portada = portadas.find((p) => p.categoria === categoria)
+            return (
+              <Link
+                key={categoria}
+                to={`/catalogo?categoria=${encodeURIComponent(categoria)}`}
+                className="group relative aspect-[4/5] rounded-sm overflow-hidden border border-line hover:border-brass/60 transition-colors bg-surface2"
+              >
+                {portada && (
+                  <img
+                    src={portada.imagen}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent flex flex-col items-center justify-end p-5">
+                  <h2 className="font-display text-2xl text-parchment mb-2 text-center">
+                    {traducirCategoria(categoria, lang)}
+                  </h2>
+                  <span className="font-mono text-[11px] tracking-widest text-brass uppercase">
+                    {t('catalog.verCatalogo')}
+                  </span>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
-      {bannerCatalogo && (
-        <div className="rounded-sm overflow-hidden border border-brass/40 mb-10">
-          <img src={bannerCatalogo.imagen} alt="" className="w-full h-auto" />
-        </div>
-      )}
-
       {cargando ? (
         <p className="font-mono text-sm text-muted">{t('catalog.cargando')}</p>
       ) : filtrados.length === 0 ? (

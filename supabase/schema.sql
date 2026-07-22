@@ -330,3 +330,31 @@ create policy "Con permiso pueden insertar banners"
 create policy "Con permiso pueden borrar banners"
   on banners for delete to authenticated
   using (has_permission('productos'));
+
+-- === Portadas de categoría para /catalogo (agregado 2026-07-21) ===
+
+create table if not exists public.categoria_portadas (
+  id uuid primary key default gen_random_uuid(),
+  categoria text not null unique,
+  imagen text not null,
+  creado_en timestamptz default now()
+);
+
+alter table public.categoria_portadas enable row level security;
+
+create policy "Lectura pública de portadas de categoría"
+  on categoria_portadas for select
+  using (true);
+
+create policy "Con permiso pueden insertar portadas de categoría"
+  on categoria_portadas for insert to authenticated
+  with check (has_permission('productos'));
+
+create policy "Con permiso pueden actualizar portadas de categoría"
+  on categoria_portadas for update to authenticated
+  using (has_permission('productos'))
+  with check (has_permission('productos'));
+
+create policy "Con permiso pueden borrar portadas de categoría"
+  on categoria_portadas for delete to authenticated
+  using (has_permission('productos'));

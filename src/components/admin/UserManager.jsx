@@ -6,7 +6,7 @@ const estadoInicial = {
   email: '',
   password: '',
   role: 'usuario',
-  permisos: { productos: false, cotizaciones: false },
+  permisos: { productos: false, cotizaciones: false, banner: false, catalogo: false },
 }
 
 async function mensajeDeError(error) {
@@ -63,7 +63,10 @@ export default function UserManager() {
         email: form.email,
         password: form.password,
         role: form.role,
-        permisos: form.role === 'admin' ? { productos: true, cotizaciones: true } : form.permisos,
+        permisos:
+          form.role === 'admin'
+            ? { productos: true, cotizaciones: true, banner: true, catalogo: true }
+            : form.permisos,
       },
     })
 
@@ -82,7 +85,14 @@ export default function UserManager() {
     setUsuarios(
       usuarios.map((u) =>
         u.id === id
-          ? { ...u, role, permisos: role === 'admin' ? { productos: true, cotizaciones: true } : u.permisos }
+          ? {
+              ...u,
+              role,
+              permisos:
+                role === 'admin'
+                  ? { productos: true, cotizaciones: true, banner: true, catalogo: true }
+                  : u.permisos,
+            }
           : u
       )
     )
@@ -172,7 +182,7 @@ export default function UserManager() {
               <span className="font-mono text-[11px] tracking-widest text-muted uppercase">
                 {t('userManager.accesoSecciones')}
               </span>
-              <div className="mt-2 flex gap-6">
+              <div className="mt-2 flex flex-wrap gap-6">
                 <PermisoCheckbox
                   label={t('userManager.productos')}
                   checked={form.permisos.productos}
@@ -182,6 +192,16 @@ export default function UserManager() {
                   label={t('userManager.cotizaciones')}
                   checked={form.permisos.cotizaciones}
                   onChange={(checked) => handlePermisoChange('cotizaciones', checked)}
+                />
+                <PermisoCheckbox
+                  label={t('userManager.banner')}
+                  checked={form.permisos.banner}
+                  onChange={(checked) => handlePermisoChange('banner', checked)}
+                />
+                <PermisoCheckbox
+                  label={t('userManager.catalogo')}
+                  checked={form.permisos.catalogo}
+                  onChange={(checked) => handlePermisoChange('catalogo', checked)}
                 />
               </div>
             </div>
@@ -232,6 +252,16 @@ export default function UserManager() {
                         label={t('userManager.cotizaciones')}
                         checked={!!u.permisos?.cotizaciones}
                         onChange={(checked) => handleRowPermisoChange(u.id, 'cotizaciones', checked)}
+                      />
+                      <PermisoCheckbox
+                        label={t('userManager.banner')}
+                        checked={!!u.permisos?.banner}
+                        onChange={(checked) => handleRowPermisoChange(u.id, 'banner', checked)}
+                      />
+                      <PermisoCheckbox
+                        label={t('userManager.catalogo')}
+                        checked={!!u.permisos?.catalogo}
+                        onChange={(checked) => handleRowPermisoChange(u.id, 'catalogo', checked)}
                       />
                     </>
                   )}
