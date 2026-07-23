@@ -565,3 +565,39 @@ end;
 $$;
 
 grant execute on function public.listar_ventas() to authenticated;
+
+-- Piezas vendidas (unidades), para el resumen por categoría en Ventas.
+-- Solo cuenta compra directa y carrito (tienen producto real ligado);
+-- los anticipos de cotización son piezas a medida sin catálogo/categoría.
+create or replace function public.listar_piezas_vendidas()
+returns table (
+  categoria text,
+  nombre text,
+  cantidad integer,
+  creado_en timestamptz
+)
+language plpgsql
+security definer
+set search_path = public
+stable
+as $$
+begin
+  if not (has_permission('ventas')) then
+    raise exception 'No tienes permiso para ver las ventas.';
+  end if;
+
+  return query
+    select coalesce(pr.categoria, 'Sin categoría'), p.producto_nombre, 1, p.creado_en
+    from public.pedidos p
+    left join public.productos pr on pr.id = p.producto_id
+    where p.estado = 'pagado'
+    union all
+    select coalesce(pr.categoria, 'Sin categoría'), (item ->> 'nombre'), (item ->> 'cantidad')::integer, co.creado_en
+    from public.carrito_ordenes co
+    cross join lateral jsonb_array_elements(co.items) as item
+    left join public.productos pr on pr.id = (item ->> 'producto_id')::uuid
+    where co.estado = 'pagado';
+end;
+$$;
+
+grant execute on function public.listar_piezas_vendidas() to authenticated;
