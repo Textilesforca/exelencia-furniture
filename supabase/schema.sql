@@ -632,3 +632,27 @@ as $$
 $$;
 
 grant execute on function public.get_cotizacion_pago_by_session(text) to anon, authenticated;
+
+-- Monto total acordado de la pieza, para poder sugerir automáticamente
+-- cuánto falta pagar (monto_total - anticipo) al generar el link del resto.
+alter table public.cotizaciones
+  add column if not exists monto_total numeric;
+
+create or replace function public.actualizar_monto_total(p_cotizacion_id uuid, p_monto_total numeric)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not has_permission('cotizaciones') then
+    raise exception 'No tienes permiso para actualizar esta cotización.';
+  end if;
+  if p_monto_total < 0 then
+    raise exception 'El monto no puede ser negativo.';
+  end if;
+  update public.cotizaciones set monto_total = p_monto_total where id = p_cotizacion_id;
+end;
+$$;
+
+grant execute on function public.actualizar_monto_total(uuid, numeric) to authenticated;

@@ -21,6 +21,10 @@ export default function QuotesList() {
   const [generandoClave, setGenerandoClave] = useState(null)
   const [linksGenerados, setLinksGenerados] = useState({})
   const [errores, setErrores] = useState({})
+  const [montosTotales, setMontosTotales] = useState({})
+  const [guardandoTotalId, setGuardandoTotalId] = useState(null)
+  const [erroresTotal, setErroresTotal] = useState({})
+  const [exitoTotalId, setExitoTotalId] = useState(null)
 
   async function cargar() {
     setCargando(true)
@@ -28,8 +32,38 @@ export default function QuotesList() {
       .from('cotizaciones')
       .select('*')
       .order('creado_en', { ascending: false })
-    if (!error) setCotizaciones(data ?? [])
+    if (!error) {
+      setCotizaciones(data ?? [])
+      setMontosTotales(Object.fromEntries((data ?? []).map((c) => [c.id, c.monto_total ?? ''])))
+    }
     setCargando(false)
+  }
+
+  async function handleGuardarMontoTotal(id) {
+    const valor = montosTotales[id]
+    if (valor === '' || valor == null || Number(valor) < 0) {
+      setErroresTotal({ ...erroresTotal, [id]: t('quotesList.montoInvalido') })
+      return
+    }
+
+    setGuardandoTotalId(id)
+    setErroresTotal({ ...erroresTotal, [id]: '' })
+
+    const { error } = await supabase.rpc('actualizar_monto_total', {
+      p_cotizacion_id: id,
+      p_monto_total: Number(valor),
+    })
+
+    if (error) {
+      setErroresTotal({ ...erroresTotal, [id]: error.message })
+      setGuardandoTotalId(null)
+      return
+    }
+
+    setCotizaciones(cotizaciones.map((c) => (c.id === id ? { ...c, monto_total: Number(valor) } : c)))
+    setGuardandoTotalId(null)
+    setExitoTotalId(id)
+    setTimeout(() => setExitoTotalId(null), 2000)
   }
 
   useEffect(() => {
@@ -42,9 +76,9 @@ export default function QuotesList() {
     if (!error) cargar()
   }
 
-  async function handleGenerarLink(cotizacionId, concepto) {
+  async function handleGenerarLink(cotizacionId, concepto, montoSugerido) {
     const clave = `${cotizacionId}::${concepto}`
-    const monto = montos[clave]
+    const monto = montos[clave] ?? montoSugerido
     if (!monto || Number(monto) <= 0) {
       setErrores({ ...errores, [clave]: t('quotesList.montoInvalido') })
       return
@@ -82,7 +116,11 @@ export default function QuotesList() {
 
   return (
     <ul className="grid gap-4">
-      {cotizaciones.map((c) => (
+      {cotizaciones.map((c) => {
+        const restoSugerido =
+          c.monto_total != null ? Math.max(0, Number(c.monto_total) - Number(c.anticipo_monto || 0)) : ''
+
+        return (
         <li key={c.id} className="bg-surface border border-line rounded-sm p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -109,6 +147,32 @@ export default function QuotesList() {
           {c.descripcion && (
             <p className="text-sm text-parchment/80 mt-3 border-t border-line pt-3">{c.descripcion}</p>
           )}
+
+          <div className="mt-4 border-t border-line pt-4 flex flex-wrap items-center gap-3">
+            <span className="font-mono text-[11px] tracking-widest text-muted uppercase">
+              {t('quotesList.montoTotal')}
+            </span>
+            <input
+              type="number"
+              min="0"
+              placeholder={t('quotesList.montoTotalPlaceholder')}
+              value={montosTotales[c.id] ?? ''}
+              onChange={(e) => setMontosTotales({ ...montosTotales, [c.id]: e.target.value })}
+              className="bg-surface2 border border-line rounded-sm px-3 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors w-40"
+            />
+            <button
+              onClick={() => handleGuardarMontoTotal(c.id)}
+              disabled={guardandoTotalId === c.id}
+              className="font-mono text-xs uppercase tracking-widest text-brass hover:underline disabled:opacity-50"
+            >
+              {guardandoTotalId === c.id
+                ? t('quotesList.generando')
+                : exitoTotalId === c.id
+                  ? t('inventoryManager.guardado')
+                  : t('inventoryManager.guardar')}
+            </button>
+            {erroresTotal[c.id] && <p className="text-xs text-red-400 w-full">{erroresTotal[c.id]}</p>}
+          </div>
 
           <div className="mt-4 border-t border-line pt-4">
             {c.anticipo_estado === 'pagado' ? (
@@ -142,10 +206,10 @@ export default function QuotesList() {
                   t={t}
                   clave={`${c.id}::resto`}
                   placeholder={t('quotesList.montoRestoPlaceholder')}
-                  monto={montos[`${c.id}::resto`]}
+                  monto={montos[`${c.id}::resto`] ?? restoSugerido}
                   onMontoChange={(v) => setMontos({ ...montos, [`${c.id}::resto`]: v })}
                   generando={generandoClave === `${c.id}::resto`}
-                  onGenerar={() => handleGenerarLink(c.id, 'resto')}
+                  onGenerar={() => handleGenerarLink(c.id, 'resto', restoSugerido)}
                   link={linksGenerados[`${c.id}::resto`]}
                   error={errores[`${c.id}::resto`]}
                   onCopiar={copiarLink}
@@ -155,7 +219,8 @@ export default function QuotesList() {
             </div>
           )}
         </li>
-      ))}
+        )
+      })}
     </ul>
   )
 }
