@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
 
   const { data: productos, error: productosError } = await supabaseAdmin
     .from('productos')
-    .select('id, nombre, precio_desde, imagen, stock')
+    .select('id, nombre, precio_desde, imagen, stock, colores')
     .in('id', productoIds)
 
   if (productosError || !productos) {
@@ -49,10 +49,11 @@ Deno.serve(async (req) => {
 
   const productosPorId = Object.fromEntries(productos.map((p) => [p.id, p]))
 
-  const cantidadTotalPorProducto = {}
+  const cantidadTotalPorClave = {}
   for (const item of items) {
     const cantidad = Math.max(1, Math.round(Number(item.cantidad) || 1))
-    cantidadTotalPorProducto[item.producto_id] = (cantidadTotalPorProducto[item.producto_id] || 0) + cantidad
+    const clave = `${item.producto_id}::${item.color || ''}`
+    cantidadTotalPorClave[clave] = (cantidadTotalPorClave[clave] || 0) + cantidad
   }
 
   const lineItems = []
@@ -64,8 +65,16 @@ Deno.serve(async (req) => {
     if (!producto.precio_desde || producto.precio_desde <= 0) {
       return jsonResponse({ error: `"${producto.nombre}" no tiene un precio válido para compra.` }, 400)
     }
-    if (producto.stock < cantidadTotalPorProducto[producto.id]) {
-      return jsonResponse({ error: `"${producto.nombre}" no tiene suficientes existencias disponibles.` }, 400)
+
+    const tieneColores = Array.isArray(producto.colores) && producto.colores.length > 0
+    const stockDisponible = tieneColores
+      ? Number(producto.colores.find((c: { nombre: string }) => c.nombre === item.color)?.stock ?? 0)
+      : Number(producto.stock ?? 0)
+    const clave = `${item.producto_id}::${item.color || ''}`
+
+    if (stockDisponible < cantidadTotalPorClave[clave]) {
+      const etiqueta = item.color ? `${producto.nombre} (${item.color})` : producto.nombre
+      return jsonResponse({ error: `"${etiqueta}" no tiene suficientes existencias disponibles.` }, 400)
     }
 
     const cantidad = Math.max(1, Math.round(Number(item.cantidad) || 1))

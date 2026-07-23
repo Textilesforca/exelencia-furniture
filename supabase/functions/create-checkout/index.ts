@@ -30,13 +30,13 @@ Deno.serve(async (req) => {
   )
 
   const body = await req.json()
-  const { producto_id, nombre_cliente, email_cliente } = body
+  const { producto_id, color, nombre_cliente, email_cliente } = body
 
   if (!producto_id) return jsonResponse({ error: 'Falta producto_id.' }, 400)
 
   const { data: producto, error: productoError } = await supabaseAdmin
     .from('productos')
-    .select('id, nombre, precio_desde, imagen, stock')
+    .select('id, nombre, precio_desde, imagen, stock, colores')
     .eq('id', producto_id)
     .single()
 
@@ -44,7 +44,13 @@ Deno.serve(async (req) => {
   if (!producto.precio_desde || producto.precio_desde <= 0) {
     return jsonResponse({ error: 'Este producto no tiene un precio válido para compra directa.' }, 400)
   }
-  if (producto.stock <= 0) {
+
+  const tieneColores = Array.isArray(producto.colores) && producto.colores.length > 0
+  const stockDisponible = tieneColores
+    ? Number(producto.colores.find((c: { nombre: string }) => c.nombre === color)?.stock ?? 0)
+    : Number(producto.stock ?? 0)
+
+  if (stockDisponible <= 0) {
     return jsonResponse({ error: `"${producto.nombre}" no tiene existencias disponibles.` }, 400)
   }
 
@@ -75,6 +81,7 @@ Deno.serve(async (req) => {
     producto_id: producto.id,
     producto_nombre: producto.nombre,
     monto: producto.precio_desde,
+    color: tieneColores ? color || null : null,
     nombre_cliente: nombre_cliente || null,
     email_cliente: email_cliente || null,
     stripe_session_id: session.id,

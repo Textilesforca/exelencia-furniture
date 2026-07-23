@@ -8,16 +8,26 @@ export default function InventoryManager() {
   const [productos, setProductos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [valores, setValores] = useState({})
-  const [guardandoId, setGuardandoId] = useState(null)
+  const [guardandoClave, setGuardandoClave] = useState(null)
   const [errores, setErrores] = useState({})
-  const [exitoId, setExitoId] = useState(null)
+  const [exitoClave, setExitoClave] = useState(null)
 
   async function cargarProductos() {
     setCargando(true)
     const { data, error } = await supabase.from('productos').select('*').order('nombre', { ascending: true })
     if (!error) {
       setProductos(data ?? [])
-      setValores(Object.fromEntries((data ?? []).map((p) => [p.id, p.stock ?? 0])))
+      const iniciales = {}
+      for (const p of data ?? []) {
+        if (p.colores?.length > 0) {
+          for (const c of p.colores) {
+            iniciales[`${p.id}::${c.nombre}`] = c.stock ?? 0
+          }
+        } else {
+          iniciales[p.id] = p.stock ?? 0
+        }
+      }
+      setValores(iniciales)
     }
     setCargando(false)
   }
@@ -26,24 +36,55 @@ export default function InventoryManager() {
     cargarProductos()
   }, [])
 
-  async function handleGuardar(id) {
+  async function handleGuardarSinColor(id) {
     const nuevoStock = Math.max(0, Math.round(Number(valores[id]) || 0))
-    setGuardandoId(id)
+    setGuardandoClave(id)
     setErrores({ ...errores, [id]: '' })
-    setExitoId(null)
+    setExitoClave(null)
 
     const { error } = await supabase.rpc('actualizar_stock', { p_producto_id: id, p_stock: nuevoStock })
 
     if (error) {
       setErrores({ ...errores, [id]: error.message })
-      setGuardandoId(null)
+      setGuardandoClave(null)
       return
     }
 
     setProductos(productos.map((p) => (p.id === id ? { ...p, stock: nuevoStock } : p)))
-    setGuardandoId(null)
-    setExitoId(id)
-    setTimeout(() => setExitoId(null), 2000)
+    setGuardandoClave(null)
+    setExitoClave(id)
+    setTimeout(() => setExitoClave(null), 2000)
+  }
+
+  async function handleGuardarColor(producto, colorNombre) {
+    const clave = `${producto.id}::${colorNombre}`
+    const nuevoStock = Math.max(0, Math.round(Number(valores[clave]) || 0))
+    setGuardandoClave(clave)
+    setErrores({ ...errores, [clave]: '' })
+    setExitoClave(null)
+
+    const { error } = await supabase.rpc('actualizar_stock_color', {
+      p_producto_id: producto.id,
+      p_color_nombre: colorNombre,
+      p_stock: nuevoStock,
+    })
+
+    if (error) {
+      setErrores({ ...errores, [clave]: error.message })
+      setGuardandoClave(null)
+      return
+    }
+
+    setProductos(
+      productos.map((p) =>
+        p.id === producto.id
+          ? { ...p, colores: p.colores.map((c) => (c.nombre === colorNombre ? { ...c, stock: nuevoStock } : c)) }
+          : p
+      )
+    )
+    setGuardandoClave(null)
+    setExitoClave(clave)
+    setTimeout(() => setExitoClave(null), 2000)
   }
 
   if (cargando) {
@@ -59,47 +100,90 @@ export default function InventoryManager() {
       <h2 className="font-display text-2xl text-parchment mb-6">{t('inventoryManager.titulo')}</h2>
       <ul className="grid gap-3">
         {productos.map((p) => {
-          const stockActual = Number(p.stock ?? 0)
+          const tieneColores = p.colores?.length > 0
+          const stockTotal = tieneColores
+            ? p.colores.reduce((suma, c) => suma + Number(c.stock ?? 0), 0)
+            : Number(p.stock ?? 0)
+
           return (
-            <li
-              key={p.id}
-              className="flex items-center gap-4 bg-surface border border-line rounded-sm p-3"
-            >
-              <img src={p.imagen} alt={p.nombre} className="h-16 w-16 object-cover rounded-sm bg-surface2 shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-parchment truncate">{p.nombre}</p>
-                <p className="font-mono text-xs text-muted">{traducirCategoria(p.categoria, lang)}</p>
-                {stockActual <= 0 ? (
-                  <p className="font-mono text-[11px] uppercase tracking-widest text-red-400 mt-1">
-                    {t('inventoryManager.sinExistencias')}
-                  </p>
-                ) : stockActual < 5 ? (
-                  <p className="font-mono text-[11px] uppercase tracking-widest text-brass mt-1">
-                    {t('inventoryManager.bajoStock')}
-                  </p>
-                ) : null}
-                {errores[p.id] && <p className="text-xs text-red-400 mt-1">{errores[p.id]}</p>}
+            <li key={p.id} className="bg-surface border border-line rounded-sm p-3">
+              <div className="flex items-center gap-4">
+                <img src={p.imagen} alt={p.nombre} className="h-16 w-16 object-cover rounded-sm bg-surface2 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-parchment truncate">{p.nombre}</p>
+                  <p className="font-mono text-xs text-muted">{traducirCategoria(p.categoria, lang)}</p>
+                  {stockTotal <= 0 ? (
+                    <p className="font-mono text-[11px] uppercase tracking-widest text-red-400 mt-1">
+                      {t('inventoryManager.sinExistencias')}
+                    </p>
+                  ) : stockTotal < 5 ? (
+                    <p className="font-mono text-[11px] uppercase tracking-widest text-brass mt-1">
+                      {t('inventoryManager.bajoStock')}
+                    </p>
+                  ) : null}
+                </div>
+
+                {!tieneColores && (
+                  <>
+                    <input
+                      type="number"
+                      min="0"
+                      value={valores[p.id] ?? 0}
+                      onChange={(e) => setValores({ ...valores, [p.id]: e.target.value })}
+                      className="w-24 bg-surface2 border border-line rounded-sm px-3 py-2 text-sm text-parchment focus:border-brass outline-none transition-colors shrink-0"
+                    />
+                    <button
+                      onClick={() => handleGuardarSinColor(p.id)}
+                      disabled={guardandoClave === p.id}
+                      className="font-mono text-xs uppercase tracking-widest text-brass hover:underline disabled:opacity-50 shrink-0"
+                    >
+                      {guardandoClave === p.id
+                        ? t('inventoryManager.guardando')
+                        : exitoClave === p.id
+                          ? t('inventoryManager.guardado')
+                          : t('inventoryManager.guardar')}
+                    </button>
+                  </>
+                )}
               </div>
 
-              <input
-                type="number"
-                min="0"
-                value={valores[p.id] ?? 0}
-                onChange={(e) => setValores({ ...valores, [p.id]: e.target.value })}
-                className="w-24 bg-surface2 border border-line rounded-sm px-3 py-2 text-sm text-parchment focus:border-brass outline-none transition-colors shrink-0"
-              />
+              {errores[p.id] && <p className="text-xs text-red-400 mt-2">{errores[p.id]}</p>}
 
-              <button
-                onClick={() => handleGuardar(p.id)}
-                disabled={guardandoId === p.id}
-                className="font-mono text-xs uppercase tracking-widest text-brass hover:underline disabled:opacity-50 shrink-0"
-              >
-                {guardandoId === p.id
-                  ? t('inventoryManager.guardando')
-                  : exitoId === p.id
-                    ? t('inventoryManager.guardado')
-                    : t('inventoryManager.guardar')}
-              </button>
+              {tieneColores && (
+                <ul className="mt-3 grid gap-2 pl-20">
+                  {p.colores.map((c) => {
+                    const clave = `${p.id}::${c.nombre}`
+                    return (
+                      <li key={c.nombre} className="flex items-center gap-3">
+                        <span
+                          className="w-4 h-4 rounded-full border border-line shrink-0"
+                          style={{ backgroundColor: c.hex }}
+                        />
+                        <span className="text-sm text-parchment/90 flex-1 min-w-0 truncate">{c.nombre}</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={valores[clave] ?? 0}
+                          onChange={(e) => setValores({ ...valores, [clave]: e.target.value })}
+                          className="w-24 bg-surface2 border border-line rounded-sm px-3 py-2 text-sm text-parchment focus:border-brass outline-none transition-colors shrink-0"
+                        />
+                        <button
+                          onClick={() => handleGuardarColor(p, c.nombre)}
+                          disabled={guardandoClave === clave}
+                          className="font-mono text-xs uppercase tracking-widest text-brass hover:underline disabled:opacity-50 shrink-0"
+                        >
+                          {guardandoClave === clave
+                            ? t('inventoryManager.guardando')
+                            : exitoClave === clave
+                              ? t('inventoryManager.guardado')
+                              : t('inventoryManager.guardar')}
+                        </button>
+                        {errores[clave] && <p className="text-xs text-red-400">{errores[clave]}</p>}
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
             </li>
           )
         })}

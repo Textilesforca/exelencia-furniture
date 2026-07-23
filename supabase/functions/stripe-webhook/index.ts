@@ -44,11 +44,15 @@ Deno.serve(async (req) => {
         .update({ estado: nuevoEstado })
         .eq('stripe_session_id', session.id)
         .neq('estado', 'pagado')
-        .select('producto_id')
+        .select('producto_id, color')
         .maybeSingle()
 
       if (nuevoEstado === 'pagado' && pedido?.producto_id) {
-        await supabaseAdmin.rpc('descontar_stock', { p_producto_id: pedido.producto_id, p_cantidad: 1 })
+        await supabaseAdmin.rpc('descontar_stock', {
+          p_producto_id: pedido.producto_id,
+          p_cantidad: 1,
+          p_color: pedido.color,
+        })
       }
     } else if (tipo === 'cotizacion') {
       await supabaseAdmin
@@ -70,6 +74,7 @@ Deno.serve(async (req) => {
           await supabaseAdmin.rpc('descontar_stock', {
             p_producto_id: item.producto_id,
             p_cantidad: item.cantidad,
+            p_color: item.color,
           })
         }
       }

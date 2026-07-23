@@ -417,13 +417,22 @@ $$;
 
 grant execute on function public.get_carrito_orden_by_session(text) to anon, authenticated;
 
--- === Inventario y ventas (agregado 2026-07-22) ===
+-- === Inventario y ventas (agregado 2026-07-22, con stock por color 2026-07-23) ===
 
+-- Stock general, usado solo para piezas SIN colores registrados.
+-- Las piezas con colores llevan su stock dentro de cada elemento de
+-- productos.colores (jsonb): {"nombre": "Azul", "hex": "#...", "stock": 5}.
 alter table public.productos
   add column if not exists stock integer not null default 0;
 
--- Set/actualiza el inventario de una pieza. Usado por el apartado
--- "Inventario" del admin. Solo con permiso de productos o de inventario.
+-- El pedido de compra directa también necesita recordar qué color se
+-- compró, para poder descontar el color correcto al confirmarse el pago.
+alter table public.pedidos
+  add column if not exists color text;
+
+-- Set/actualiza el inventario de una pieza SIN colores. Usado por el
+-- apartado "Inventario" del admin. Solo con permiso de productos o de
+-- inventario.
 create or replace function public.actualizar_stock(p_producto_id uuid, p_stock integer)
 returns void
 language plpgsql
@@ -443,20 +452,71 @@ $$;
 
 grant execute on function public.actualizar_stock(uuid, integer) to authenticated;
 
--- Descuenta stock tras una compra confirmada. Solo la llaman las Edge
--- Functions con la service_role key (no se otorga a anon/authenticated).
-create or replace function public.descontar_stock(p_producto_id uuid, p_cantidad integer)
+-- Set/actualiza el inventario de UN color específico de una pieza.
+create or replace function public.actualizar_stock_color(p_producto_id uuid, p_color_nombre text, p_stock integer)
 returns void
-language sql
+language plpgsql
 security definer
 set search_path = public
 as $$
+begin
+  if not (has_permission('productos') or has_permission('inventario')) then
+    raise exception 'No tienes permiso para actualizar el inventario.';
+  end if;
+  if p_stock < 0 then
+    raise exception 'El inventario no puede ser negativo.';
+  end if;
+
   update public.productos
-  set stock = greatest(stock - p_cantidad, 0)
+  set colores = (
+    select jsonb_agg(
+      case when (c ->> 'nombre') = p_color_nombre
+        then c || jsonb_build_object('stock', p_stock)
+        else c
+      end
+    )
+    from jsonb_array_elements(colores) as c
+  )
   where id = p_producto_id;
+end;
 $$;
 
-revoke execute on function public.descontar_stock(uuid, integer) from public;
+grant execute on function public.actualizar_stock_color(uuid, text, integer) to authenticated;
+
+-- Descuenta stock tras una compra confirmada. Si p_color va, descuenta del
+-- color correspondiente dentro de productos.colores; si no, del stock
+-- general. Solo la llaman las Edge Functions con la service_role key (no
+-- se otorga a anon/authenticated).
+drop function if exists public.descontar_stock(uuid, integer);
+
+create or replace function public.descontar_stock(p_producto_id uuid, p_cantidad integer, p_color text default null)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if p_color is null then
+    update public.productos
+    set stock = greatest(stock - p_cantidad, 0)
+    where id = p_producto_id;
+  else
+    update public.productos
+    set colores = (
+      select jsonb_agg(
+        case when (c ->> 'nombre') = p_color
+          then c || jsonb_build_object('stock', greatest(coalesce((c ->> 'stock')::integer, 0) - p_cantidad, 0))
+          else c
+        end
+      )
+      from jsonb_array_elements(colores) as c
+    )
+    where id = p_producto_id;
+  end if;
+end;
+$$;
+
+revoke execute on function public.descontar_stock(uuid, integer, text) from public;
 
 -- Ventas unificadas (compra directa + carrito + anticipos de cotización)
 -- para el apartado "Ventas" del admin. Solo con permiso de ventas.
@@ -480,12 +540,18 @@ begin
   end if;
 
   return query
-    select p.id, 'producto'::text, p.producto_nombre, p.monto, p.nombre_cliente, p.creado_en
+    select p.id, 'producto'::text,
+      p.producto_nombre || case when p.color is not null then ' (' || p.color || ')' else '' end,
+      p.monto, p.nombre_cliente, p.creado_en
     from public.pedidos p
     where p.estado = 'pagado'
     union all
     select co.id, 'carrito'::text,
-      (select string_agg((item ->> 'nombre') || ' x' || (item ->> 'cantidad'), ', ')
+      (select string_agg(
+        (item ->> 'nombre') ||
+        case when (item ->> 'color') is not null then ' (' || (item ->> 'color') || ')' else '' end ||
+        ' x' || (item ->> 'cantidad'),
+        ', ')
        from jsonb_array_elements(co.items) as item),
       co.monto, co.nombre_cliente, co.creado_en
     from public.carrito_ordenes co

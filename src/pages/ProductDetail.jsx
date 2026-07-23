@@ -39,15 +39,23 @@ export default function ProductDetail() {
     setCantidad(1)
   }, [producto])
 
-  const stock = Number(producto?.stock ?? 0)
+  const tieneColores = producto?.colores?.length > 0
+  const stock = tieneColores
+    ? Number(producto.colores.find((c) => c.nombre === colorSeleccionado)?.stock ?? 0)
+    : Number(producto?.stock ?? 0)
   const sinExistencias = stock <= 0
+
+  useEffect(() => {
+    setCantidad((c) => Math.max(1, Math.min(c, stock || 1)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [colorSeleccionado, stock])
 
   async function handleComprar() {
     setComprando(true)
     setErrorCompra('')
 
     const { data, error } = await supabase.functions.invoke('create-checkout', {
-      body: { producto_id: producto.id },
+      body: { producto_id: producto.id, color: colorSeleccionado },
     })
 
     if (error) {

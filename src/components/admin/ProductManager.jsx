@@ -85,7 +85,7 @@ export default function ProductManager() {
   }
 
   function handleAgregarColor() {
-    setForm({ ...form, colores: [...form.colores, { nombre: '', hex: '#8B5A2B' }] })
+    setForm({ ...form, colores: [...form.colores, { nombre: '', hex: '#8B5A2B', stock: 0 }] })
   }
 
   function handleColorChange(index, campo, valor) {
