@@ -50,6 +50,12 @@ Deno.serve(async (req) => {
         .update({ anticipo_estado: nuevoEstado })
         .eq('stripe_session_id', session.id)
         .neq('anticipo_estado', 'pagado')
+    } else if (tipo === 'carrito') {
+      await supabaseAdmin
+        .from('carrito_ordenes')
+        .update({ estado: nuevoEstado })
+        .eq('stripe_session_id', session.id)
+        .neq('estado', 'pagado')
     }
   }
 

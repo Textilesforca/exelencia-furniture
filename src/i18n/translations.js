@@ -13,7 +13,8 @@ export const translations = {
       titulo: 'Tu carrito',
       vacio: 'Tu carrito está vacío.',
       total: 'Total',
-      pagoProximamente: 'Pago del carrito disponible próximamente — compra cada pieza por separado con Comprar ahora',
+      pagar: 'Pagar',
+      procesando: 'Procesando…',
     },
     footer: {
       taller: 'Taller y showroom con cita previa',
@@ -329,7 +330,8 @@ export const translations = {
       titulo: 'Your cart',
       vacio: 'Your cart is empty.',
       total: 'Total',
-      pagoProximamente: 'Cart checkout coming soon — buy each piece separately with Buy Now',
+      pagar: 'Pay',
+      procesando: 'Processing…',
     },
     footer: {
       taller: 'Workshop and showroom by appointment',

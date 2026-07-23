@@ -53,10 +53,14 @@ export function CartProvider({ children }) {
     setItems((actuales) => actuales.map((i) => (i.id === id ? { ...i, cantidad } : i)))
   }
 
+  function vaciar() {
+    setItems([])
+  }
+
   const total = items.reduce((suma, i) => suma + i.cantidad, 0)
 
   return (
-    <CartContext.Provider value={{ items, agregar, quitar, actualizarCantidad, total }}>
+    <CartContext.Provider value={{ items, agregar, quitar, actualizarCantidad, vaciar, total }}>
       {children}
     </CartContext.Provider>
   )

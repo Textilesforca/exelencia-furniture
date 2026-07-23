@@ -1,12 +1,46 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../cart/CartContext'
 import { useLanguage } from '../i18n/LanguageContext'
+import { supabase } from '../lib/supabaseClient'
 
 export default function Cart() {
   const { t } = useLanguage()
   const { items, quitar, actualizarCantidad } = useCart()
+  const [pagando, setPagando] = useState(false)
+  const [errorPago, setErrorPago] = useState('')
 
   const total = items.reduce((suma, i) => suma + i.cantidad * Number(i.precio_desde), 0)
+
+  async function handlePagar() {
+    setPagando(true)
+    setErrorPago('')
+
+    const { data, error } = await supabase.functions.invoke('create-cart-checkout', {
+      body: {
+        items: items.map((i) => ({
+          producto_id: i.productoId,
+          color: i.color,
+          cantidad: i.cantidad,
+        })),
+      },
+    })
+
+    if (error) {
+      let mensaje = error.message
+      try {
+        const cuerpo = await error.context.json()
+        if (cuerpo?.error) mensaje = cuerpo.error
+      } catch {
+        // sin body JSON, usamos el mensaje genérico
+      }
+      setErrorPago(mensaje)
+      setPagando(false)
+      return
+    }
+
+    window.location.assign(data.url)
+  }
 
   return (
     <section className="max-w-4xl mx-auto px-6 py-16">
@@ -72,12 +106,15 @@ export default function Cart() {
             </p>
           </div>
 
+          {errorPago && <p className="font-mono text-xs text-red-400 mt-4">{errorPago}</p>}
+
           <button
             type="button"
-            disabled
-            className="mt-6 w-full sm:w-auto bg-line text-muted font-body font-medium px-8 py-3 rounded-sm cursor-not-allowed"
+            onClick={handlePagar}
+            disabled={pagando}
+            className="mt-6 w-full sm:w-auto bg-brass text-ink font-body font-medium px-8 py-3 rounded-sm hover:bg-walnut2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {t('cart.pagoProximamente')}
+            {pagando ? t('cart.procesando') : t('cart.pagar')}
           </button>
         </>
       )}

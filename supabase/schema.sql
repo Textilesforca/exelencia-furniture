@@ -382,3 +382,37 @@ create policy "Con permiso pueden insertar galería de categoría"
 create policy "Con permiso pueden borrar galería de categoría"
   on categoria_imagenes for delete to authenticated
   using (has_permission('productos'));
+
+-- === Pago del carrito con Stripe (agregado 2026-07-22) ===
+
+create table if not exists public.carrito_ordenes (
+  id uuid primary key default gen_random_uuid(),
+  items jsonb not null,
+  monto numeric not null,
+  nombre_cliente text,
+  email_cliente text,
+  stripe_session_id text unique not null,
+  estado text not null default 'pendiente' check (estado in ('pendiente', 'pagado', 'cancelado')),
+  creado_en timestamptz default now()
+);
+
+alter table public.carrito_ordenes enable row level security;
+-- Mismo patrón que pedidos: sin policies de select/insert/update, toda
+-- escritura pasa por la Edge Function con la service_role key. Lectura
+-- pública solo vía la función de abajo, filtrando por session_id (un token
+-- opaco de la URL, no por usuario).
+
+create or replace function public.get_carrito_orden_by_session(p_session_id text)
+returns table (items jsonb, monto numeric, estado text)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select items, monto, estado
+  from public.carrito_ordenes
+  where stripe_session_id = p_session_id
+  limit 1;
+$$;
+
+grant execute on function public.get_carrito_orden_by_session(text) to anon, authenticated;
