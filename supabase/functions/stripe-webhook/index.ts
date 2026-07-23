@@ -39,11 +39,17 @@ Deno.serve(async (req) => {
     )
 
     if (tipo === 'producto') {
-      await supabaseAdmin
+      const { data: pedido } = await supabaseAdmin
         .from('pedidos')
         .update({ estado: nuevoEstado })
         .eq('stripe_session_id', session.id)
         .neq('estado', 'pagado')
+        .select('producto_id')
+        .maybeSingle()
+
+      if (nuevoEstado === 'pagado' && pedido?.producto_id) {
+        await supabaseAdmin.rpc('descontar_stock', { p_producto_id: pedido.producto_id, p_cantidad: 1 })
+      }
     } else if (tipo === 'cotizacion') {
       await supabaseAdmin
         .from('cotizaciones')
@@ -51,11 +57,22 @@ Deno.serve(async (req) => {
         .eq('stripe_session_id', session.id)
         .neq('anticipo_estado', 'pagado')
     } else if (tipo === 'carrito') {
-      await supabaseAdmin
+      const { data: orden } = await supabaseAdmin
         .from('carrito_ordenes')
         .update({ estado: nuevoEstado })
         .eq('stripe_session_id', session.id)
         .neq('estado', 'pagado')
+        .select('items')
+        .maybeSingle()
+
+      if (nuevoEstado === 'pagado' && orden?.items) {
+        for (const item of orden.items) {
+          await supabaseAdmin.rpc('descontar_stock', {
+            p_producto_id: item.producto_id,
+            p_cantidad: item.cantidad,
+          })
+        }
+      }
     }
   }
 

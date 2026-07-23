@@ -8,6 +8,8 @@ import QuotesList from '../components/admin/QuotesList'
 import UserManager from '../components/admin/UserManager'
 import BannerManager from '../components/admin/BannerManager'
 import CatalogoManager from '../components/admin/CatalogoManager'
+import InventoryManager from '../components/admin/InventoryManager'
+import SalesManager from '../components/admin/SalesManager'
 import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Admin() {
@@ -22,6 +24,8 @@ export default function Admin() {
     (esAdmin || profile?.permisos?.cotizaciones) && 'cotizaciones',
     (esAdmin || profile?.permisos?.banner) && 'banner',
     (esAdmin || profile?.permisos?.catalogo) && 'catalogo',
+    (esAdmin || profile?.permisos?.inventario) && 'inventario',
+    (esAdmin || profile?.permisos?.ventas) && 'ventas',
     esAdmin && 'usuarios',
   ].filter(Boolean)
 
@@ -79,6 +83,16 @@ export default function Admin() {
                 {t('admin.tabCatalogo')}
               </TabButton>
             )}
+            {tabsDisponibles.includes('inventario') && (
+              <TabButton active={tab === 'inventario'} onClick={() => setTab('inventario')}>
+                {t('admin.tabInventario')}
+              </TabButton>
+            )}
+            {tabsDisponibles.includes('ventas') && (
+              <TabButton active={tab === 'ventas'} onClick={() => setTab('ventas')}>
+                {t('admin.tabVentas')}
+              </TabButton>
+            )}
             {tabsDisponibles.includes('usuarios') && (
               <TabButton active={tab === 'usuarios'} onClick={() => setTab('usuarios')}>
                 {t('admin.tabUsuarios')}
@@ -90,6 +104,8 @@ export default function Admin() {
           {tab === 'cotizaciones' && <QuotesList />}
           {tab === 'banner' && <BannerManager />}
           {tab === 'catalogo' && <CatalogoManager />}
+          {tab === 'inventario' && <InventoryManager />}
+          {tab === 'ventas' && <SalesManager />}
           {tab === 'usuarios' && <UserManager />}
         </>
       )}

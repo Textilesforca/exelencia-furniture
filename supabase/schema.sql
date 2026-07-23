@@ -416,3 +416,86 @@ as $$
 $$;
 
 grant execute on function public.get_carrito_orden_by_session(text) to anon, authenticated;
+
+-- === Inventario y ventas (agregado 2026-07-22) ===
+
+alter table public.productos
+  add column if not exists stock integer not null default 0;
+
+-- Set/actualiza el inventario de una pieza. Usado por el apartado
+-- "Inventario" del admin. Solo con permiso de productos o de inventario.
+create or replace function public.actualizar_stock(p_producto_id uuid, p_stock integer)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not (has_permission('productos') or has_permission('inventario')) then
+    raise exception 'No tienes permiso para actualizar el inventario.';
+  end if;
+  if p_stock < 0 then
+    raise exception 'El inventario no puede ser negativo.';
+  end if;
+  update public.productos set stock = p_stock where id = p_producto_id;
+end;
+$$;
+
+grant execute on function public.actualizar_stock(uuid, integer) to authenticated;
+
+-- Descuenta stock tras una compra confirmada. Solo la llaman las Edge
+-- Functions con la service_role key (no se otorga a anon/authenticated).
+create or replace function public.descontar_stock(p_producto_id uuid, p_cantidad integer)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update public.productos
+  set stock = greatest(stock - p_cantidad, 0)
+  where id = p_producto_id;
+$$;
+
+revoke execute on function public.descontar_stock(uuid, integer) from public;
+
+-- Ventas unificadas (compra directa + carrito + anticipos de cotización)
+-- para el apartado "Ventas" del admin. Solo con permiso de ventas.
+create or replace function public.listar_ventas()
+returns table (
+  id uuid,
+  tipo text,
+  descripcion text,
+  monto numeric,
+  cliente text,
+  creado_en timestamptz
+)
+language plpgsql
+security definer
+set search_path = public
+stable
+as $$
+begin
+  if not (has_permission('ventas')) then
+    raise exception 'No tienes permiso para ver las ventas.';
+  end if;
+
+  return query
+    select p.id, 'producto'::text, p.producto_nombre, p.monto, p.nombre_cliente, p.creado_en
+    from public.pedidos p
+    where p.estado = 'pagado'
+    union all
+    select co.id, 'carrito'::text,
+      (select string_agg((item ->> 'nombre') || ' x' || (item ->> 'cantidad'), ', ')
+       from jsonb_array_elements(co.items) as item),
+      co.monto, co.nombre_cliente, co.creado_en
+    from public.carrito_ordenes co
+    where co.estado = 'pagado'
+    union all
+    select c.id, 'anticipo'::text, c.nombre, c.anticipo_monto, c.nombre, c.creado_en
+    from public.cotizaciones c
+    where c.anticipo_estado = 'pagado'
+    order by creado_en desc;
+end;
+$$;
+
+grant execute on function public.listar_ventas() to authenticated;

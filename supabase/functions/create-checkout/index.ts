@@ -36,13 +36,16 @@ Deno.serve(async (req) => {
 
   const { data: producto, error: productoError } = await supabaseAdmin
     .from('productos')
-    .select('id, nombre, precio_desde, imagen')
+    .select('id, nombre, precio_desde, imagen, stock')
     .eq('id', producto_id)
     .single()
 
   if (productoError || !producto) return jsonResponse({ error: 'Producto no encontrado.' }, 404)
   if (!producto.precio_desde || producto.precio_desde <= 0) {
     return jsonResponse({ error: 'Este producto no tiene un precio válido para compra directa.' }, 400)
+  }
+  if (producto.stock <= 0) {
+    return jsonResponse({ error: `"${producto.nombre}" no tiene existencias disponibles.` }, 400)
   }
 
   const montoCentavos = Math.round(Number(producto.precio_desde) * 100)

@@ -6,7 +6,23 @@ const estadoInicial = {
   email: '',
   password: '',
   role: 'usuario',
-  permisos: { productos: false, cotizaciones: false, banner: false, catalogo: false },
+  permisos: {
+    productos: false,
+    cotizaciones: false,
+    banner: false,
+    catalogo: false,
+    inventario: false,
+    ventas: false,
+  },
+}
+
+const PERMISOS_ADMIN = {
+  productos: true,
+  cotizaciones: true,
+  banner: true,
+  catalogo: true,
+  inventario: true,
+  ventas: true,
 }
 
 async function mensajeDeError(error) {
@@ -63,10 +79,7 @@ export default function UserManager() {
         email: form.email,
         password: form.password,
         role: form.role,
-        permisos:
-          form.role === 'admin'
-            ? { productos: true, cotizaciones: true, banner: true, catalogo: true }
-            : form.permisos,
+        permisos: form.role === 'admin' ? PERMISOS_ADMIN : form.permisos,
       },
     })
 
@@ -88,10 +101,7 @@ export default function UserManager() {
           ? {
               ...u,
               role,
-              permisos:
-                role === 'admin'
-                  ? { productos: true, cotizaciones: true, banner: true, catalogo: true }
-                  : u.permisos,
+              permisos: role === 'admin' ? PERMISOS_ADMIN : u.permisos,
             }
           : u
       )
@@ -203,6 +213,16 @@ export default function UserManager() {
                   checked={form.permisos.catalogo}
                   onChange={(checked) => handlePermisoChange('catalogo', checked)}
                 />
+                <PermisoCheckbox
+                  label={t('userManager.inventario')}
+                  checked={form.permisos.inventario}
+                  onChange={(checked) => handlePermisoChange('inventario', checked)}
+                />
+                <PermisoCheckbox
+                  label={t('userManager.ventas')}
+                  checked={form.permisos.ventas}
+                  onChange={(checked) => handlePermisoChange('ventas', checked)}
+                />
               </div>
             </div>
           )}
@@ -262,6 +282,16 @@ export default function UserManager() {
                         label={t('userManager.catalogo')}
                         checked={!!u.permisos?.catalogo}
                         onChange={(checked) => handleRowPermisoChange(u.id, 'catalogo', checked)}
+                      />
+                      <PermisoCheckbox
+                        label={t('userManager.inventario')}
+                        checked={!!u.permisos?.inventario}
+                        onChange={(checked) => handleRowPermisoChange(u.id, 'inventario', checked)}
+                      />
+                      <PermisoCheckbox
+                        label={t('userManager.ventas')}
+                        checked={!!u.permisos?.ventas}
+                        onChange={(checked) => handleRowPermisoChange(u.id, 'ventas', checked)}
                       />
                     </>
                   )}

@@ -39,6 +39,9 @@ export default function ProductDetail() {
     setCantidad(1)
   }, [producto])
 
+  const stock = Number(producto?.stock ?? 0)
+  const sinExistencias = stock <= 0
+
   async function handleComprar() {
     setComprando(true)
     setErrorCompra('')
@@ -173,33 +176,41 @@ export default function ProductDetail() {
           {t('productDetail.desde')} ${Number(producto.precio_desde).toLocaleString('en-US')} USD
         </p>
 
-        <div className="flex items-center gap-4 mb-6">
-          <span className="font-mono text-[11px] tracking-widest text-muted uppercase">
-            {t('productDetail.cantidad')}
-          </span>
-          <div className="flex items-center border border-line rounded-sm">
-            <button
-              type="button"
-              onClick={() => setCantidad((c) => Math.max(1, c - 1))}
-              className="w-9 h-9 text-parchment hover:text-brass transition-colors"
-            >
-              −
-            </button>
-            <span className="w-10 text-center font-mono text-parchment">{cantidad}</span>
-            <button
-              type="button"
-              onClick={() => setCantidad((c) => c + 1)}
-              className="w-9 h-9 text-parchment hover:text-brass transition-colors"
-            >
-              +
-            </button>
+        {esProductoReal && sinExistencias && (
+          <p className="font-mono text-xs uppercase tracking-widest text-red-400 mb-6">
+            {t('productDetail.sinExistencias')}
+          </p>
+        )}
+
+        {esProductoReal && !sinExistencias && (
+          <div className="flex items-center gap-4 mb-6">
+            <span className="font-mono text-[11px] tracking-widest text-muted uppercase">
+              {t('productDetail.cantidad')}
+            </span>
+            <div className="flex items-center border border-line rounded-sm">
+              <button
+                type="button"
+                onClick={() => setCantidad((c) => Math.max(1, c - 1))}
+                className="w-9 h-9 text-parchment hover:text-brass transition-colors"
+              >
+                −
+              </button>
+              <span className="w-10 text-center font-mono text-parchment">{cantidad}</span>
+              <button
+                type="button"
+                onClick={() => setCantidad((c) => Math.min(stock, c + 1))}
+                className="w-9 h-9 text-parchment hover:text-brass transition-colors"
+              >
+                +
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {errorCompra && <p className="text-sm text-red-400 mb-3">{errorCompra}</p>}
 
         <div className="flex flex-wrap gap-3">
-          {esProductoReal && (
+          {esProductoReal && !sinExistencias && (
             <button
               type="button"
               onClick={handleAgregarCarrito}
@@ -209,7 +220,7 @@ export default function ProductDetail() {
             </button>
           )}
 
-          {esProductoReal && (
+          {esProductoReal && !sinExistencias && (
             <button
               type="button"
               onClick={handleComprar}

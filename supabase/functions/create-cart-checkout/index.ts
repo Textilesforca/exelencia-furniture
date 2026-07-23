@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
 
   const { data: productos, error: productosError } = await supabaseAdmin
     .from('productos')
-    .select('id, nombre, precio_desde, imagen')
+    .select('id, nombre, precio_desde, imagen, stock')
     .in('id', productoIds)
 
   if (productosError || !productos) {
@@ -48,6 +48,12 @@ Deno.serve(async (req) => {
   }
 
   const productosPorId = Object.fromEntries(productos.map((p) => [p.id, p]))
+
+  const cantidadTotalPorProducto = {}
+  for (const item of items) {
+    const cantidad = Math.max(1, Math.round(Number(item.cantidad) || 1))
+    cantidadTotalPorProducto[item.producto_id] = (cantidadTotalPorProducto[item.producto_id] || 0) + cantidad
+  }
 
   const lineItems = []
   const itemsValidados = []
@@ -57,6 +63,9 @@ Deno.serve(async (req) => {
     if (!producto) return jsonResponse({ error: 'Uno de los productos del carrito ya no está disponible.' }, 404)
     if (!producto.precio_desde || producto.precio_desde <= 0) {
       return jsonResponse({ error: `"${producto.nombre}" no tiene un precio válido para compra.` }, 400)
+    }
+    if (producto.stock < cantidadTotalPorProducto[producto.id]) {
+      return jsonResponse({ error: `"${producto.nombre}" no tiene suficientes existencias disponibles.` }, 400)
     }
 
     const cantidad = Math.max(1, Math.round(Number(item.cantidad) || 1))
