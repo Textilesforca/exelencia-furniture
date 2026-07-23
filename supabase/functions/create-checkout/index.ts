@@ -72,6 +72,7 @@ Deno.serve(async (req) => {
       },
     ],
     customer_email: email_cliente || undefined,
+    billing_address_collection: 'required',
     success_url: `${SITE_URL}/pago/exito?session_id={CHECKOUT_SESSION_ID}&tipo=producto`,
     cancel_url: `${SITE_URL}/pago/cancelado?tipo=producto`,
     metadata: { tipo: 'producto', producto_id: producto.id },

@@ -108,6 +108,7 @@ Deno.serve(async (req) => {
     mode: 'payment',
     line_items: lineItems,
     customer_email: email_cliente || undefined,
+    billing_address_collection: 'required',
     success_url: `${SITE_URL}/pago/exito?session_id={CHECKOUT_SESSION_ID}&tipo=carrito`,
     cancel_url: `${SITE_URL}/pago/cancelado?tipo=carrito`,
     metadata: { tipo: 'carrito' },

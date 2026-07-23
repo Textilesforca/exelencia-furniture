@@ -41,7 +41,11 @@ Deno.serve(async (req) => {
     if (tipo === 'producto') {
       const { data: pedido } = await supabaseAdmin
         .from('pedidos')
-        .update({ estado: nuevoEstado })
+        .update({
+          estado: nuevoEstado,
+          nombre_cliente: session.customer_details?.name ?? null,
+          email_cliente: session.customer_details?.email ?? null,
+        })
         .eq('stripe_session_id', session.id)
         .neq('estado', 'pagado')
         .select('producto_id, color')
@@ -63,7 +67,11 @@ Deno.serve(async (req) => {
     } else if (tipo === 'carrito') {
       const { data: orden } = await supabaseAdmin
         .from('carrito_ordenes')
-        .update({ estado: nuevoEstado })
+        .update({
+          estado: nuevoEstado,
+          nombre_cliente: session.customer_details?.name ?? null,
+          email_cliente: session.customer_details?.email ?? null,
+        })
         .eq('stripe_session_id', session.id)
         .neq('estado', 'pagado')
         .select('items')
