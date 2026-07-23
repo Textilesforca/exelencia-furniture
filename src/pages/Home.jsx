@@ -1,14 +1,28 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Hero from '../components/Hero'
 import Banner from '../components/Banner'
 import BlueprintDivider from '../components/BlueprintDivider'
 import ProductCard from '../components/ProductCard'
 import { sampleProducts } from '../data/products'
+import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Home() {
   const { t } = useLanguage()
-  const destacados = sampleProducts.slice(0, 3)
+  const [destacados, setDestacados] = useState(sampleProducts.slice(0, 3))
+
+  useEffect(() => {
+    async function cargarDestacados() {
+      const { data, error } = await supabase
+        .from('productos')
+        .select('*')
+        .order('creado_en', { ascending: false })
+        .limit(3)
+      if (!error && data && data.length > 0) setDestacados(data)
+    }
+    cargarDestacados()
+  }, [])
 
   return (
     <>
