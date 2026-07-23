@@ -329,6 +329,8 @@ export const translations = {
       vistaPiezas: 'Piezas vendidas',
       categoria: 'Categoría',
       piezasVendidas: 'Piezas vendidas',
+      expandir: 'Ver subcategorías',
+      colapsar: 'Ocultar subcategorías',
     },
     bannerManager: {
       cargando: 'Cargando…',
@@ -689,6 +691,8 @@ export const translations = {
       vistaPiezas: 'Units sold',
       categoria: 'Category',
       piezasVendidas: 'Units sold',
+      expandir: 'Show subcategories',
+      colapsar: 'Hide subcategories',
     },
     bannerManager: {
       cargando: 'Loading…',

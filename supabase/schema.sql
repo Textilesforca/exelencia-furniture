@@ -569,9 +569,12 @@ grant execute on function public.listar_ventas() to authenticated;
 -- Piezas vendidas (unidades), para el resumen por categoría en Ventas.
 -- Solo cuenta compra directa y carrito (tienen producto real ligado);
 -- los anticipos de cotización son piezas a medida sin catálogo/categoría.
+drop function if exists public.listar_piezas_vendidas();
+
 create or replace function public.listar_piezas_vendidas()
 returns table (
   categoria text,
+  subcategoria text,
   nombre text,
   cantidad integer,
   creado_en timestamptz
@@ -587,12 +590,12 @@ begin
   end if;
 
   return query
-    select coalesce(pr.categoria, 'Sin categoría'), p.producto_nombre, 1, p.creado_en
+    select coalesce(pr.categoria, 'Sin categoría'), pr.subcategoria, p.producto_nombre, 1, p.creado_en
     from public.pedidos p
     left join public.productos pr on pr.id = p.producto_id
     where p.estado = 'pagado'
     union all
-    select coalesce(pr.categoria, 'Sin categoría'), (item ->> 'nombre'), (item ->> 'cantidad')::integer, co.creado_en
+    select coalesce(pr.categoria, 'Sin categoría'), pr.subcategoria, (item ->> 'nombre'), (item ->> 'cantidad')::integer, co.creado_en
     from public.carrito_ordenes co
     cross join lateral jsonb_array_elements(co.items) as item
     left join public.productos pr on pr.id = (item ->> 'producto_id')::uuid

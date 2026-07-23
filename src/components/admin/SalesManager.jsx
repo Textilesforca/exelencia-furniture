@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { jsPDF } from 'jspdf'
 import { supabase } from '../../lib/supabaseClient'
 import { useLanguage } from '../../i18n/LanguageContext'
-import { traducirCategoria } from '../../i18n/translations'
+import { traducirCategoria, traducirSubcategoria } from '../../i18n/translations'
 
 const FILTROS = ['hoy', 'semana', 'mes', 'anio']
 
@@ -33,6 +33,16 @@ export default function SalesManager() {
   const [filtro, setFiltro] = useState('hoy')
   const [vista, setVista] = useState('dinero')
   const [generandoPdf, setGenerandoPdf] = useState(false)
+  const [categoriasExpandidas, setCategoriasExpandidas] = useState(new Set())
+
+  function toggleCategoria(categoria) {
+    setCategoriasExpandidas((actuales) => {
+      const nuevas = new Set(actuales)
+      if (nuevas.has(categoria)) nuevas.delete(categoria)
+      else nuevas.add(categoria)
+      return nuevas
+    })
+  }
 
   useEffect(() => {
     async function cargar() {
@@ -57,13 +67,24 @@ export default function SalesManager() {
 
   const piezasPorCategoria = useMemo(() => {
     const desde = limiteDesde(filtro)
-    const totales = {}
+    const porCategoria = {}
     for (const p of piezas) {
       if (new Date(p.creado_en) < desde) continue
-      totales[p.categoria] = (totales[p.categoria] || 0) + Number(p.cantidad || 0)
+      const cantidad = Number(p.cantidad || 0)
+      const subNombre = p.subcategoria || null
+      if (!porCategoria[p.categoria]) porCategoria[p.categoria] = { cantidad: 0, subcategorias: {} }
+      porCategoria[p.categoria].cantidad += cantidad
+      porCategoria[p.categoria].subcategorias[subNombre] =
+        (porCategoria[p.categoria].subcategorias[subNombre] || 0) + cantidad
     }
-    return Object.entries(totales)
-      .map(([categoria, cantidad]) => ({ categoria, cantidad }))
+    return Object.entries(porCategoria)
+      .map(([categoria, { cantidad, subcategorias }]) => ({
+        categoria,
+        cantidad,
+        subcategorias: Object.entries(subcategorias)
+          .map(([subcategoria, cantidad]) => ({ subcategoria, cantidad }))
+          .sort((a, b) => b.cantidad - a.cantidad),
+      }))
       .sort((a, b) => b.cantidad - a.cantidad)
   }, [piezas, filtro])
 
@@ -322,12 +343,45 @@ export default function SalesManager() {
               </tr>
             </thead>
             <tbody>
-              {piezasPorCategoria.map((p) => (
-                <tr key={p.categoria} className="border-b border-line/60 text-parchment/90">
-                  <td className="py-2 pr-4">{traducirCategoria(p.categoria, lang)}</td>
-                  <td className="py-2 font-mono text-walnut2 text-right">{p.cantidad}</td>
-                </tr>
-              ))}
+              {piezasPorCategoria.map((p) => {
+                const expandida = categoriasExpandidas.has(p.categoria)
+                const tieneSubcategorias = p.subcategorias.length > 1 || p.subcategorias[0]?.subcategoria
+                return (
+                  <Fragment key={p.categoria}>
+                    <tr className="border-b border-line/60 text-parchment/90">
+                      <td className="py-2 pr-4">
+                        <div className="flex items-center gap-2">
+                          {tieneSubcategorias ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleCategoria(p.categoria)}
+                              aria-label={expandida ? t('salesManager.colapsar') : t('salesManager.expandir')}
+                              className="w-5 h-5 flex items-center justify-center border border-line rounded-sm text-brass hover:border-brass/60 transition-colors shrink-0"
+                            >
+                              {expandida ? '−' : '+'}
+                            </button>
+                          ) : (
+                            <span className="w-5 h-5 shrink-0" />
+                          )}
+                          {traducirCategoria(p.categoria, lang)}
+                        </div>
+                      </td>
+                      <td className="py-2 font-mono text-walnut2 text-right">{p.cantidad}</td>
+                    </tr>
+                    {expandida &&
+                      p.subcategorias.map((s) => (
+                        <tr key={`${p.categoria}::${s.subcategoria}`} className="border-b border-line/60 text-parchment/70">
+                          <td className="py-2 pr-4 pl-9 text-sm">
+                            {s.subcategoria
+                              ? traducirSubcategoria(s.subcategoria, lang, p.categoria)
+                              : t('productManager.sinSubcategoria')}
+                          </td>
+                          <td className="py-2 font-mono text-right">{s.cantidad}</td>
+                        </tr>
+                      ))}
+                  </Fragment>
+                )
+              })}
             </tbody>
           </table>
 
