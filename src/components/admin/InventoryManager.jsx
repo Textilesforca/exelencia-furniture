@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import { categorias } from '../../data/products'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { traducirCategoria } from '../../i18n/translations'
 
@@ -11,6 +12,15 @@ export default function InventoryManager() {
   const [guardandoClave, setGuardandoClave] = useState(null)
   const [errores, setErrores] = useState({})
   const [exitoClave, setExitoClave] = useState(null)
+  const [categoriaActiva, setCategoriaActiva] = useState('Todos')
+
+  const categoriasPresentes = useMemo(
+    () => categorias.filter((c) => c === 'Todos' || productos.some((p) => p.categoria === c)),
+    [productos]
+  )
+
+  const productosFiltrados =
+    categoriaActiva === 'Todos' ? productos : productos.filter((p) => p.categoria === categoriaActiva)
 
   async function cargarProductos() {
     setCargando(true)
@@ -98,8 +108,29 @@ export default function InventoryManager() {
   return (
     <div>
       <h2 className="font-display text-2xl text-parchment mb-6">{t('inventoryManager.titulo')}</h2>
+
+      <div className="flex flex-wrap gap-2 mb-6">
+        {categoriasPresentes.map((c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => setCategoriaActiva(c)}
+            className={`font-mono text-xs uppercase tracking-widest px-4 py-2 rounded-sm border transition-colors ${
+              categoriaActiva === c
+                ? 'border-brass text-brass'
+                : 'border-line text-muted hover:text-parchment hover:border-brass/60'
+            }`}
+          >
+            {traducirCategoria(c, lang)}
+          </button>
+        ))}
+      </div>
+
+      {productosFiltrados.length === 0 ? (
+        <p className="font-mono text-sm text-muted">{t('inventoryManager.vacio')}</p>
+      ) : (
       <ul className="grid gap-3">
-        {productos.map((p) => {
+        {productosFiltrados.map((p) => {
           const tieneColores = p.colores?.length > 0
           const stockTotal = tieneColores
             ? p.colores.reduce((suma, c) => suma + Number(c.stock ?? 0), 0)
@@ -188,6 +219,7 @@ export default function InventoryManager() {
           )
         })}
       </ul>
+      )}
     </div>
   )
 }
