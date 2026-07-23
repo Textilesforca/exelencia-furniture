@@ -160,11 +160,15 @@ export default function CatalogViewer({ imagenes, categoria }) {
           </div>
         ) : (
           <>
-            <div className={`overflow-auto ${zoom ? 'max-h-[80vh]' : ''}`}>
+            <div
+              className={`flex items-center justify-center bg-ink ${
+                zoom ? 'h-[70vh] sm:h-[80vh] overflow-auto' : 'h-[70vh] sm:h-[80vh]'
+              }`}
+            >
               <img
                 src={actual.imagen}
                 alt=""
-                className={zoom ? 'w-auto h-auto scale-150 origin-top-left' : 'w-full h-auto'}
+                className={zoom ? 'w-auto h-auto scale-150 origin-top-left' : 'max-w-full max-h-full object-contain'}
               />
             </div>
 
