@@ -48,7 +48,8 @@ Deno.serve(async (req) => {
   }
 
   const body = await req.json()
-  const { cotizacion_id, monto } = body
+  const { cotizacion_id, monto, concepto } = body
+  const esResto = concepto === 'resto'
 
   if (!cotizacion_id) return jsonResponse({ error: 'Falta cotizacion_id.' }, 400)
 
@@ -59,13 +60,18 @@ Deno.serve(async (req) => {
 
   const { data: cotizacion, error: cotizacionError } = await supabaseAdmin
     .from('cotizaciones')
-    .select('id, nombre')
+    .select('id, nombre, anticipo_estado')
     .eq('id', cotizacion_id)
     .single()
 
   if (cotizacionError || !cotizacion) return jsonResponse({ error: 'Cotización no encontrada.' }, 404)
 
+  if (esResto && cotizacion.anticipo_estado !== 'pagado') {
+    return jsonResponse({ error: 'Primero debes recibir el anticipo de esta cotización.' }, 400)
+  }
+
   const montoCentavos = Math.round(montoNumero * 100)
+  const etiqueta = esResto ? 'Resto' : 'Anticipo'
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
@@ -75,7 +81,7 @@ Deno.serve(async (req) => {
           currency: 'usd',
           unit_amount: montoCentavos,
           product_data: {
-            name: `Anticipo — ${cotizacion.nombre}`,
+            name: `${etiqueta} — ${cotizacion.nombre}`,
           },
         },
         quantity: 1,
@@ -83,16 +89,16 @@ Deno.serve(async (req) => {
     ],
     success_url: `${SITE_URL}/pago/exito?session_id={CHECKOUT_SESSION_ID}&tipo=cotizacion`,
     cancel_url: `${SITE_URL}/pago/cancelado?tipo=cotizacion`,
-    metadata: { tipo: 'cotizacion', cotizacion_id: cotizacion.id },
+    metadata: { tipo: 'cotizacion', concepto: esResto ? 'resto' : 'anticipo', cotizacion_id: cotizacion.id },
   })
 
   const { error: updateError } = await supabaseAdmin
     .from('cotizaciones')
-    .update({
-      anticipo_monto: montoNumero,
-      anticipo_estado: 'pendiente',
-      stripe_session_id: session.id,
-    })
+    .update(
+      esResto
+        ? { resto_monto: montoNumero, resto_estado: 'pendiente', resto_stripe_session_id: session.id }
+        : { anticipo_monto: montoNumero, anticipo_estado: 'pendiente', stripe_session_id: session.id }
+    )
     .eq('id', cotizacion.id)
 
   if (updateError) return jsonResponse({ error: updateError.message }, 500)

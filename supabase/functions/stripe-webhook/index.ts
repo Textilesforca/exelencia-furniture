@@ -59,11 +59,19 @@ Deno.serve(async (req) => {
         })
       }
     } else if (tipo === 'cotizacion') {
-      await supabaseAdmin
-        .from('cotizaciones')
-        .update({ anticipo_estado: nuevoEstado })
-        .eq('stripe_session_id', session.id)
-        .neq('anticipo_estado', 'pagado')
+      if (session.metadata?.concepto === 'resto') {
+        await supabaseAdmin
+          .from('cotizaciones')
+          .update({ resto_estado: nuevoEstado })
+          .eq('resto_stripe_session_id', session.id)
+          .neq('resto_estado', 'pagado')
+      } else {
+        await supabaseAdmin
+          .from('cotizaciones')
+          .update({ anticipo_estado: nuevoEstado })
+          .eq('stripe_session_id', session.id)
+          .neq('anticipo_estado', 'pagado')
+      }
     } else if (tipo === 'carrito') {
       const { data: orden } = await supabaseAdmin
         .from('carrito_ordenes')

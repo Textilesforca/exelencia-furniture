@@ -18,7 +18,7 @@ export default function QuotesList() {
   const [cotizaciones, setCotizaciones] = useState([])
   const [cargando, setCargando] = useState(true)
   const [montos, setMontos] = useState({})
-  const [generandoId, setGenerandoId] = useState(null)
+  const [generandoClave, setGenerandoClave] = useState(null)
   const [linksGenerados, setLinksGenerados] = useState({})
   const [errores, setErrores] = useState({})
 
@@ -42,28 +42,29 @@ export default function QuotesList() {
     if (!error) cargar()
   }
 
-  async function handleGenerarLink(cotizacionId) {
-    const monto = montos[cotizacionId]
+  async function handleGenerarLink(cotizacionId, concepto) {
+    const clave = `${cotizacionId}::${concepto}`
+    const monto = montos[clave]
     if (!monto || Number(monto) <= 0) {
-      setErrores({ ...errores, [cotizacionId]: t('quotesList.montoInvalido') })
+      setErrores({ ...errores, [clave]: t('quotesList.montoInvalido') })
       return
     }
 
-    setGenerandoId(cotizacionId)
-    setErrores({ ...errores, [cotizacionId]: '' })
+    setGenerandoClave(clave)
+    setErrores({ ...errores, [clave]: '' })
 
     const { data, error } = await supabase.functions.invoke('create-payment-link', {
-      body: { cotizacion_id: cotizacionId, monto: Number(monto) },
+      body: { cotizacion_id: cotizacionId, monto: Number(monto), concepto },
     })
 
     if (error) {
-      setErrores({ ...errores, [cotizacionId]: await mensajeDeError(error) })
-      setGenerandoId(null)
+      setErrores({ ...errores, [clave]: await mensajeDeError(error) })
+      setGenerandoClave(null)
       return
     }
 
-    setLinksGenerados({ ...linksGenerados, [cotizacionId]: data.url })
-    setGenerandoId(null)
+    setLinksGenerados({ ...linksGenerados, [clave]: data.url })
+    setGenerandoClave(null)
     cargar()
   }
 
@@ -115,45 +116,86 @@ export default function QuotesList() {
                 {t('quotesList.anticipoRecibido')} ${Number(c.anticipo_monto).toLocaleString('en-US')} USD
               </p>
             ) : (
-              <div className="flex flex-wrap items-center gap-3">
-                <input
-                  type="number"
-                  min="1"
-                  placeholder={t('quotesList.montoPlaceholder')}
-                  value={montos[c.id] ?? ''}
-                  onChange={(e) => setMontos({ ...montos, [c.id]: e.target.value })}
-                  className="bg-surface2 border border-line rounded-sm px-3 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors w-52"
-                />
-                <button
-                  onClick={() => handleGenerarLink(c.id)}
-                  disabled={generandoId === c.id}
-                  className="font-mono text-xs uppercase tracking-widest text-brass hover:underline disabled:opacity-50"
-                >
-                  {generandoId === c.id ? t('quotesList.generando') : t('quotesList.generarLink')}
-                </button>
-
-                {linksGenerados[c.id] && (
-                  <div className="flex items-center gap-2 w-full mt-1">
-                    <input
-                      readOnly
-                      value={linksGenerados[c.id]}
-                      className="flex-1 bg-surface2 border border-line rounded-sm px-3 py-2 text-xs text-parchment/80"
-                    />
-                    <button
-                      onClick={() => copiarLink(linksGenerados[c.id])}
-                      className="font-mono text-xs uppercase tracking-widest text-brass hover:underline shrink-0"
-                    >
-                      {t('quotesList.copiar')}
-                    </button>
-                  </div>
-                )}
-
-                {errores[c.id] && <p className="text-xs text-red-400 w-full">{errores[c.id]}</p>}
-              </div>
+              <PagoForm
+                t={t}
+                clave={`${c.id}::anticipo`}
+                placeholder={t('quotesList.montoPlaceholder')}
+                monto={montos[`${c.id}::anticipo`]}
+                onMontoChange={(v) => setMontos({ ...montos, [`${c.id}::anticipo`]: v })}
+                generando={generandoClave === `${c.id}::anticipo`}
+                onGenerar={() => handleGenerarLink(c.id, 'anticipo')}
+                link={linksGenerados[`${c.id}::anticipo`]}
+                error={errores[`${c.id}::anticipo`]}
+                onCopiar={copiarLink}
+              />
             )}
           </div>
+
+          {c.anticipo_estado === 'pagado' && (
+            <div className="mt-4 border-t border-line pt-4">
+              {c.resto_estado === 'pagado' ? (
+                <p className="font-mono text-xs uppercase tracking-widest text-brass">
+                  {t('quotesList.restoRecibido')} ${Number(c.resto_monto).toLocaleString('en-US')} USD
+                </p>
+              ) : (
+                <PagoForm
+                  t={t}
+                  clave={`${c.id}::resto`}
+                  placeholder={t('quotesList.montoRestoPlaceholder')}
+                  monto={montos[`${c.id}::resto`]}
+                  onMontoChange={(v) => setMontos({ ...montos, [`${c.id}::resto`]: v })}
+                  generando={generandoClave === `${c.id}::resto`}
+                  onGenerar={() => handleGenerarLink(c.id, 'resto')}
+                  link={linksGenerados[`${c.id}::resto`]}
+                  error={errores[`${c.id}::resto`]}
+                  onCopiar={copiarLink}
+                  generarLabel={t('quotesList.generarLinkResto')}
+                />
+              )}
+            </div>
+          )}
         </li>
       ))}
     </ul>
+  )
+}
+
+function PagoForm({ t, placeholder, monto, onMontoChange, generando, onGenerar, link, error, onCopiar, generarLabel }) {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <input
+        type="number"
+        min="1"
+        placeholder={placeholder}
+        value={monto ?? ''}
+        onChange={(e) => onMontoChange(e.target.value)}
+        className="bg-surface2 border border-line rounded-sm px-3 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors w-52"
+      />
+      <button
+        onClick={onGenerar}
+        disabled={generando}
+        className="font-mono text-xs uppercase tracking-widest text-brass hover:underline disabled:opacity-50"
+      >
+        {generando ? t('quotesList.generando') : generarLabel ?? t('quotesList.generarLink')}
+      </button>
+
+      {link && (
+        <div className="flex items-center gap-2 w-full mt-1">
+          <input
+            readOnly
+            value={link}
+            className="flex-1 bg-surface2 border border-line rounded-sm px-3 py-2 text-xs text-parchment/80"
+          />
+          <button
+            onClick={() => onCopiar(link)}
+            className="font-mono text-xs uppercase tracking-widest text-brass hover:underline shrink-0"
+          >
+            {t('quotesList.copiar')}
+          </button>
+        </div>
+      )}
+
+      {error && <p className="text-xs text-red-400 w-full">{error}</p>}
+    </div>
   )
 }

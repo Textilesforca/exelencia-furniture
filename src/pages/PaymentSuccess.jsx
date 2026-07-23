@@ -66,6 +66,11 @@ export default function PaymentSuccess() {
         </div>
       ) : resultado ? (
         <div className="font-mono text-sm text-parchment/90 space-y-2">
+          {resultado.concepto && (
+            <p className="text-brass uppercase tracking-widest text-xs">
+              {resultado.concepto === 'resto' ? t('paymentSuccess.resto') : t('paymentSuccess.anticipo')}
+            </p>
+          )}
           <p>{resultado.nombre_producto ?? resultado.nombre}</p>
           <p className="text-walnut2">${Number(resultado.monto).toLocaleString('en-US')} USD</p>
           <p className="text-muted uppercase tracking-widest text-xs">

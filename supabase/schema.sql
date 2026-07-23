@@ -604,3 +604,31 @@ end;
 $$;
 
 grant execute on function public.listar_piezas_vendidas() to authenticated;
+
+-- === Pago del resto de la cotización, después del anticipo (agregado 2026-07-23) ===
+
+alter table public.cotizaciones
+  add column if not exists resto_monto numeric,
+  add column if not exists resto_estado text check (resto_estado in ('pendiente', 'pagado', 'cancelado')),
+  add column if not exists resto_stripe_session_id text unique;
+
+drop function if exists public.get_cotizacion_pago_by_session(text);
+
+create or replace function public.get_cotizacion_pago_by_session(p_session_id text)
+returns table (nombre text, monto numeric, estado text, concepto text)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select nombre, anticipo_monto, anticipo_estado, 'anticipo'::text
+  from public.cotizaciones
+  where stripe_session_id = p_session_id
+  union all
+  select nombre, resto_monto, resto_estado, 'resto'::text
+  from public.cotizaciones
+  where resto_stripe_session_id = p_session_id
+  limit 1;
+$$;
+
+grant execute on function public.get_cotizacion_pago_by_session(text) to anon, authenticated;
