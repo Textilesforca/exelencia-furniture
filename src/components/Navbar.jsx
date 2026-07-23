@@ -4,12 +4,14 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { traducirCategoria, traducirSubcategoria } from '../i18n/translations'
 import { categorias, subcategoriasPorCategoria } from '../data/products'
 import { useCart } from '../cart/CartContext'
+import { useSession } from '../hooks/useSession'
 
 const categoriasNav = categorias.filter((c) => c !== 'Todos')
 
 export default function Navbar() {
   const { lang, setLang, t } = useLanguage()
   const { total } = useCart()
+  const { session } = useSession()
   const navigate = useNavigate()
   const [busqueda, setBusqueda] = useState('')
   const [categoriaAbierta, setCategoriaAbierta] = useState(null)
@@ -80,6 +82,18 @@ export default function Navbar() {
             {t('idioma.cambiarA')}
           </button>
 
+          <Link
+            to="/admin"
+            aria-label={session ? t('navbar.panelAdmin') : t('navbar.iniciarSesion')}
+            title={session ? t('navbar.panelAdmin') : t('navbar.iniciarSesion')}
+            className="text-parchment/80 hover:text-brass transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-5 h-5">
+              <circle cx="12" cy="8" r="3.5" />
+              <path strokeLinecap="round" d="M4.5 20c1.2-3.8 4.4-6 7.5-6s6.3 2.2 7.5 6" />
+            </svg>
+          </Link>
+
           <Link to="/carrito" aria-label={t('navbar.carritoAria')} className="relative text-parchment/80 hover:text-brass transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-5 h-5">
               <circle cx="9" cy="20" r="1.2" fill="currentColor" stroke="none" />
@@ -141,6 +155,13 @@ export default function Navbar() {
                 {t('navbar.contactUs')}
               </Link>
             </li>
+            {session && (
+              <li className="shrink-0">
+                <Link to="/admin" className="text-brass hover:text-parchment transition-colors">
+                  {t('navbar.admin')}
+                </Link>
+              </li>
+            )}
           </ul>
 
           {subcategoriasActivas && (

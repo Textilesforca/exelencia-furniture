@@ -8,6 +8,9 @@ export const translations = {
       carritoAria: 'Carrito',
       delivery: 'Entrega y recolección',
       contactUs: 'Contáctanos',
+      admin: 'Admin',
+      panelAdmin: 'Panel de administración',
+      iniciarSesion: 'Iniciar sesión',
     },
     cart: {
       titulo: 'Tu carrito',
@@ -376,6 +379,9 @@ export const translations = {
       carritoAria: 'Cart',
       delivery: 'Delivery and Pickup',
       contactUs: 'Contact Us',
+      admin: 'Admin',
+      panelAdmin: 'Admin panel',
+      iniciarSesion: 'Log in',
     },
     cart: {
       titulo: 'Your cart',
