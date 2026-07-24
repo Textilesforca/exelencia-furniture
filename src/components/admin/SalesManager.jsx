@@ -169,8 +169,16 @@ export default function SalesManager() {
     encabezado()
     doc.setFontSize(9)
 
+    const anchoDesc = colCliente - colDesc - 10
+    const anchoCliente = colMonto - colCliente - 10
+
     for (const v of ventasFiltradas) {
-      if (y > 740) {
+      const lineasDesc = doc.splitTextToSize(v.descripcion || '—', anchoDesc)
+      const lineasCliente = doc.splitTextToSize(v.cliente || '—', anchoCliente)
+      const numLineas = Math.max(lineasDesc.length, lineasCliente.length, 1)
+      const alturaFila = numLineas * 11 + 5
+
+      if (y + alturaFila > 740) {
         doc.addPage()
         encabezado()
         doc.setFontSize(9)
@@ -178,10 +186,10 @@ export default function SalesManager() {
 
       doc.text(new Date(v.creado_en).toLocaleDateString(), colFecha, y)
       doc.text(tipoLabel(v.tipo), colTipo, y)
-      doc.text((v.descripcion || '').slice(0, 45), colDesc, y)
-      doc.text((v.cliente || '—').slice(0, 22), colCliente, y)
+      doc.text(lineasDesc, colDesc, y)
+      doc.text(lineasCliente, colCliente, y)
       doc.text(`$${Number(v.monto).toLocaleString('en-US')}`, colMonto, y, { align: 'right' })
-      y += 16
+      y += alturaFila
     }
 
     y += 10
@@ -244,9 +252,28 @@ export default function SalesManager() {
         doc.setFontSize(10)
       }
 
+      doc.setFont(undefined, 'bold')
       doc.text(traducirCategoria(p.categoria, lang), colCategoria, y)
       doc.text(String(p.cantidad), colCantidad, y, { align: 'right' })
-      y += 18
+      doc.setFont(undefined, 'normal')
+      y += 16
+
+      doc.setFontSize(9)
+      for (const s of p.subcategorias) {
+        if (y > 740) {
+          doc.addPage()
+          encabezado()
+          doc.setFontSize(9)
+        }
+        const etiqueta = s.subcategoria
+          ? traducirSubcategoria(s.subcategoria, lang, p.categoria)
+          : t('productManager.sinSubcategoria')
+        doc.text(etiqueta, colCategoria + 14, y)
+        doc.text(String(s.cantidad), colCantidad, y, { align: 'right' })
+        y += 13
+      }
+      doc.setFontSize(10)
+      y += 6
     }
 
     y += 8
