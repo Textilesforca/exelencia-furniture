@@ -345,24 +345,19 @@ export default function SalesManager() {
             <tbody>
               {piezasPorCategoria.map((p) => {
                 const expandida = categoriasExpandidas.has(p.categoria)
-                const tieneSubcategorias = p.subcategorias.length > 1 || p.subcategorias[0]?.subcategoria
                 return (
                   <Fragment key={p.categoria}>
                     <tr className="border-b border-line/60 text-parchment/90">
                       <td className="py-2 pr-4">
                         <div className="flex items-center gap-2">
-                          {tieneSubcategorias ? (
-                            <button
-                              type="button"
-                              onClick={() => toggleCategoria(p.categoria)}
-                              aria-label={expandida ? t('salesManager.colapsar') : t('salesManager.expandir')}
-                              className="w-5 h-5 flex items-center justify-center border border-line rounded-sm text-brass hover:border-brass/60 transition-colors shrink-0"
-                            >
-                              {expandida ? '−' : '+'}
-                            </button>
-                          ) : (
-                            <span className="w-5 h-5 shrink-0" />
-                          )}
+                          <button
+                            type="button"
+                            onClick={() => toggleCategoria(p.categoria)}
+                            aria-label={expandida ? t('salesManager.colapsar') : t('salesManager.expandir')}
+                            className="w-5 h-5 flex items-center justify-center border border-line rounded-sm text-brass hover:border-brass/60 transition-colors shrink-0"
+                          >
+                            {expandida ? '−' : '+'}
+                          </button>
                           {traducirCategoria(p.categoria, lang)}
                         </div>
                       </td>
