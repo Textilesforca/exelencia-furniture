@@ -71,7 +71,7 @@ export default function SalesManager() {
     for (const p of piezas) {
       if (new Date(p.creado_en) < desde) continue
       const cantidad = Number(p.cantidad || 0)
-      const subNombre = p.subcategoria || null
+      const subNombre = p.subcategoria || ''
       if (!porCategoria[p.categoria]) porCategoria[p.categoria] = { cantidad: 0, subcategorias: {} }
       porCategoria[p.categoria].cantidad += cantidad
       porCategoria[p.categoria].subcategorias[subNombre] =
