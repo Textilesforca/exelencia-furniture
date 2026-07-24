@@ -68,8 +68,8 @@ async function generarRemision(tipo, resultado, sessionId, t) {
   let textoX = margenX
   try {
     const { dataUrl } = await cargarImagenComoDataUrl('/logo.png')
-    doc.addImage(dataUrl, 'JPEG', margenX, 30, 34, 34)
-    textoX = margenX + 44
+    doc.addImage(dataUrl, 'JPEG', margenX, 22, 58, 58)
+    textoX = margenX + 70
   } catch {
     // si el logo no carga, seguimos sin él
   }
@@ -93,7 +93,7 @@ async function generarRemision(tipo, resultado, sessionId, t) {
   doc.text(`${t('paymentSuccess.fecha')}: ${fecha.toLocaleString()}`, colImporte, 75, { align: 'right' })
 
   y = 75
-  y += 15
+  y += 20
   doc.setLineWidth(0.5)
   doc.line(margenX, y, margenX + anchoUtil, y)
   y += 18
