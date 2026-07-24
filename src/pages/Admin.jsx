@@ -10,6 +10,7 @@ import BannerManager from '../components/admin/BannerManager'
 import CatalogoManager from '../components/admin/CatalogoManager'
 import InventoryManager from '../components/admin/InventoryManager'
 import SalesManager from '../components/admin/SalesManager'
+import ShippingManager from '../components/admin/ShippingManager'
 import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Admin() {
@@ -26,6 +27,7 @@ export default function Admin() {
     (esAdmin || profile?.permisos?.catalogo) && 'catalogo',
     (esAdmin || profile?.permisos?.inventario) && 'inventario',
     (esAdmin || profile?.permisos?.ventas) && 'ventas',
+    (esAdmin || profile?.permisos?.envio) && 'envio',
     esAdmin && 'usuarios',
   ].filter(Boolean)
 
@@ -93,6 +95,11 @@ export default function Admin() {
                 {t('admin.tabVentas')}
               </TabButton>
             )}
+            {tabsDisponibles.includes('envio') && (
+              <TabButton active={tab === 'envio'} onClick={() => setTab('envio')}>
+                {t('admin.tabEnvio')}
+              </TabButton>
+            )}
             {tabsDisponibles.includes('usuarios') && (
               <TabButton active={tab === 'usuarios'} onClick={() => setTab('usuarios')}>
                 {t('admin.tabUsuarios')}
@@ -106,6 +113,7 @@ export default function Admin() {
           {tab === 'catalogo' && <CatalogoManager />}
           {tab === 'inventario' && <InventoryManager />}
           {tab === 'ventas' && <SalesManager />}
+          {tab === 'envio' && <ShippingManager />}
           {tab === 'usuarios' && <UserManager />}
         </>
       )}

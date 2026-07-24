@@ -13,6 +13,7 @@ const estadoInicial = {
     catalogo: false,
     inventario: false,
     ventas: false,
+    envio: false,
   },
 }
 
@@ -23,6 +24,7 @@ const PERMISOS_ADMIN = {
   catalogo: true,
   inventario: true,
   ventas: true,
+  envio: true,
 }
 
 async function mensajeDeError(error) {
@@ -223,6 +225,11 @@ export default function UserManager() {
                   checked={form.permisos.ventas}
                   onChange={(checked) => handlePermisoChange('ventas', checked)}
                 />
+                <PermisoCheckbox
+                  label={t('userManager.envio')}
+                  checked={form.permisos.envio}
+                  onChange={(checked) => handlePermisoChange('envio', checked)}
+                />
               </div>
             </div>
           )}
@@ -292,6 +299,11 @@ export default function UserManager() {
                         label={t('userManager.ventas')}
                         checked={!!u.permisos?.ventas}
                         onChange={(checked) => handleRowPermisoChange(u.id, 'ventas', checked)}
+                      />
+                      <PermisoCheckbox
+                        label={t('userManager.envio')}
+                        checked={!!u.permisos?.envio}
+                        onChange={(checked) => handleRowPermisoChange(u.id, 'envio', checked)}
                       />
                     </>
                   )}

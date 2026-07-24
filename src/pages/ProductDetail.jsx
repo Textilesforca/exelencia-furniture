@@ -7,11 +7,14 @@ import ImageLightbox from '../components/ImageLightbox'
 import { useLanguage } from '../i18n/LanguageContext'
 import { traducirCategoria } from '../i18n/translations'
 import { useCart } from '../cart/CartContext'
+import { useMontoFlete } from '../hooks/useMontoFlete'
+import EnvioOpcion from '../components/EnvioOpcion'
 
 export default function ProductDetail() {
   const { id } = useParams()
   const { lang, t } = useLanguage()
   const { agregar } = useCart()
+  const montoFlete = useMontoFlete()
   const [producto, setProducto] = useState(() => sampleProducts.find((p) => p.id === id))
   const [cargando, setCargando] = useState(!producto)
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -21,6 +24,7 @@ export default function ProductDetail() {
   const [colorSeleccionado, setColorSeleccionado] = useState(null)
   const [cantidad, setCantidad] = useState(1)
   const [agregado, setAgregado] = useState(false)
+  const [metodoEnvio, setMetodoEnvio] = useState('tienda')
 
   useEffect(() => {
     if (producto) return
@@ -55,7 +59,7 @@ export default function ProductDetail() {
     setErrorCompra('')
 
     const { data, error } = await supabase.functions.invoke('create-checkout', {
-      body: { producto_id: producto.id, color: colorSeleccionado },
+      body: { producto_id: producto.id, color: colorSeleccionado, metodo_envio: metodoEnvio },
     })
 
     if (error) {
@@ -212,6 +216,36 @@ export default function ProductDetail() {
                 +
               </button>
             </div>
+          </div>
+        )}
+
+        {esProductoReal && !sinExistencias && (
+          <div className="mb-6">
+            <p className="font-mono text-[11px] tracking-widest text-muted uppercase mb-2">
+              {t('productDetail.metodoEnvio')}
+            </p>
+            <div className="grid gap-2">
+              <EnvioOpcion
+                seleccionado={metodoEnvio === 'tienda'}
+                onClick={() => setMetodoEnvio('tienda')}
+                titulo={t('productDetail.recogerTienda')}
+                monto="$0"
+              />
+              <EnvioOpcion
+                seleccionado={metodoEnvio === 'flete'}
+                onClick={() => setMetodoEnvio('flete')}
+                titulo={t('productDetail.servicioFlete')}
+                monto={montoFlete > 0 ? `$${montoFlete.toLocaleString('en-US')}` : '$0'}
+              />
+            </div>
+            {metodoEnvio === 'flete' && montoFlete > 0 && (
+              <p className="font-mono text-sm text-parchment mt-3">
+                {t('productDetail.totalConEnvio')}:{' '}
+                <span className="text-walnut2">
+                  ${(Number(producto.precio_desde) + montoFlete).toLocaleString('en-US')} USD
+                </span>
+              </p>
+            )}
           </div>
         )}
 

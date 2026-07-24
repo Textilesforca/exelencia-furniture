@@ -30,7 +30,8 @@ Deno.serve(async (req) => {
   )
 
   const body = await req.json()
-  const { producto_id, color, nombre_cliente, email_cliente } = body
+  const { producto_id, color, nombre_cliente, email_cliente, metodo_envio } = body
+  const esFlete = metodo_envio === 'flete'
 
   if (!producto_id) return jsonResponse({ error: 'Falta producto_id.' }, 400)
 
@@ -56,21 +57,40 @@ Deno.serve(async (req) => {
 
   const montoCentavos = Math.round(Number(producto.precio_desde) * 100)
 
+  let montoFlete = 0
+  if (esFlete) {
+    const { data: config } = await supabaseAdmin.from('configuracion_envio').select('monto_flete').single()
+    montoFlete = Number(config?.monto_flete ?? 0)
+  }
+
+  const lineItems = [
+    {
+      price_data: {
+        currency: 'usd',
+        unit_amount: montoCentavos,
+        product_data: {
+          name: producto.nombre,
+          images: producto.imagen ? [producto.imagen] : undefined,
+        },
+      },
+      quantity: 1,
+    },
+  ]
+
+  if (montoFlete > 0) {
+    lineItems.push({
+      price_data: {
+        currency: 'usd',
+        unit_amount: Math.round(montoFlete * 100),
+        product_data: { name: 'Servicio de flete' },
+      },
+      quantity: 1,
+    })
+  }
+
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          unit_amount: montoCentavos,
-          product_data: {
-            name: producto.nombre,
-            images: producto.imagen ? [producto.imagen] : undefined,
-          },
-        },
-        quantity: 1,
-      },
-    ],
+    line_items: lineItems,
     customer_email: email_cliente || undefined,
     billing_address_collection: 'required',
     success_url: `${SITE_URL}/pago/exito?session_id={CHECKOUT_SESSION_ID}&tipo=producto`,
@@ -87,6 +107,8 @@ Deno.serve(async (req) => {
     email_cliente: email_cliente || null,
     stripe_session_id: session.id,
     estado: 'pendiente',
+    metodo_envio: esFlete ? 'flete' : 'tienda',
+    monto_flete: montoFlete,
   })
 
   if (insertError) return jsonResponse({ error: insertError.message }, 500)

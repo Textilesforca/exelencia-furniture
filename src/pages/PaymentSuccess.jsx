@@ -6,15 +6,6 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { useCart } from '../cart/CartContext'
 
 function itemsDeResultado(tipo, resultado, t) {
-  if (tipo === 'carrito') {
-    return resultado.items.map((item) => ({
-      descripcion: item.color ? `${item.nombre} (${item.color})` : item.nombre,
-      cantidad: item.cantidad,
-      precioUnitario: Number(item.precio),
-      importe: item.cantidad * Number(item.precio),
-    }))
-  }
-
   if (tipo === 'cotizacion') {
     const concepto = resultado.concepto === 'resto' ? t('paymentSuccess.resto') : t('paymentSuccess.anticipo')
     return [
@@ -27,14 +18,35 @@ function itemsDeResultado(tipo, resultado, t) {
     ]
   }
 
-  return [
-    {
-      descripcion: resultado.color ? `${resultado.nombre_producto} (${resultado.color})` : resultado.nombre_producto,
+  const items =
+    tipo === 'carrito'
+      ? resultado.items.map((item) => ({
+          descripcion: item.color ? `${item.nombre} (${item.color})` : item.nombre,
+          cantidad: item.cantidad,
+          precioUnitario: Number(item.precio),
+          importe: item.cantidad * Number(item.precio),
+        }))
+      : [
+          {
+            descripcion: resultado.color
+              ? `${resultado.nombre_producto} (${resultado.color})`
+              : resultado.nombre_producto,
+            cantidad: 1,
+            precioUnitario: Number(resultado.monto),
+            importe: Number(resultado.monto),
+          },
+        ]
+
+  if (resultado.metodo_envio === 'flete' && Number(resultado.monto_flete) > 0) {
+    items.push({
+      descripcion: t('paymentSuccess.servicioFlete'),
       cantidad: 1,
-      precioUnitario: Number(resultado.monto),
-      importe: Number(resultado.monto),
-    },
-  ]
+      precioUnitario: Number(resultado.monto_flete),
+      importe: Number(resultado.monto_flete),
+    })
+  }
+
+  return items
 }
 
 function generarRemision(tipo, resultado, sessionId, t) {
@@ -104,7 +116,38 @@ function generarRemision(tipo, resultado, sessionId, t) {
   doc.setFontSize(12)
   doc.text(`${t('paymentSuccess.total')}: $${total.toLocaleString('en-US')} USD`, colImporte, y, { align: 'right' })
 
-  y += 40
+  if (resultado.metodo_envio === 'flete' && Number(resultado.monto_flete) > 0) {
+    y += 34
+    if (y > 700) {
+      doc.addPage()
+      y = 55
+    }
+    doc.setFont(undefined, 'bold')
+    doc.setFontSize(10)
+    doc.text(t('paymentSuccess.notaFleteTitulo'), margenX, y)
+    y += 16
+    doc.setFont(undefined, 'normal')
+    doc.setFontSize(9)
+    const notaItems = t('paymentSuccess.notaFleteItems')
+    notaItems.forEach((linea, i) => {
+      if (y > 730) {
+        doc.addPage()
+        y = 55
+      }
+      doc.text(linea, margenX, y)
+      y += 14
+      if (i < notaItems.length - 1) {
+        doc.text('—', margenX, y)
+        y += 14
+      }
+    })
+  }
+
+  y += 30
+  if (y > 730) {
+    doc.addPage()
+    y = 55
+  }
   doc.setFont(undefined, 'normal')
   doc.setFontSize(8)
   doc.text(t('paymentSuccess.remisionAviso'), margenX, y)

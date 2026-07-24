@@ -3,14 +3,19 @@ import { Link } from 'react-router-dom'
 import { useCart } from '../cart/CartContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import { supabase } from '../lib/supabaseClient'
+import { useMontoFlete } from '../hooks/useMontoFlete'
+import EnvioOpcion from '../components/EnvioOpcion'
 
 export default function Cart() {
   const { t } = useLanguage()
   const { items, quitar, actualizarCantidad } = useCart()
+  const montoFlete = useMontoFlete()
   const [pagando, setPagando] = useState(false)
   const [errorPago, setErrorPago] = useState('')
+  const [metodoEnvio, setMetodoEnvio] = useState('tienda')
 
   const total = items.reduce((suma, i) => suma + i.cantidad * Number(i.precio_desde), 0)
+  const totalConEnvio = total + (metodoEnvio === 'flete' ? montoFlete : 0)
 
   async function handlePagar() {
     setPagando(true)
@@ -23,6 +28,7 @@ export default function Cart() {
           color: i.color,
           cantidad: i.cantidad,
         })),
+        metodo_envio: metodoEnvio,
       },
     })
 
@@ -104,6 +110,32 @@ export default function Cart() {
             <p className="font-mono text-lg text-parchment">
               {t('cart.total')}: <span className="text-walnut2">${total.toLocaleString('en-US')} USD</span>
             </p>
+          </div>
+
+          <div className="mt-6">
+            <p className="font-mono text-[11px] tracking-widest text-muted uppercase mb-2">
+              {t('productDetail.metodoEnvio')}
+            </p>
+            <div className="grid gap-2">
+              <EnvioOpcion
+                seleccionado={metodoEnvio === 'tienda'}
+                onClick={() => setMetodoEnvio('tienda')}
+                titulo={t('productDetail.recogerTienda')}
+                monto="$0"
+              />
+              <EnvioOpcion
+                seleccionado={metodoEnvio === 'flete'}
+                onClick={() => setMetodoEnvio('flete')}
+                titulo={t('productDetail.servicioFlete')}
+                monto={montoFlete > 0 ? `$${montoFlete.toLocaleString('en-US')}` : '$0'}
+              />
+            </div>
+            {metodoEnvio === 'flete' && montoFlete > 0 && (
+              <p className="font-mono text-sm text-parchment mt-3">
+                {t('productDetail.totalConEnvio')}:{' '}
+                <span className="text-walnut2">${totalConEnvio.toLocaleString('en-US')} USD</span>
+              </p>
+            )}
           </div>
 
           {errorPago && <p className="font-mono text-xs text-red-400 mt-4">{errorPago}</p>}
