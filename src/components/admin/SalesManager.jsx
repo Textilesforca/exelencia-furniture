@@ -3,6 +3,23 @@ import { jsPDF } from 'jspdf'
 import { supabase } from '../../lib/supabaseClient'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { traducirCategoria, traducirSubcategoria } from '../../i18n/translations'
+import { cargarImagenComoDataUrl } from '../../lib/cargarImagenComoDataUrl'
+
+function dibujarEncabezadoEmpresa(doc, margenX, anchoUtil, logoDataUrl) {
+  let textoX = margenX
+  if (logoDataUrl) {
+    doc.addImage(logoDataUrl, 'JPEG', margenX, 18, 46, 46)
+    textoX = margenX + 56
+  }
+  doc.setFont(undefined, 'bold')
+  doc.setFontSize(14)
+  doc.text('THE EXELENCIA FURNITURE', textoX, 36)
+  doc.setFont(undefined, 'normal')
+  doc.setFontSize(9)
+  doc.text('14709 S Western Ave, Gardena, CA 90249', textoX, 51)
+  doc.setLineWidth(0.5)
+  doc.line(margenX, 66, margenX + anchoUtil, 66)
+}
 
 const FILTROS = ['hoy', 'semana', 'mes', 'anio']
 
@@ -104,15 +121,7 @@ export default function SalesManager() {
     return t('salesManager.anio')
   }
 
-  function nuevaPagina(doc, margenX) {
-    const y = 50
-    doc.setFont(undefined, 'bold')
-    doc.setFontSize(16)
-    doc.text(vista === 'dinero' ? t('salesManager.reporteTitulo') : t('salesManager.reportePiezasTitulo'), margenX, y)
-    return y
-  }
-
-  function handleGenerarPdfDinero() {
+  async function handleGenerarPdfDinero(logoDataUrl) {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' })
     const margenX = 40
     const anchoUtil = 612 - margenX * 2
@@ -123,9 +132,20 @@ export default function SalesManager() {
     const colMonto = margenX + anchoUtil
 
     let y = 50
+    let esPrimeraPagina = true
 
     function encabezado() {
-      y = nuevaPagina(doc, margenX)
+      if (esPrimeraPagina) {
+        dibujarEncabezadoEmpresa(doc, margenX, anchoUtil, logoDataUrl)
+        y = 88
+        esPrimeraPagina = false
+      } else {
+        y = 50
+      }
+
+      doc.setFont(undefined, 'bold')
+      doc.setFontSize(16)
+      doc.text(t('salesManager.reporteTitulo'), margenX, y)
       y += 20
       doc.setFontSize(10)
       doc.setFont(undefined, 'normal')
@@ -175,7 +195,7 @@ export default function SalesManager() {
     doc.save(`ventas-${filtro}-${Date.now()}.pdf`)
   }
 
-  function handleGenerarPdfPiezas() {
+  async function handleGenerarPdfPiezas(logoDataUrl) {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' })
     const margenX = 40
     const anchoUtil = 612 - margenX * 2
@@ -183,9 +203,20 @@ export default function SalesManager() {
     const colCantidad = margenX + anchoUtil
 
     let y = 50
+    let esPrimeraPagina = true
 
     function encabezado() {
-      y = nuevaPagina(doc, margenX)
+      if (esPrimeraPagina) {
+        dibujarEncabezadoEmpresa(doc, margenX, anchoUtil, logoDataUrl)
+        y = 88
+        esPrimeraPagina = false
+      } else {
+        y = 50
+      }
+
+      doc.setFont(undefined, 'bold')
+      doc.setFontSize(16)
+      doc.text(t('salesManager.reportePiezasTitulo'), margenX, y)
       y += 20
       doc.setFontSize(10)
       doc.setFont(undefined, 'normal')
@@ -229,10 +260,20 @@ export default function SalesManager() {
     doc.save(`piezas-vendidas-${filtro}-${Date.now()}.pdf`)
   }
 
-  function handleGenerarPdf() {
+  async function handleGenerarPdf() {
     setGenerandoPdf(true)
-    if (vista === 'dinero') handleGenerarPdfDinero()
-    else handleGenerarPdfPiezas()
+
+    let logoDataUrl = null
+    try {
+      const { dataUrl } = await cargarImagenComoDataUrl('/logo.png')
+      logoDataUrl = dataUrl
+    } catch {
+      // seguimos sin logo si no carga
+    }
+
+    if (ventasFiltradas.length > 0) await handleGenerarPdfDinero(logoDataUrl)
+    if (piezasPorCategoria.length > 0) await handleGenerarPdfPiezas(logoDataUrl)
+
     setGenerandoPdf(false)
   }
 
@@ -240,7 +281,7 @@ export default function SalesManager() {
     return <p className="font-mono text-sm text-muted">{t('salesManager.cargando')}</p>
   }
 
-  const sinDatos = vista === 'dinero' ? ventasFiltradas.length === 0 : piezasPorCategoria.length === 0
+  const sinDatos = ventasFiltradas.length === 0 && piezasPorCategoria.length === 0
 
   return (
     <div>
