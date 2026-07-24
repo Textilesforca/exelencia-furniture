@@ -656,3 +656,84 @@ end;
 $$;
 
 grant execute on function public.actualizar_monto_total(uuid, numeric) to authenticated;
+
+-- === Datos adicionales para la remisión descargable (agregado 2026-07-23) ===
+-- Se agregan id/nombre_cliente/color/creado_en a las funciones de
+-- confirmación de pago para poder armar el PDF de remisión en el cliente.
+
+drop function if exists public.get_pedido_by_session(text);
+
+create or replace function public.get_pedido_by_session(p_session_id text)
+returns table (
+  id uuid,
+  nombre_producto text,
+  monto numeric,
+  estado text,
+  color text,
+  nombre_cliente text,
+  creado_en timestamptz
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select id, producto_nombre, monto, estado, color, nombre_cliente, creado_en
+  from public.pedidos
+  where stripe_session_id = p_session_id
+  limit 1;
+$$;
+
+grant execute on function public.get_pedido_by_session(text) to anon, authenticated;
+
+drop function if exists public.get_carrito_orden_by_session(text);
+
+create or replace function public.get_carrito_orden_by_session(p_session_id text)
+returns table (
+  id uuid,
+  items jsonb,
+  monto numeric,
+  estado text,
+  nombre_cliente text,
+  creado_en timestamptz
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select id, items, monto, estado, nombre_cliente, creado_en
+  from public.carrito_ordenes
+  where stripe_session_id = p_session_id
+  limit 1;
+$$;
+
+grant execute on function public.get_carrito_orden_by_session(text) to anon, authenticated;
+
+drop function if exists public.get_cotizacion_pago_by_session(text);
+
+create or replace function public.get_cotizacion_pago_by_session(p_session_id text)
+returns table (
+  id uuid,
+  nombre text,
+  monto numeric,
+  estado text,
+  concepto text,
+  creado_en timestamptz
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select id, nombre, anticipo_monto, anticipo_estado, 'anticipo'::text, creado_en
+  from public.cotizaciones
+  where stripe_session_id = p_session_id
+  union all
+  select id, nombre, resto_monto, resto_estado, 'resto'::text, creado_en
+  from public.cotizaciones
+  where resto_stripe_session_id = p_session_id
+  limit 1;
+$$;
+
+grant execute on function public.get_cotizacion_pago_by_session(text) to anon, authenticated;

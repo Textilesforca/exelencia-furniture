@@ -1,8 +1,118 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
+import { jsPDF } from 'jspdf'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useCart } from '../cart/CartContext'
+
+function itemsDeResultado(tipo, resultado, t) {
+  if (tipo === 'carrito') {
+    return resultado.items.map((item) => ({
+      descripcion: item.color ? `${item.nombre} (${item.color})` : item.nombre,
+      cantidad: item.cantidad,
+      precioUnitario: Number(item.precio),
+      importe: item.cantidad * Number(item.precio),
+    }))
+  }
+
+  if (tipo === 'cotizacion') {
+    const concepto = resultado.concepto === 'resto' ? t('paymentSuccess.resto') : t('paymentSuccess.anticipo')
+    return [
+      {
+        descripcion: `${concepto} — ${resultado.nombre}`,
+        cantidad: 1,
+        precioUnitario: Number(resultado.monto),
+        importe: Number(resultado.monto),
+      },
+    ]
+  }
+
+  return [
+    {
+      descripcion: resultado.color ? `${resultado.nombre_producto} (${resultado.color})` : resultado.nombre_producto,
+      cantidad: 1,
+      precioUnitario: Number(resultado.monto),
+      importe: Number(resultado.monto),
+    },
+  ]
+}
+
+function generarRemision(tipo, resultado, sessionId, t) {
+  const items = itemsDeResultado(tipo, resultado, t)
+  const total = items.reduce((suma, i) => suma + i.importe, 0)
+  const cliente = resultado.nombre_cliente || resultado.nombre || t('paymentSuccess.clienteGenerico')
+  const folio = (resultado.id ? resultado.id.slice(0, 8) : sessionId.slice(-8)).toUpperCase()
+  const fecha = resultado.creado_en ? new Date(resultado.creado_en) : new Date()
+
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' })
+  const margenX = 40
+  const anchoUtil = 612 - margenX * 2
+  const colDesc = margenX
+  const colCant = margenX + 320
+  const colPrecio = margenX + 400
+  const colImporte = margenX + anchoUtil
+
+  let y = 55
+
+  doc.setFont(undefined, 'bold')
+  doc.setFontSize(16)
+  doc.text('THE EXELENCIA FURNITURE', margenX, y)
+  y += 18
+  doc.setFont(undefined, 'normal')
+  doc.setFontSize(9)
+  doc.text('14709 S Western Ave, Gardena, CA 90249', margenX, y)
+
+  doc.setFont(undefined, 'bold')
+  doc.setFontSize(18)
+  doc.text(t('paymentSuccess.remisionTitulo').toUpperCase(), colImporte, 55, { align: 'right' })
+  doc.setFont(undefined, 'normal')
+  doc.setFontSize(9)
+  doc.text(`${t('paymentSuccess.folio')}: ${folio}`, colImporte, 73, { align: 'right' })
+  doc.text(`${t('paymentSuccess.fecha')}: ${fecha.toLocaleString()}`, colImporte, 86, { align: 'right' })
+
+  y += 26
+  doc.setLineWidth(0.5)
+  doc.line(margenX, y, margenX + anchoUtil, y)
+  y += 18
+
+  doc.setFontSize(10)
+  doc.text(`${t('paymentSuccess.cliente')}: ${cliente}`, margenX, y)
+  y += 24
+
+  doc.setFont(undefined, 'bold')
+  doc.text(t('paymentSuccess.descripcion'), colDesc, y)
+  doc.text(t('paymentSuccess.cantidad'), colCant, y)
+  doc.text(t('paymentSuccess.precioUnitario'), colPrecio, y)
+  doc.text(t('paymentSuccess.importe'), colImporte, y, { align: 'right' })
+  doc.setFont(undefined, 'normal')
+  y += 8
+  doc.line(margenX, y, margenX + anchoUtil, y)
+  y += 16
+
+  for (const item of items) {
+    doc.text(String(item.descripcion).slice(0, 55), colDesc, y)
+    doc.text(String(item.cantidad), colCant, y)
+    doc.text(`$${item.precioUnitario.toLocaleString('en-US')}`, colPrecio, y)
+    doc.text(`$${item.importe.toLocaleString('en-US')}`, colImporte, y, { align: 'right' })
+    y += 18
+  }
+
+  y += 8
+  doc.line(margenX, y, margenX + anchoUtil, y)
+  y += 20
+  doc.setFont(undefined, 'bold')
+  doc.setFontSize(12)
+  doc.text(`${t('paymentSuccess.total')}: $${total.toLocaleString('en-US')} USD`, colImporte, y, { align: 'right' })
+
+  y += 40
+  doc.setFont(undefined, 'normal')
+  doc.setFontSize(8)
+  doc.text(t('paymentSuccess.remisionAviso'), margenX, y)
+  y += 14
+  doc.text(t('paymentSuccess.gracias'), margenX, y)
+
+  doc.save(`remision-${folio}.pdf`)
+}
 
 export default function PaymentSuccess() {
   const { t } = useLanguage()
@@ -12,6 +122,7 @@ export default function PaymentSuccess() {
   const [resultado, setResultado] = useState(null)
   const [cargando, setCargando] = useState(true)
   const { vaciar } = useCart()
+  const descargadaRef = useRef(false)
 
   useEffect(() => {
     if (!sessionId) {
@@ -31,6 +142,10 @@ export default function PaymentSuccess() {
       setResultado(fila)
       setCargando(false)
       if (tipo === 'carrito' && fila?.estado === 'pagado') vaciar()
+      if (fila?.estado === 'pagado' && !descargadaRef.current) {
+        descargadaRef.current = true
+        generarRemision(tipo, fila, sessionId, t)
+      }
     }
 
     cargar()
@@ -81,12 +196,24 @@ export default function PaymentSuccess() {
         <p className="font-mono text-sm text-muted">{t('paymentSuccess.noEncontrado')}</p>
       )}
 
-      <Link
-        to="/catalogo"
-        className="inline-block mt-10 bg-brass text-ink font-body font-medium px-6 py-3 rounded-sm hover:bg-walnut2 transition-colors"
-      >
-        {t('paymentSuccess.volverCatalogo')}
-      </Link>
+      {resultado?.estado === 'pagado' && (
+        <button
+          type="button"
+          onClick={() => generarRemision(tipo, resultado, sessionId, t)}
+          className="inline-block mt-6 border border-brass text-brass font-body font-medium px-6 py-3 rounded-sm hover:bg-brass hover:text-ink transition-colors"
+        >
+          {t('paymentSuccess.descargarRemision')}
+        </button>
+      )}
+
+      <div>
+        <Link
+          to="/catalogo"
+          className="inline-block mt-6 bg-brass text-ink font-body font-medium px-6 py-3 rounded-sm hover:bg-walnut2 transition-colors"
+        >
+          {t('paymentSuccess.volverCatalogo')}
+        </Link>
+      </div>
     </section>
   )
 }
