@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { categorias, subcategoriasPorCategoria } from '../../data/products'
 import { useLanguage } from '../../i18n/LanguageContext'
@@ -35,6 +35,26 @@ export default function ProductManager() {
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
   const [exito, setExito] = useState(false)
+  const [filtroCategoria, setFiltroCategoria] = useState('Todos')
+  const [filtroSubcategoria, setFiltroSubcategoria] = useState('')
+
+  const categoriasPresentes = useMemo(
+    () => categorias.filter((c) => c === 'Todos' || productos.some((p) => p.categoria === c)),
+    [productos]
+  )
+
+  const subcategoriasDelFiltro = subcategoriasPorCategoria[filtroCategoria]
+
+  const productosFiltrados = productos.filter((p) => {
+    if (filtroCategoria !== 'Todos' && p.categoria !== filtroCategoria) return false
+    if (filtroSubcategoria && p.subcategoria !== filtroSubcategoria) return false
+    return true
+  })
+
+  function handleFiltroCategoria(categoria) {
+    setFiltroCategoria(categoria)
+    setFiltroSubcategoria('')
+  }
 
   async function cargarProductos() {
     setCargando(true)
@@ -385,13 +405,52 @@ export default function ProductManager() {
 
       <div>
         <h2 className="font-display text-2xl text-parchment mb-6">{t('productManager.catalogoActual')}</h2>
+
+        {productos.length > 0 && (
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-2">
+              {categoriasPresentes.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => handleFiltroCategoria(c)}
+                  className={`font-mono text-xs uppercase tracking-widest px-3 py-1.5 rounded-sm border transition-colors ${
+                    filtroCategoria === c
+                      ? 'border-brass text-brass'
+                      : 'border-line text-muted hover:text-parchment hover:border-brass/60'
+                  }`}
+                >
+                  {traducirCategoria(c, lang)}
+                </button>
+              ))}
+            </div>
+
+            {subcategoriasDelFiltro && (
+              <select
+                value={filtroSubcategoria}
+                onChange={(e) => setFiltroSubcategoria(e.target.value)}
+                className="mt-3 bg-surface2 border border-line rounded-sm px-3 py-2 text-sm text-parchment focus:border-brass outline-none transition-colors"
+              >
+                <option value="">{t('productManager.todasSubcategorias')}</option>
+                {subcategoriasDelFiltro.slice(1).map((s) => (
+                  <option key={s} value={s}>
+                    {traducirSubcategoria(s, lang, filtroCategoria)}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+
         {cargando ? (
           <p className="font-mono text-sm text-muted">{t('productManager.cargando')}</p>
         ) : productos.length === 0 ? (
           <p className="font-mono text-sm text-muted">{t('productManager.vacio')}</p>
+        ) : productosFiltrados.length === 0 ? (
+          <p className="font-mono text-sm text-muted">{t('productManager.sinResultadosFiltro')}</p>
         ) : (
           <ul className="grid gap-3">
-            {productos.map((p) => (
+            {productosFiltrados.map((p) => (
               <li
                 key={p.id}
                 className="flex items-center gap-4 bg-surface border border-line rounded-sm p-3"
