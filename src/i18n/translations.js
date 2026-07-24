@@ -341,6 +341,8 @@ export const translations = {
       guardando: 'Guardando…',
       guardado: 'Guardado ✓',
       guardar: 'Guardar',
+      guardarTodo: 'Guardar todo',
+      errorGuardarTodo: 'Algunos cambios no se pudieron guardar.',
     },
     salesManager: {
       titulo: 'Ventas',
@@ -752,6 +754,8 @@ export const translations = {
       guardando: 'Saving…',
       guardado: 'Saved ✓',
       guardar: 'Save',
+      guardarTodo: 'Save all',
+      errorGuardarTodo: 'Some changes could not be saved.',
     },
     salesManager: {
       titulo: 'Sales',

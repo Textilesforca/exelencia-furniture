@@ -13,6 +13,9 @@ export default function InventoryManager() {
   const [errores, setErrores] = useState({})
   const [exitoClave, setExitoClave] = useState(null)
   const [categoriaActiva, setCategoriaActiva] = useState('Todos')
+  const [guardandoTodo, setGuardandoTodo] = useState(false)
+  const [errorTodo, setErrorTodo] = useState('')
+  const [exitoTodo, setExitoTodo] = useState(false)
 
   const categoriasPresentes = useMemo(
     () => categorias.filter((c) => c === 'Todos' || productos.some((p) => p.categoria === c)),
@@ -97,6 +100,66 @@ export default function InventoryManager() {
     setTimeout(() => setExitoClave(null), 2000)
   }
 
+  async function handleGuardarTodo() {
+    setGuardandoTodo(true)
+    setErrorTodo('')
+    setExitoTodo(false)
+
+    const tareas = []
+
+    for (const p of productos) {
+      if (p.colores?.length > 0) {
+        for (const c of p.colores) {
+          const clave = `${p.id}::${c.nombre}`
+          const nuevoStock = Math.max(0, Math.round(Number(valores[clave]) || 0))
+          if (nuevoStock !== Number(c.stock ?? 0)) {
+            tareas.push(
+              supabase
+                .rpc('actualizar_stock_color', { p_producto_id: p.id, p_color_nombre: c.nombre, p_stock: nuevoStock })
+                .then(({ error }) => ({ error, clave }))
+            )
+          }
+        }
+      } else {
+        const nuevoStock = Math.max(0, Math.round(Number(valores[p.id]) || 0))
+        if (nuevoStock !== Number(p.stock ?? 0)) {
+          tareas.push(
+            supabase
+              .rpc('actualizar_stock', { p_producto_id: p.id, p_stock: nuevoStock })
+              .then(({ error }) => ({ error, clave: p.id }))
+          )
+        }
+      }
+    }
+
+    if (tareas.length === 0) {
+      setGuardandoTodo(false)
+      setExitoTodo(true)
+      setTimeout(() => setExitoTodo(false), 2000)
+      return
+    }
+
+    const resultados = await Promise.all(tareas)
+    const erroresNuevos = {}
+    let huboError = false
+    for (const r of resultados) {
+      if (r.error) {
+        erroresNuevos[r.clave] = r.error.message
+        huboError = true
+      }
+    }
+
+    setGuardandoTodo(false)
+    if (huboError) {
+      setErrores({ ...errores, ...erroresNuevos })
+      setErrorTodo(t('inventoryManager.errorGuardarTodo'))
+    } else {
+      setExitoTodo(true)
+      setTimeout(() => setExitoTodo(false), 2000)
+    }
+    cargarProductos()
+  }
+
   if (cargando) {
     return <p className="font-mono text-sm text-muted">{t('inventoryManager.cargando')}</p>
   }
@@ -107,7 +170,24 @@ export default function InventoryManager() {
 
   return (
     <div>
-      <h2 className="font-display text-2xl text-parchment mb-6">{t('inventoryManager.titulo')}</h2>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <h2 className="font-display text-2xl text-parchment">{t('inventoryManager.titulo')}</h2>
+        <div className="flex items-center gap-3">
+          {errorTodo && <p className="text-xs text-red-400">{errorTodo}</p>}
+          <button
+            type="button"
+            onClick={handleGuardarTodo}
+            disabled={guardandoTodo}
+            className="font-mono text-xs uppercase tracking-widest bg-brass text-ink font-medium px-5 py-2.5 rounded-sm hover:bg-walnut2 transition-colors disabled:opacity-50"
+          >
+            {guardandoTodo
+              ? t('inventoryManager.guardando')
+              : exitoTodo
+                ? t('inventoryManager.guardado')
+                : t('inventoryManager.guardarTodo')}
+          </button>
+        </div>
+      </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
         {categoriasPresentes.map((c) => (

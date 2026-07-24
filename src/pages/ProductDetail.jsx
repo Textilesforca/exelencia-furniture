@@ -15,8 +15,8 @@ export default function ProductDetail() {
   const { lang, t } = useLanguage()
   const { agregar } = useCart()
   const montoFlete = useMontoFlete()
-  const [producto, setProducto] = useState(() => sampleProducts.find((p) => p.id === id))
-  const [cargando, setCargando] = useState(!producto)
+  const [producto, setProducto] = useState(null)
+  const [cargando, setCargando] = useState(true)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [comprando, setComprando] = useState(false)
   const [errorCompra, setErrorCompra] = useState('')
@@ -27,14 +27,23 @@ export default function ProductDetail() {
   const [metodoEnvio, setMetodoEnvio] = useState('tienda')
 
   useEffect(() => {
-    if (producto) return
+    const sample = sampleProducts.find((p) => p.id === id)
+    if (sample) {
+      setProducto(sample)
+      setCargando(false)
+      return
+    }
+
+    setCargando(true)
+    setProducto(null)
+
     async function cargar() {
       const { data } = await supabase.from('productos').select('*').eq('id', id).single()
-      if (data) setProducto(data)
+      setProducto(data ?? null)
       setCargando(false)
     }
     cargar()
-  }, [id, producto])
+  }, [id])
 
   useEffect(() => {
     if (!producto) return
