@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useCart } from '../cart/CartContext'
+import { cargarImagenComoDataUrl } from '../lib/cargarImagenComoDataUrl'
 
 function itemsDeResultado(tipo, resultado, t) {
   if (tipo === 'cotizacion') {
@@ -49,7 +50,7 @@ function itemsDeResultado(tipo, resultado, t) {
   return items
 }
 
-function generarRemision(tipo, resultado, sessionId, t) {
+async function generarRemision(tipo, resultado, sessionId, t) {
   const items = itemsDeResultado(tipo, resultado, t)
   const total = items.reduce((suma, i) => suma + i.importe, 0)
   const cliente = resultado.nombre_cliente || resultado.nombre || t('paymentSuccess.clienteGenerico')
@@ -64,25 +65,35 @@ function generarRemision(tipo, resultado, sessionId, t) {
   const colPrecio = margenX + 400
   const colImporte = margenX + anchoUtil
 
-  let y = 55
+  let textoX = margenX
+  try {
+    const { dataUrl } = await cargarImagenComoDataUrl('/logo.png')
+    doc.addImage(dataUrl, 'JPEG', margenX, 30, 34, 34)
+    textoX = margenX + 44
+  } catch {
+    // si el logo no carga, seguimos sin él
+  }
+
+  let y = 44
 
   doc.setFont(undefined, 'bold')
   doc.setFontSize(16)
-  doc.text('THE EXELENCIA FURNITURE', margenX, y)
+  doc.text('THE EXELENCIA FURNITURE', textoX, y)
   y += 18
   doc.setFont(undefined, 'normal')
   doc.setFontSize(9)
-  doc.text('14709 S Western Ave, Gardena, CA 90249', margenX, y)
+  doc.text('14709 S Western Ave, Gardena, CA 90249', textoX, y)
 
   doc.setFont(undefined, 'bold')
   doc.setFontSize(18)
-  doc.text(t('paymentSuccess.remisionTitulo').toUpperCase(), colImporte, 55, { align: 'right' })
+  doc.text(t('paymentSuccess.remisionTitulo').toUpperCase(), colImporte, 44, { align: 'right' })
   doc.setFont(undefined, 'normal')
   doc.setFontSize(9)
-  doc.text(`${t('paymentSuccess.folio')}: ${folio}`, colImporte, 73, { align: 'right' })
-  doc.text(`${t('paymentSuccess.fecha')}: ${fecha.toLocaleString()}`, colImporte, 86, { align: 'right' })
+  doc.text(`${t('paymentSuccess.folio')}: ${folio}`, colImporte, 62, { align: 'right' })
+  doc.text(`${t('paymentSuccess.fecha')}: ${fecha.toLocaleString()}`, colImporte, 75, { align: 'right' })
 
-  y += 26
+  y = 75
+  y += 15
   doc.setLineWidth(0.5)
   doc.line(margenX, y, margenX + anchoUtil, y)
   y += 18
@@ -187,7 +198,7 @@ export default function PaymentSuccess() {
       if (tipo === 'carrito' && fila?.estado === 'pagado') vaciar()
       if (fila?.estado === 'pagado' && !descargadaRef.current) {
         descargadaRef.current = true
-        generarRemision(tipo, fila, sessionId, t)
+        await generarRemision(tipo, fila, sessionId, t)
       }
     }
 

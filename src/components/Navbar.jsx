@@ -34,10 +34,13 @@ export default function Navbar() {
   return (
     <header className="relative sticky top-0 z-40 bg-ink/90 backdrop-blur border-b border-line">
       <nav className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between gap-6">
-        <Link to="/" className="font-display text-lg tracking-tight leading-none shrink-0">
-          <span className="block text-parchment">Custom &amp; Designs</span>
-          <span className="block text-[11px] font-mono tracking-[0.2em] text-brass uppercase mt-1">
-            The Exelencia Furniture
+        <Link to="/" className="flex items-center gap-3 font-display text-lg tracking-tight leading-none shrink-0">
+          <img src="/logo.png" alt="Exelencia Furniture" className="w-11 h-11 rounded-full shrink-0" />
+          <span>
+            <span className="block text-parchment">Custom &amp; Designs</span>
+            <span className="block text-[11px] font-mono tracking-[0.2em] text-brass uppercase mt-1">
+              The Exelencia Furniture
+            </span>
           </span>
         </Link>
 
