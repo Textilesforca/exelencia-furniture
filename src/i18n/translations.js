@@ -11,6 +11,8 @@ export const translations = {
       admin: 'Admin',
       panelAdmin: 'Panel de administración',
       iniciarSesion: 'Iniciar sesión',
+      buscando: 'Buscando…',
+      sinResultados: 'No hay piezas con existencias que coincidan.',
     },
     cart: {
       titulo: 'Tu carrito',
@@ -421,6 +423,8 @@ export const translations = {
       admin: 'Admin',
       panelAdmin: 'Admin panel',
       iniciarSesion: 'Log in',
+      buscando: 'Searching…',
+      sinResultados: 'No in-stock pieces match.',
     },
     cart: {
       titulo: 'Your cart',

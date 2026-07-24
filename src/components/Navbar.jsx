@@ -1,12 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import { traducirCategoria, traducirSubcategoria } from '../i18n/translations'
 import { categorias, subcategoriasPorCategoria } from '../data/products'
 import { useCart } from '../cart/CartContext'
 import { useSession } from '../hooks/useSession'
+import { supabase } from '../lib/supabaseClient'
 
 const categoriasNav = categorias.filter((c) => c !== 'Todos')
+
+function stockDeProducto(producto) {
+  if (producto.colores?.length > 0) {
+    return producto.colores.reduce((suma, c) => suma + Number(c.stock ?? 0), 0)
+  }
+  return Number(producto.stock ?? 0)
+}
 
 export default function Navbar() {
   const { lang, setLang, t } = useLanguage()
@@ -15,6 +23,10 @@ export default function Navbar() {
   const navigate = useNavigate()
   const [busqueda, setBusqueda] = useState('')
   const [categoriaAbierta, setCategoriaAbierta] = useState(null)
+  const [resultados, setResultados] = useState([])
+  const [buscando, setBuscando] = useState(false)
+  const [mostrarResultados, setMostrarResultados] = useState(false)
+  const buscadorRef = useRef(null)
 
   const links = [
     { to: '/', label: t('navbar.inicio') },
@@ -26,7 +38,48 @@ export default function Navbar() {
     e.preventDefault()
     const params = new URLSearchParams()
     if (busqueda.trim()) params.set('buscar', busqueda.trim())
+    setMostrarResultados(false)
     navigate(`/catalogo${params.toString() ? `?${params.toString()}` : ''}`)
+  }
+
+  useEffect(() => {
+    const texto = busqueda.trim()
+    if (texto.length < 2) {
+      setResultados([])
+      setBuscando(false)
+      return
+    }
+
+    setBuscando(true)
+    const temporizador = setTimeout(async () => {
+      const { data } = await supabase
+        .from('productos')
+        .select('id, nombre, categoria, imagen, precio_desde, stock, colores')
+        .or(`nombre.ilike.%${texto}%,descripcion.ilike.%${texto}%`)
+        .limit(20)
+
+      const conExistencias = (data ?? []).filter((p) => stockDeProducto(p) > 0).slice(0, 6)
+      setResultados(conExistencias)
+      setBuscando(false)
+    }, 300)
+
+    return () => clearTimeout(temporizador)
+  }, [busqueda])
+
+  useEffect(() => {
+    function handleClickFuera(e) {
+      if (buscadorRef.current && !buscadorRef.current.contains(e.target)) {
+        setMostrarResultados(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickFuera)
+    return () => document.removeEventListener('mousedown', handleClickFuera)
+  }, [])
+
+  function handleSeleccionarResultado(id) {
+    setMostrarResultados(false)
+    setBusqueda('')
+    navigate(`/catalogo/${id}`)
   }
 
   const subcategoriasActivas = categoriaAbierta ? subcategoriasPorCategoria[categoriaAbierta] : null
@@ -44,15 +97,55 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <form onSubmit={handleBuscar} className="hidden sm:flex flex-1 max-w-sm">
-          <input
-            type="search"
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            placeholder={t('navbar.buscarPlaceholder')}
-            className="w-full bg-surface border border-line rounded-sm px-4 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors"
-          />
-        </form>
+        <div ref={buscadorRef} className="relative hidden sm:block flex-1 max-w-sm">
+          <form onSubmit={handleBuscar} className="flex">
+            <input
+              type="search"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              onFocus={() => setMostrarResultados(true)}
+              placeholder={t('navbar.buscarPlaceholder')}
+              className="w-full bg-surface border border-line rounded-sm px-4 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors"
+            />
+          </form>
+
+          {mostrarResultados && busqueda.trim().length >= 2 && (
+            <div className="absolute left-0 right-0 top-full mt-2 bg-surface border border-brass/40 rounded-sm shadow-lg z-50 max-h-96 overflow-y-auto">
+              {buscando ? (
+                <p className="font-mono text-xs text-muted px-4 py-3">{t('navbar.buscando')}</p>
+              ) : resultados.length === 0 ? (
+                <p className="font-mono text-xs text-muted px-4 py-3">{t('navbar.sinResultados')}</p>
+              ) : (
+                <ul>
+                  {resultados.map((p) => (
+                    <li key={p.id} className="border-b border-line/60 last:border-b-0">
+                      <button
+                        type="button"
+                        onClick={() => handleSeleccionarResultado(p.id)}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-surface2 transition-colors"
+                      >
+                        <img
+                          src={p.imagen}
+                          alt=""
+                          className="w-11 h-11 object-cover rounded-sm bg-surface2 shrink-0"
+                        />
+                        <span className="flex-1 min-w-0">
+                          <span className="block text-sm text-parchment truncate">{p.nombre}</span>
+                          <span className="block font-mono text-[11px] text-muted uppercase tracking-widest">
+                            {traducirCategoria(p.categoria, lang)}
+                          </span>
+                        </span>
+                        <span className="font-mono text-sm text-walnut2 shrink-0">
+                          ${Number(p.precio_desde).toLocaleString('en-US')}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
 
         <ul className="hidden lg:flex items-center gap-8 font-body text-sm shrink-0">
           {links.map((l) => (
