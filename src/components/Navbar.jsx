@@ -109,12 +109,10 @@ export default function Navbar() {
             />
           </form>
 
-          {mostrarResultados && busqueda.trim().length >= 2 && (
+          {mostrarResultados && busqueda.trim().length >= 2 && (buscando || resultados.length > 0) && (
             <div className="absolute left-0 right-0 top-full mt-2 bg-surface border border-brass/40 rounded-sm shadow-lg z-50 max-h-96 overflow-y-auto">
               {buscando ? (
                 <p className="font-mono text-xs text-muted px-4 py-3">{t('navbar.buscando')}</p>
-              ) : resultados.length === 0 ? (
-                <p className="font-mono text-xs text-muted px-4 py-3">{t('navbar.sinResultados')}</p>
               ) : (
                 <ul>
                   {resultados.map((p) => (
