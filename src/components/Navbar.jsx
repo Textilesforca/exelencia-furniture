@@ -251,7 +251,7 @@ export default function Navbar() {
         <ResultadosBusqueda />
       </div>
 
-      <div className="hidden lg:block border-t border-line/60">
+      <div className="border-t border-line/60">
         <div className="relative max-w-6xl mx-auto px-6">
           <ul className="h-12 flex items-center gap-6 overflow-x-auto font-mono text-xs uppercase tracking-widest text-parchment/70">
             {categoriasNav.map((cat) =>
