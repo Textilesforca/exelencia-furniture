@@ -26,7 +26,10 @@ export default function Navbar() {
   const [resultados, setResultados] = useState([])
   const [buscando, setBuscando] = useState(false)
   const [mostrarResultados, setMostrarResultados] = useState(false)
+  const [menuAbierto, setMenuAbierto] = useState(false)
+  const [categoriaMovilAbierta, setCategoriaMovilAbierta] = useState(null)
   const buscadorRef = useRef(null)
+  const buscadorMovilRef = useRef(null)
 
   const links = [
     { to: '/', label: t('navbar.inicio') },
@@ -39,6 +42,7 @@ export default function Navbar() {
     const params = new URLSearchParams()
     if (busqueda.trim()) params.set('buscar', busqueda.trim())
     setMostrarResultados(false)
+    setMenuAbierto(false)
     navigate(`/catalogo${params.toString() ? `?${params.toString()}` : ''}`)
   }
 
@@ -68,7 +72,9 @@ export default function Navbar() {
 
   useEffect(() => {
     function handleClickFuera(e) {
-      if (buscadorRef.current && !buscadorRef.current.contains(e.target)) {
+      const dentroDesktop = buscadorRef.current?.contains(e.target)
+      const dentroMovil = buscadorMovilRef.current?.contains(e.target)
+      if (!dentroDesktop && !dentroMovil) {
         setMostrarResultados(false)
       }
     }
@@ -76,20 +82,64 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickFuera)
   }, [])
 
+  useEffect(() => {
+    setMenuAbierto(false)
+  }, [session])
+
   function handleSeleccionarResultado(id) {
     setMostrarResultados(false)
+    setMenuAbierto(false)
     setBusqueda('')
     navigate(`/catalogo/${id}`)
   }
 
+  function cerrarMenuMovil() {
+    setMenuAbierto(false)
+    setCategoriaMovilAbierta(null)
+  }
+
   const subcategoriasActivas = categoriaAbierta ? subcategoriasPorCategoria[categoriaAbierta] : null
+
+  function ResultadosBusqueda() {
+    if (!(mostrarResultados && busqueda.trim().length >= 2 && (buscando || resultados.length > 0))) return null
+    return (
+      <div className="absolute left-0 right-0 top-full mt-2 bg-surface border border-brass/40 rounded-sm shadow-lg z-50 max-h-96 overflow-y-auto">
+        {buscando ? (
+          <p className="font-mono text-xs text-muted px-4 py-3">{t('navbar.buscando')}</p>
+        ) : (
+          <ul>
+            {resultados.map((p) => (
+              <li key={p.id} className="border-b border-line/60 last:border-b-0">
+                <button
+                  type="button"
+                  onClick={() => handleSeleccionarResultado(p.id)}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-surface2 transition-colors"
+                >
+                  <img src={p.imagen} alt="" className="w-11 h-11 object-cover rounded-sm bg-surface2 shrink-0" />
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-sm text-parchment truncate">{p.nombre}</span>
+                    <span className="block font-mono text-[11px] text-muted uppercase tracking-widest">
+                      {traducirCategoria(p.categoria, lang)}
+                    </span>
+                  </span>
+                  <span className="font-mono text-sm text-walnut2 shrink-0">
+                    ${Number(p.precio_desde).toLocaleString('en-US')}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    )
+  }
 
   return (
     <header className="relative sticky top-0 z-40 bg-ink/90 backdrop-blur border-b border-line">
-      <nav className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between gap-6">
+      <nav className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-3 sm:gap-6">
         <Link to="/" className="flex items-center gap-3 font-display text-lg tracking-tight leading-none shrink-0">
           <img src="/logo.png" alt="Exelencia Furniture" className="w-11 h-11 rounded-full shrink-0" />
-          <span>
+          <span className="hidden sm:inline">
             <span className="block text-parchment">Custom &amp; Designs</span>
             <span className="block text-[11px] font-mono tracking-[0.2em] text-brass uppercase mt-1">
               The Exelencia Furniture
@@ -108,41 +158,7 @@ export default function Navbar() {
               className="w-full bg-surface border border-line rounded-sm px-4 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors"
             />
           </form>
-
-          {mostrarResultados && busqueda.trim().length >= 2 && (buscando || resultados.length > 0) && (
-            <div className="absolute left-0 right-0 top-full mt-2 bg-surface border border-brass/40 rounded-sm shadow-lg z-50 max-h-96 overflow-y-auto">
-              {buscando ? (
-                <p className="font-mono text-xs text-muted px-4 py-3">{t('navbar.buscando')}</p>
-              ) : (
-                <ul>
-                  {resultados.map((p) => (
-                    <li key={p.id} className="border-b border-line/60 last:border-b-0">
-                      <button
-                        type="button"
-                        onClick={() => handleSeleccionarResultado(p.id)}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-surface2 transition-colors"
-                      >
-                        <img
-                          src={p.imagen}
-                          alt=""
-                          className="w-11 h-11 object-cover rounded-sm bg-surface2 shrink-0"
-                        />
-                        <span className="flex-1 min-w-0">
-                          <span className="block text-sm text-parchment truncate">{p.nombre}</span>
-                          <span className="block font-mono text-[11px] text-muted uppercase tracking-widest">
-                            {traducirCategoria(p.categoria, lang)}
-                          </span>
-                        </span>
-                        <span className="font-mono text-sm text-walnut2 shrink-0">
-                          ${Number(p.precio_desde).toLocaleString('en-US')}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
+          <ResultadosBusqueda />
         </div>
 
         <ul className="hidden lg:flex items-center gap-8 font-body text-sm shrink-0">
@@ -162,7 +178,7 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 sm:gap-3.5 shrink-0">
           <button
             type="button"
             onClick={() => setLang(lang === 'es' ? 'en' : 'es')}
@@ -173,7 +189,7 @@ export default function Navbar() {
               <circle cx="12" cy="12" r="9" />
               <path strokeLinecap="round" d="M3 12h18M12 3c2.5 2.6 3.8 5.8 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.8-3.8-9S9.5 5.6 12 3z" />
             </svg>
-            {t('idioma.cambiarA')}
+            <span>{t('idioma.cambiarA')}</span>
           </button>
 
           <Link
@@ -201,16 +217,41 @@ export default function Navbar() {
             )}
           </Link>
 
-          <Link
-            to="/contacto"
-            className="sm:hidden text-xs font-mono uppercase tracking-widest text-brass border border-brass/50 px-3 py-2 rounded-sm"
+          <button
+            type="button"
+            onClick={() => setMenuAbierto((v) => !v)}
+            aria-label={menuAbierto ? t('navbar.cerrarMenu') : t('navbar.abrirMenu')}
+            aria-expanded={menuAbierto}
+            className="lg:hidden text-parchment/80 hover:text-brass transition-colors"
           >
-            {t('navbar.cotizar')}
-          </Link>
+            {menuAbierto ? (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            )}
+          </button>
         </div>
       </nav>
 
-      <div className="border-t border-line/60">
+      <div className="sm:hidden border-t border-line/60 px-4 py-3 relative" ref={buscadorMovilRef}>
+        <form onSubmit={handleBuscar} className="flex">
+          <input
+            type="search"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            onFocus={() => setMostrarResultados(true)}
+            placeholder={t('navbar.buscarPlaceholder')}
+            className="w-full bg-surface border border-line rounded-sm px-4 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors"
+          />
+        </form>
+        <ResultadosBusqueda />
+      </div>
+
+      <div className="hidden lg:block border-t border-line/60">
         <div className="relative max-w-6xl mx-auto px-6">
           <ul className="h-12 flex items-center gap-6 overflow-x-auto font-mono text-xs uppercase tracking-widest text-parchment/70">
             {categoriasNav.map((cat) =>
@@ -288,6 +329,108 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      {menuAbierto && (
+        <div className="lg:hidden border-t border-line/60 bg-ink max-h-[75vh] overflow-y-auto">
+          <ul className="font-body text-sm">
+            {links.map((l) => (
+              <li key={l.to} className="border-b border-line/60">
+                <Link
+                  to={l.to}
+                  onClick={cerrarMenuMovil}
+                  className="block px-4 py-3 text-parchment hover:text-brass transition-colors"
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+
+            {categoriasNav.map((cat) => {
+              const subs = subcategoriasPorCategoria[cat]
+              const abierta = categoriaMovilAbierta === cat
+              return (
+                <li key={cat} className="border-b border-line/60">
+                  {subs ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setCategoriaMovilAbierta(abierta ? null : cat)}
+                        aria-expanded={abierta}
+                        className="w-full flex items-center justify-between px-4 py-3 text-parchment hover:text-brass transition-colors font-mono text-xs uppercase tracking-widest"
+                      >
+                        {traducirCategoria(cat, lang)}
+                        <span className="text-brass">{abierta ? '−' : '+'}</span>
+                      </button>
+                      {abierta && (
+                        <ul className="pb-2">
+                          <li>
+                            <Link
+                              to={`/catalogo?categoria=${encodeURIComponent(cat)}`}
+                              onClick={cerrarMenuMovil}
+                              className="block pl-8 pr-4 py-2 text-sm text-brass hover:underline"
+                            >
+                              {traducirCategoria(cat, lang)} — {t('catalog.verCatalogo')}
+                            </Link>
+                          </li>
+                          {subs.slice(1).map((sub) => (
+                            <li key={sub}>
+                              <Link
+                                to={`/catalogo?categoria=${encodeURIComponent(cat)}&subcategoria=${encodeURIComponent(sub)}`}
+                                onClick={cerrarMenuMovil}
+                                className="block pl-8 pr-4 py-2 text-sm text-parchment/80 hover:text-brass transition-colors"
+                              >
+                                {traducirSubcategoria(sub, lang, cat)}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  ) : (
+                    <Link
+                      to={`/catalogo?categoria=${encodeURIComponent(cat)}`}
+                      onClick={cerrarMenuMovil}
+                      className="block px-4 py-3 text-parchment hover:text-brass transition-colors font-mono text-xs uppercase tracking-widest"
+                    >
+                      {traducirCategoria(cat, lang)}
+                    </Link>
+                  )}
+                </li>
+              )
+            })}
+
+            <li className="border-b border-line/60">
+              <Link
+                to="/entrega"
+                onClick={cerrarMenuMovil}
+                className="block px-4 py-3 text-parchment hover:text-brass transition-colors font-mono text-xs uppercase tracking-widest"
+              >
+                {t('navbar.delivery')}
+              </Link>
+            </li>
+            <li className="border-b border-line/60">
+              <Link
+                to="/contacto"
+                onClick={cerrarMenuMovil}
+                className="block px-4 py-3 text-parchment hover:text-brass transition-colors font-mono text-xs uppercase tracking-widest"
+              >
+                {t('navbar.contactUs')}
+              </Link>
+            </li>
+            {session && (
+              <li>
+                <Link
+                  to="/admin"
+                  onClick={cerrarMenuMovil}
+                  className="block px-4 py-3 text-brass hover:text-parchment transition-colors font-mono text-xs uppercase tracking-widest"
+                >
+                  {t('navbar.admin')}
+                </Link>
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
     </header>
   )
 }

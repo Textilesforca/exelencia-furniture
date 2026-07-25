@@ -128,13 +128,13 @@ export default function ProductDetail() {
         </div>
 
         {galeria.length > 1 && (
-          <div className="flex gap-3 mt-4">
+          <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
             {galeria.map((url, i) => (
               <button
                 key={url + i}
                 type="button"
                 onClick={() => setImagenSeleccionada(url)}
-                className={`w-16 h-16 rounded-sm overflow-hidden border transition-colors ${
+                className={`w-16 h-16 rounded-sm overflow-hidden border transition-colors shrink-0 ${
                   imagenSeleccionada === url ? 'border-brass' : 'border-line hover:border-brass/60'
                 }`}
               >
@@ -166,7 +166,7 @@ export default function ProductDetail() {
               {t('productDetail.color')}
               {colorSeleccionado ? `: ${colorSeleccionado}` : ''}
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {producto.colores.map((color) => (
                 <button
                   key={color.nombre}
@@ -174,7 +174,7 @@ export default function ProductDetail() {
                   onClick={() => setColorSeleccionado(color.nombre)}
                   title={color.nombre}
                   style={{ backgroundColor: color.hex }}
-                  className={`w-7 h-7 rounded-full border-2 transition-colors ${
+                  className={`w-7 h-7 rounded-full border-2 transition-colors shrink-0 ${
                     colorSeleccionado === color.nombre ? 'border-brass' : 'border-transparent hover:border-line'
                   }`}
                 />

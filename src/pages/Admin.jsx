@@ -64,7 +64,7 @@ export default function Admin() {
         <p className="font-mono text-sm text-muted">{t('admin.sinPermisos')}</p>
       ) : (
         <>
-          <div className="flex gap-6 border-b border-line mb-10">
+          <div className="flex gap-6 border-b border-line mb-10 overflow-x-auto">
             {tabsDisponibles.includes('productos') && (
               <TabButton active={tab === 'productos'} onClick={() => setTab('productos')}>
                 {t('admin.tabProductos')}
@@ -125,7 +125,7 @@ function TabButton({ active, onClick, children }) {
   return (
     <button
       onClick={onClick}
-      className={`pb-3 font-mono text-xs uppercase tracking-widest border-b transition-colors ${
+      className={`pb-3 font-mono text-xs uppercase tracking-widest border-b transition-colors shrink-0 whitespace-nowrap ${
         active ? 'text-brass border-brass' : 'text-muted border-transparent hover:text-parchment'
       }`}
     >

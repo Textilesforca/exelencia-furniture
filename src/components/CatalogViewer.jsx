@@ -188,7 +188,7 @@ export default function CatalogViewer({ imagenes, categoria }) {
         )}
 
         {mostrarCompartir && (
-          <div className="absolute top-4 right-4 bg-surface border border-brass/40 rounded-sm shadow-lg p-5 w-72 z-10">
+          <div className="absolute top-4 right-4 left-4 sm:left-auto bg-surface border border-brass/40 rounded-sm shadow-lg p-5 sm:w-72 z-10">
             <p className="font-mono text-xs tracking-widest text-brass uppercase mb-4">Comparte esta página</p>
             <div className="grid gap-3 mb-4">
               <ShareLink href={`https://wa.me/?text=${encodeURIComponent(urlPagina)}`} label="WhatsApp" />

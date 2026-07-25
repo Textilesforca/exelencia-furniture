@@ -12,6 +12,8 @@ export const translations = {
       panelAdmin: 'Panel de administración',
       iniciarSesion: 'Iniciar sesión',
       buscando: 'Buscando…',
+      abrirMenu: 'Abrir menú',
+      cerrarMenu: 'Cerrar menú',
     },
     cart: {
       titulo: 'Tu carrito',
@@ -425,6 +427,8 @@ export const translations = {
       panelAdmin: 'Admin panel',
       iniciarSesion: 'Log in',
       buscando: 'Searching…',
+      abrirMenu: 'Open menu',
+      cerrarMenu: 'Close menu',
     },
     cart: {
       titulo: 'Your cart',

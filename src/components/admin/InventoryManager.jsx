@@ -218,9 +218,9 @@ export default function InventoryManager() {
 
           return (
             <li key={p.id} className="bg-surface border border-line rounded-sm p-3">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <img src={p.imagen} alt={p.nombre} className="h-16 w-16 object-cover rounded-sm bg-surface2 shrink-0" />
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-[140px]">
                   <p className="text-parchment truncate">{p.nombre}</p>
                   <p className="font-mono text-xs text-muted">{traducirCategoria(p.categoria, lang)}</p>
                   {stockTotal <= 0 ? (
@@ -235,7 +235,7 @@ export default function InventoryManager() {
                 </div>
 
                 {!tieneColores && (
-                  <>
+                  <div className="flex items-center gap-3 ml-auto">
                     <input
                       type="number"
                       min="0"
@@ -254,23 +254,23 @@ export default function InventoryManager() {
                           ? t('inventoryManager.guardado')
                           : t('inventoryManager.guardar')}
                     </button>
-                  </>
+                  </div>
                 )}
               </div>
 
               {errores[p.id] && <p className="text-xs text-red-400 mt-2">{errores[p.id]}</p>}
 
               {tieneColores && (
-                <ul className="mt-3 grid gap-2 pl-20">
+                <ul className="mt-3 grid gap-2 pl-0 sm:pl-20">
                   {p.colores.map((c) => {
                     const clave = `${p.id}::${c.nombre}`
                     return (
-                      <li key={c.nombre} className="flex items-center gap-3">
+                      <li key={c.nombre} className="flex flex-wrap items-center gap-3">
                         <span
                           className="w-4 h-4 rounded-full border border-line shrink-0"
                           style={{ backgroundColor: c.hex }}
                         />
-                        <span className="text-sm text-parchment/90 flex-1 min-w-0 truncate">{c.nombre}</span>
+                        <span className="text-sm text-parchment/90 flex-1 min-w-[80px] truncate">{c.nombre}</span>
                         <input
                           type="number"
                           min="0"
