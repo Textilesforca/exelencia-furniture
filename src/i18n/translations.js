@@ -28,8 +28,8 @@ export const translations = {
     },
     hero: {
       kicker: 'Diseño · Medida · Materia',
-      tituloL1: 'Muebles dibujados para tu espacio,',
-      tituloL2: 'no al revés.',
+      tituloL1: 'Ayudamos a nuestros clientes a hacer realidad sus sueños mediante la fabricación de muebles',
+      tituloL2: 'personalizados o de catálogo.',
       texto:
         'Cada pieza empieza como un plano acotado a tus paredes, tu luz y tu forma de vivir. Carpintería de autor, hecha en taller, sin catálogos genéricos.',
       verCatalogo: 'Ver catálogo',
@@ -428,8 +428,8 @@ export const translations = {
     },
     hero: {
       kicker: 'Design · Measure · Material',
-      tituloL1: 'Furniture drawn for your space,',
-      tituloL2: 'not the other way around.',
+      tituloL1: 'We help our clients bring their dreams to life by crafting',
+      tituloL2: 'custom or catalog furniture.',
       texto:
         'Every piece starts as a drawing sized to your walls, your light, and how you actually live. Handmade joinery, built in our workshop, no generic catalogs.',
       verCatalogo: 'View catalog',

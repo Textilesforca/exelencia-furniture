@@ -10,7 +10,7 @@ export default function Hero() {
         <p className="font-mono text-xs tracking-[0.25em] text-brass uppercase mb-4">
           {t('hero.kicker')}
         </p>
-        <h1 className="font-display text-5xl sm:text-6xl leading-[1.05] text-parchment">
+        <h1 className="font-display text-3xl sm:text-4xl leading-[1.15] text-parchment">
           {t('hero.tituloL1')}
           <span className="text-walnut2"> {t('hero.tituloL2')}</span>
         </h1>

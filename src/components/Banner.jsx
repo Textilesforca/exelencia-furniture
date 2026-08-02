@@ -20,7 +20,7 @@ export default function Banner() {
   if (slides.length === 0) return null
 
   return (
-    <section className="max-w-6xl mx-auto px-6 pt-10">
+    <section className="w-full px-4 sm:px-6 pt-10">
       <ImageCarousel imagenes={slides} />
     </section>
   )
