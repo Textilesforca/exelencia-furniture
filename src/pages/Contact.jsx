@@ -17,11 +17,8 @@ export default function Contact() {
 
         <div className="font-mono text-xs uppercase tracking-widest text-muted space-y-2">
           <p>14709 S Western Ave, Gardena, CA 90249</p>
-          <p>{t('contact.losAngeles')}: (323) 235-4011</p>
-          <p>{t('contact.ontario')}: (562) 746-2001</p>
-          <p>
-            {t('contact.email')} contacto@custom.com
-          </p>
+          <p>{t('contact.telefono')} (323) 507-1945</p>
+          <p>{t('contact.whatsapp')} (323) 507-1945</p>
           <p>
             {t('contact.horario')} {t('contact.horarioValor')}
           </p>

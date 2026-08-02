@@ -105,6 +105,10 @@ export default function Catalog() {
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
+      {activa === 'Piezas a medida' && !busqueda && (
+        <p className="text-parchment/70 max-w-2xl mb-10">{t('catalog.piezasMedidaIntro')}</p>
+      )}
+
       {cargando ? (
         <p className="font-mono text-sm text-muted">{t('catalog.cargando')}</p>
       ) : filtrados.length === 0 ? (

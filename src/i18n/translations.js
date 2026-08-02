@@ -54,6 +54,8 @@ export const translations = {
       sinFotos: 'Aún no hay fotos de catálogo en esta categoría.',
       filtroAria: 'Filtrar por categoría',
       verCatalogo: 'Ver catálogo',
+      piezasMedidaIntro:
+        'Cada lugar de tu hogar merece ser excepcional. Tenemos una amplia selección de muebles de alta calidad y también ofrecemos muebles personalizados hechos por nuestras manufacturas para hacer de cada espacio un lugar inolvidable.',
     },
     categorias: {
       Todos: 'Todos',
@@ -141,10 +143,9 @@ export const translations = {
     contact: {
       titulo: 'Contáctanos',
       intro:
-        '¡El doble de buena vibra, el doble de ubicaciones! Visítanos en 14709 S Western Ave, Gardena, CA 90249. Gracias por tu interés, te responderemos lo antes posible. Si tienes una pregunta sobre un producto, por favor incluye el número de artículo. Gracias.',
-      losAngeles: 'Los Ángeles',
-      ontario: 'Ontario',
-      email: 'Escríbenos a:',
+        'Visítanos en 14709 S Western Ave, Gardena, CA 90249. Gracias por tu interés, te responderemos lo antes posible. Si tienes una pregunta sobre un producto, por favor incluye el número de artículo. Gracias.',
+      telefono: 'Teléfono:',
+      whatsapp: 'WhatsApp:',
       horario: 'Horario:',
       horarioValor: 'Lun - Sáb: 9:00am - 6:30pm　　Dom: 10:30am - 5:00pm',
       formTitulo: 'Cuéntanos qué mueble necesitas',
@@ -454,6 +455,8 @@ export const translations = {
       sinFotos: 'No catalog photos in this category yet.',
       filtroAria: 'Filter by category',
       verCatalogo: 'View catalog',
+      piezasMedidaIntro:
+        'Every place in your home deserves to be exceptional. We offer a wide selection of high-quality furniture and also custom pieces built by our own workshop to make every space unforgettable.',
     },
     categorias: {
       Todos: 'All',
@@ -541,10 +544,9 @@ export const translations = {
     contact: {
       titulo: 'Contact Us',
       intro:
-        'Double the vibes, double the locations! Visit us 14709 S Western Ave Gardena CA 90249, Thank you for your inquiry. We will get back to you as soon as possible. If you have a question about a product, please include the item number. Thanks',
-      losAngeles: 'Los Angeles',
-      ontario: 'Ontario',
-      email: 'Email us at:',
+        'Visit us at 14709 S Western Ave, Gardena, CA 90249. Thank you for your inquiry, we will get back to you as soon as possible. If you have a question about a product, please include the item number. Thanks.',
+      telefono: 'Phone:',
+      whatsapp: 'WhatsApp:',
       horario: 'Store Hours:',
       horarioValor: 'Mon - Sat: 9:00am - 6:30pm　　Sun: 10:30am - 5:00pm',
       formTitulo: 'Tell us what furniture you need',
