@@ -11,6 +11,9 @@ export default function Contact() {
         <h1 className="font-display text-4xl text-parchment mb-6">{t('contact.titulo')}</h1>
         <p className="text-parchment/70 max-w-md">{t('contact.intro')}</p>
 
+        <p className="font-display text-2xl text-parchment mt-8 mb-3">{t('contact.materialesTitulo')}</p>
+        <p className="text-parchment/70 max-w-md">{t('contact.materialesTexto')}</p>
+
         <div className="my-8">
           <BlueprintDivider />
         </div>

@@ -54,6 +54,7 @@ export const translations = {
       sinFotos: 'Aún no hay fotos de catálogo en esta categoría.',
       filtroAria: 'Filtrar por categoría',
       verCatalogo: 'Ver catálogo',
+      piezasMedidaKicker: 'Piezas hechas para tu espacio',
       piezasMedidaIntro:
         'Cada lugar de tu hogar merece ser excepcional. Tenemos una amplia selección de muebles de alta calidad y también ofrecemos muebles personalizados hechos por nuestras manufacturas para hacer de cada espacio un lugar inolvidable.',
     },
@@ -143,7 +144,10 @@ export const translations = {
     contact: {
       titulo: 'Contáctanos',
       intro:
-        'Visítanos en 14709 S Western Ave, Gardena, CA 90249. Gracias por tu interés, te responderemos lo antes posible. Si tienes una pregunta sobre un producto, por favor incluye el número de artículo. Gracias.',
+        'Nuestros expertos pueden ir a tu hogar en el área de Los Ángeles, Gardena, San Pedro, etc. para ayudarte a medir y diseñar tu espacio de manera óptima, o nos puedes compartir tus medidas y te realizamos tu presupuesto.',
+      materialesTitulo: 'Materiales y Productos',
+      materialesTexto:
+        'Contamos con materiales de excelencia para diseñar tus muebles personalizados, junto con productos de catálogo para renovar tus espacios.',
       telefono: 'Teléfono:',
       whatsapp: 'WhatsApp:',
       horario: 'Horario:',
@@ -455,6 +459,7 @@ export const translations = {
       sinFotos: 'No catalog photos in this category yet.',
       filtroAria: 'Filter by category',
       verCatalogo: 'View catalog',
+      piezasMedidaKicker: 'Pieces made for your space',
       piezasMedidaIntro:
         'Every place in your home deserves to be exceptional. We offer a wide selection of high-quality furniture and also custom pieces built by our own workshop to make every space unforgettable.',
     },

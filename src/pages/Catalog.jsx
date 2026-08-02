@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
+import BlueprintDivider from '../components/BlueprintDivider'
 import { sampleProducts, categorias } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -106,7 +107,13 @@ export default function Catalog() {
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
       {activa === 'Piezas a medida' && !busqueda && (
-        <p className="text-parchment/70 max-w-2xl mb-10">{t('catalog.piezasMedidaIntro')}</p>
+        <div className="mb-12">
+          <BlueprintDivider label={traducirCategoria(activa, lang)} />
+          <p className="font-display text-2xl text-parchment mt-5 mb-3 max-w-2xl">
+            {t('catalog.piezasMedidaKicker')}
+          </p>
+          <p className="text-parchment/70 text-lg max-w-2xl">{t('catalog.piezasMedidaIntro')}</p>
+        </div>
       )}
 
       {cargando ? (
