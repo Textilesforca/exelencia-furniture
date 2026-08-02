@@ -1,5 +1,4 @@
-// Número de prueba — reemplázalo por el número real de WhatsApp del negocio.
-const WHATSAPP_NUMERO = '522227095613'
+const WHATSAPP_NUMERO = '13235071945'
 
 export default function WhatsAppButton() {
   return (
