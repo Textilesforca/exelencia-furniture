@@ -299,33 +299,33 @@ export default function Navbar() {
             )}
           </ul>
 
-          <div className="hidden sm:flex items-center gap-4 shrink-0 ml-auto">
+          <div className="hidden sm:flex items-center gap-3.5 shrink-0 ml-auto">
             <a
               href="https://facebook.com/exelenciafurniture"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
-              className="text-parchment/70 hover:text-brass transition-colors"
+              className="hover:opacity-75 transition-opacity"
             >
-              <IconoFacebook className="w-4 h-4" />
+              <IconoFacebook className="w-5 h-5" />
             </a>
             <a
               href="https://instagram.com/exelenciafurniture"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
-              className="text-parchment/70 hover:text-brass transition-colors"
+              className="hover:opacity-75 transition-opacity"
             >
-              <IconoInstagram className="w-4 h-4" />
+              <IconoInstagram className="w-5 h-5" />
             </a>
             <a
               href="https://tiktok.com/@exelenciafurniture"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="TikTok"
-              className="text-parchment/70 hover:text-brass transition-colors"
+              className="hover:opacity-75 transition-opacity"
             >
-              <IconoTikTok className="w-4 h-4" />
+              <IconoTikTok className="w-5 h-5" />
             </a>
           </div>
 
@@ -467,12 +467,11 @@ export default function Navbar() {
 
 function IconoFacebook({ className }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className={className}>
-      <circle cx="12" cy="12" r="9" />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+      <circle cx="12" cy="12" r="12" fill="#1877F2" />
       <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M13.5 21v-7.2h2.2l.3-2.6h-2.5V9.4c0-.75.2-1.3 1.3-1.3h1.4V5.6c-.25-.03-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5v2.2H8.6v2.6h2.2V21"
+        fill="#fff"
+        d="M15.5 8.5h-1.6c-.5 0-.9.4-.9 1v1.5h2.4l-.3 2.4h-2.1V21h-2.5v-7.6H8.5v-2.4h2V9.2c0-2 1.2-3.2 3.1-3.2.9 0 1.7.1 1.9.1v2.4z"
       />
     </svg>
   )
@@ -480,19 +479,31 @@ function IconoFacebook({ className }) {
 
 function IconoInstagram({ className }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className={className}>
-      <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none" />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+      <defs>
+        <linearGradient id="igGrad" x1="0" y1="24" x2="24" y2="0">
+          <stop offset="0%" stopColor="#FEDA75" />
+          <stop offset="30%" stopColor="#FA7E1E" />
+          <stop offset="60%" stopColor="#D62976" />
+          <stop offset="100%" stopColor="#4F5BD5" />
+        </linearGradient>
+      </defs>
+      <rect width="24" height="24" rx="6" fill="url(#igGrad)" />
+      <rect x="6" y="6" width="12" height="12" rx="4" fill="none" stroke="#fff" strokeWidth="1.6" />
+      <circle cx="12" cy="12" r="3.2" fill="none" stroke="#fff" strokeWidth="1.6" />
+      <circle cx="16.3" cy="7.7" r="1" fill="#fff" />
     </svg>
   )
 }
 
 function IconoTikTok({ className }) {
+  const d =
+    'M14.5 3.8c.5 2 2 3.6 4.1 4v2.6c-1.5 0-2.9-.5-4.1-1.3v6.6a5.4 5.4 0 11-5.4-5.4c.3 0 .6 0 .9.1v2.7a2.7 2.7 0 102.2 2.7V3.8h2.3z'
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className={className}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 3.5v11.8a3.7 3.7 0 11-3.2-3.67" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 3.5c.4 2.3 2 4.1 4.5 4.4" />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+      <path fill="#25F4EE" d={d} transform="translate(-0.7,-0.7)" />
+      <path fill="#FE2C55" d={d} transform="translate(0.7,0.7)" />
+      <path fill="#fff" d={d} />
     </svg>
   )
 }
