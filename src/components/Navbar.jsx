@@ -252,8 +252,8 @@ export default function Navbar() {
       </div>
 
       <div className="border-t border-line/60">
-        <div className="relative max-w-6xl mx-auto px-6">
-          <ul className="h-12 flex items-center gap-6 overflow-x-auto font-mono text-xs uppercase tracking-widest text-parchment/70">
+        <div className="relative max-w-6xl mx-auto px-6 flex items-center gap-6">
+          <ul className="h-12 flex items-center gap-6 overflow-x-auto font-mono text-xs uppercase tracking-widest text-parchment/70 min-w-0">
             {categoriasNav.map((cat) =>
               subcategoriasPorCategoria[cat] ? (
                 <li
@@ -298,6 +298,36 @@ export default function Navbar() {
               </li>
             )}
           </ul>
+
+          <div className="hidden sm:flex items-center gap-4 shrink-0 ml-auto">
+            <a
+              href="https://facebook.com/exelenciafurniture"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              className="text-parchment/70 hover:text-brass transition-colors"
+            >
+              <IconoFacebook className="w-4 h-4" />
+            </a>
+            <a
+              href="https://instagram.com/exelenciafurniture"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="text-parchment/70 hover:text-brass transition-colors"
+            >
+              <IconoInstagram className="w-4 h-4" />
+            </a>
+            <a
+              href="https://tiktok.com/@exelenciafurniture"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+              className="text-parchment/70 hover:text-brass transition-colors"
+            >
+              <IconoTikTok className="w-4 h-4" />
+            </a>
+          </div>
 
           {subcategoriasActivas && (
             <div
@@ -432,5 +462,37 @@ export default function Navbar() {
         </div>
       )}
     </header>
+  )
+}
+
+function IconoFacebook({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M13.5 21v-7.2h2.2l.3-2.6h-2.5V9.4c0-.75.2-1.3 1.3-1.3h1.4V5.6c-.25-.03-1.1-.1-2-.1-2 0-3.4 1.2-3.4 3.5v2.2H8.6v2.6h2.2V21"
+      />
+    </svg>
+  )
+}
+
+function IconoInstagram({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className={className}>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+function IconoTikTok({ className }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 3.5v11.8a3.7 3.7 0 11-3.2-3.67" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 3.5c.4 2.3 2 4.1 4.5 4.4" />
+    </svg>
   )
 }
