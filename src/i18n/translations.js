@@ -31,7 +31,7 @@ export const translations = {
       tituloL1: 'Ayudamos a nuestros clientes a hacer realidad sus sueños mediante la fabricación de muebles',
       tituloL2: 'personalizados o de catálogo.',
       texto:
-        'Cada pieza empieza como un plano acotado a tus paredes, tu luz y tu forma de vivir. Carpintería de autor, hecha en taller, sin catálogos genéricos.',
+        'Cada lugar de tu hogar merece ser excepcional. Tenemos una amplia selección de muebles de alta calidad y también ofrecemos muebles personalizados hechos por nuestras manufacturas para hacer de cada espacio un lugar inolvidable.',
       verCatalogo: 'Ver catálogo',
       pedirCotizacion: 'Pedir cotización',
       bocetoAlt: 'Boceto acotado de un sillón a medida',
@@ -437,7 +437,7 @@ export const translations = {
       tituloL1: 'We help our clients bring their dreams to life by crafting',
       tituloL2: 'custom or catalog furniture.',
       texto:
-        'Every piece starts as a drawing sized to your walls, your light, and how you actually live. Handmade joinery, built in our workshop, no generic catalogs.',
+        'Every place in your home deserves to be exceptional. We offer a wide selection of high-quality furniture and also custom pieces built by our own workshop to make every space unforgettable.',
       verCatalogo: 'View catalog',
       pedirCotizacion: 'Request a quote',
       bocetoAlt: 'Dimensioned sketch of a custom armchair',

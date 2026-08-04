@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Hero from '../components/Hero'
 import Banner from '../components/Banner'
-import BlueprintDivider from '../components/BlueprintDivider'
 import ProductCard from '../components/ProductCard'
 import { sampleProducts } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
@@ -30,7 +29,12 @@ export default function Home() {
       <Hero />
 
       <section className="max-w-6xl mx-auto px-6 py-6">
-        <BlueprintDivider label={t('home.destacadas')} />
+        <div className="flex items-center gap-4">
+          <span className="bg-brass text-ink font-mono text-xs sm:text-sm font-semibold tracking-widest uppercase px-4 py-2 rounded-sm shrink-0">
+            {t('home.destacadas')}
+          </span>
+          <div className="flex-1 h-px bg-line" />
+        </div>
       </section>
 
       <section className="max-w-6xl mx-auto px-6 pb-20 grid gap-4">
