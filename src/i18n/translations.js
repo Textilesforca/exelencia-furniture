@@ -40,13 +40,16 @@ export const translations = {
     },
     home: {
       destacadas: 'Lo más vendido',
-      paso1Titulo: 'Levantamiento',
-      paso1Texto: 'Medimos tu espacio y escuchamos cómo lo usas antes de dibujar nada.',
-      paso2Titulo: 'Plano y material',
-      paso2Texto: 'Aprobamos contigo dimensiones, madera y acabado en un plano acotado.',
-      paso3Titulo: 'Taller y entrega',
-      paso3Texto: 'Construimos en taller propio y entregamos con instalación incluida.',
-      ctaTitulo: '¿Tienes un espacio en mente?',
+      paso1Titulo: 'Estimados y Presupuestos',
+      paso1Texto:
+        'Nuestros expertos pueden ir a tu hogar en el área de Los Ángeles, Gardena, San Pedro, etc. para ayudarte a medir y diseñar tu espacio de manera óptima, o nos puedes compartir tus medidas y te daremos un presupuesto.',
+      paso2Titulo: 'Materiales y Productos',
+      paso2Texto:
+        'Contamos con material de excelencia para diseñar tus muebles personalizados, junto con productos de catálogo para renovar tus espacios.',
+      paso3Titulo: 'Entregas o Pickup',
+      paso3Texto:
+        'Contamos con servicios profesionales de entrega e instalación en California, o pickup directamente de nuestra localidad.',
+      ctaTitulo: '¿Tienes un proyecto innovador que deseas hacer realidad?',
       ctaBoton: 'Cuéntanos tu proyecto',
     },
     catalog: {
@@ -446,13 +449,16 @@ export const translations = {
     },
     home: {
       destacadas: 'Best sellers',
-      paso1Titulo: 'Site survey',
-      paso1Texto: 'We measure your space and listen to how you use it before drawing anything.',
-      paso2Titulo: 'Drawing and material',
-      paso2Texto: 'We confirm dimensions, wood, and finish with you on a dimensioned drawing.',
-      paso3Titulo: 'Workshop and delivery',
-      paso3Texto: 'We build in our own workshop and deliver with installation included.',
-      ctaTitulo: 'Have a space in mind?',
+      paso1Titulo: 'Estimates and Budgets',
+      paso1Texto:
+        'Our experts can visit your home in the Los Angeles, Gardena, San Pedro area, etc. to help you measure and design your space optimally, or you can share your own measurements and we will give you a quote.',
+      paso2Titulo: 'Materials and Products',
+      paso2Texto:
+        'We use top-quality materials to design your custom furniture, along with catalog products to renew your spaces.',
+      paso3Titulo: 'Deliveries or Pickup',
+      paso3Texto:
+        'We offer professional delivery and installation services across California, or pickup directly from our location.',
+      ctaTitulo: 'Have an innovative project you want to bring to life?',
       ctaBoton: 'Tell us about your project',
     },
     catalog: {
