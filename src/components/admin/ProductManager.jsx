@@ -10,14 +10,17 @@ const categoriasForm = categorias.filter((c) => c !== 'Todos')
 
 const estadoInicial = {
   nombre: '',
+  nombre_en: '',
   categoria: categoriasForm[0] ?? '',
   subcategoria: '',
   material: '',
+  material_en: '',
   ancho: '',
   alto: '',
   profundidad: '',
   precio_desde: '',
   descripcion: '',
+  descripcion_en: '',
   imagen: '',
   imagenes: [],
   colores: [],
@@ -75,14 +78,17 @@ export default function ProductManager() {
     setEditandoId(producto.id)
     setForm({
       nombre: producto.nombre ?? '',
+      nombre_en: producto.nombre_en ?? '',
       categoria: producto.categoria ?? categoriasForm[0] ?? '',
       subcategoria: producto.subcategoria ?? '',
       material: producto.material ?? '',
+      material_en: producto.material_en ?? '',
       ancho: producto.ancho ?? '',
       alto: producto.alto ?? '',
       profundidad: producto.profundidad ?? '',
       precio_desde: producto.precio_desde ?? '',
       descripcion: producto.descripcion ?? '',
+      descripcion_en: producto.descripcion_en ?? '',
       imagen: producto.imagen ?? '',
       imagenes: producto.imagenes ?? [],
       colores: producto.colores ?? [],
@@ -105,7 +111,7 @@ export default function ProductManager() {
   }
 
   function handleAgregarColor() {
-    setForm({ ...form, colores: [...form.colores, { nombre: '', hex: '#8B5A2B', stock: 0 }] })
+    setForm({ ...form, colores: [...form.colores, { nombre: '', nombre_en: '', hex: '#8B5A2B', stock: 0 }] })
   }
 
   function handleColorChange(index, campo, valor) {
@@ -186,17 +192,22 @@ export default function ProductManager() {
 
     const payload = {
       nombre: form.nombre,
+      nombre_en: form.nombre_en || null,
       categoria: form.categoria,
       subcategoria: subcategoriasPorCategoria[form.categoria] ? form.subcategoria || null : null,
       material: form.material,
+      material_en: form.material_en || null,
       ancho: form.ancho ? Number(form.ancho) : null,
       alto: form.alto ? Number(form.alto) : null,
       profundidad: form.profundidad ? Number(form.profundidad) : null,
       precio_desde: form.precio_desde ? Number(form.precio_desde) : null,
       descripcion: form.descripcion,
+      descripcion_en: form.descripcion_en || null,
       imagen: imagenUrl,
       imagenes: imagenesGaleria,
-      colores: form.colores.filter((c) => c.nombre.trim()),
+      colores: form.colores
+        .filter((c) => c.nombre.trim())
+        .map((c) => ({ ...c, nombre_en: c.nombre_en?.trim() || undefined })),
     }
 
     const { error: guardarError } = editandoId
@@ -233,6 +244,7 @@ export default function ProductManager() {
 
         <form onSubmit={handleSubmit} className="grid gap-5">
           <Field label={t('productManager.nombre')} name="nombre" value={form.nombre} onChange={handleChange} required />
+          <Field label={t('productManager.nombreEn')} name="nombre_en" value={form.nombre_en} onChange={handleChange} />
 
           <label className="block">
             <span className="font-mono text-[11px] tracking-widest text-muted uppercase">{t('productManager.categoria')}</span>
@@ -272,6 +284,7 @@ export default function ProductManager() {
           )}
 
           <Field label={t('productManager.material')} name="material" value={form.material} onChange={handleChange} />
+          <Field label={t('productManager.materialEn')} name="material_en" value={form.material_en} onChange={handleChange} />
 
           <div className="grid grid-cols-3 gap-4">
             <Field label={t('productManager.anchoCm')} name="ancho" type="number" value={form.ancho} onChange={handleChange} />
@@ -288,6 +301,13 @@ export default function ProductManager() {
           />
 
           <Field as="textarea" label={t('productManager.descripcion')} name="descripcion" value={form.descripcion} onChange={handleChange} />
+          <Field
+            as="textarea"
+            label={t('productManager.descripcionEn')}
+            name="descripcion_en"
+            value={form.descripcion_en}
+            onChange={handleChange}
+          />
 
           <label className="block">
             <span className="font-mono text-[11px] tracking-widest text-muted uppercase">{t('productManager.imagen')}</span>
@@ -341,7 +361,7 @@ export default function ProductManager() {
             </span>
             <div className="mt-2 grid gap-3">
               {form.colores.map((color, i) => (
-                <div key={i} className="flex items-center gap-3">
+                <div key={i} className="flex items-center gap-3 flex-wrap">
                   <input
                     type="color"
                     value={color.hex}
@@ -354,7 +374,14 @@ export default function ProductManager() {
                     onChange={(e) => handleColorChange(i, 'nombre', e.target.value)}
                     placeholder={t('productManager.colorNombrePlaceholder')}
                     required
-                    className="flex-1 bg-surface border border-line rounded-sm px-4 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors"
+                    className="flex-1 min-w-[9rem] bg-surface border border-line rounded-sm px-4 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors"
+                  />
+                  <input
+                    type="text"
+                    value={color.nombre_en ?? ''}
+                    onChange={(e) => handleColorChange(i, 'nombre_en', e.target.value)}
+                    placeholder={t('productManager.colorNombreEnPlaceholder')}
+                    className="flex-1 min-w-[9rem] bg-surface border border-line rounded-sm px-4 py-2 text-sm text-parchment placeholder:text-muted focus:border-brass outline-none transition-colors"
                   />
                   <button
                     type="button"

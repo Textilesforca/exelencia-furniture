@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import { traducirCategoria } from '../i18n/translations'
+import { campoTraducido } from '../lib/campoTraducido'
 
 export default function ProductCard({ producto }) {
   const { lang, t } = useLanguage()
-  const nombre = producto.nombre
-  const material = producto.material
+  const nombre = campoTraducido(producto, 'nombre', lang)
+  const material = campoTraducido(producto, 'material', lang)
 
   return (
     <Link
@@ -56,7 +57,7 @@ export default function ProductCard({ producto }) {
               {producto.colores.map((color) => (
                 <span
                   key={color.nombre}
-                  title={color.nombre}
+                  title={campoTraducido(color, 'nombre', lang)}
                   style={{ backgroundColor: color.hex }}
                   className="w-4 h-4 rounded-full border border-line"
                 />

@@ -6,6 +6,7 @@ import BlueprintDivider from '../components/BlueprintDivider'
 import ImageLightbox from '../components/ImageLightbox'
 import { useLanguage } from '../i18n/LanguageContext'
 import { traducirCategoria } from '../i18n/translations'
+import { campoTraducido } from '../lib/campoTraducido'
 import { useCart } from '../cart/CartContext'
 import { useMontoFlete } from '../hooks/useMontoFlete'
 import EnvioOpcion from '../components/EnvioOpcion'
@@ -109,9 +110,9 @@ export default function ProductDetail() {
   }
 
   const esProductoReal = UUID_REGEX.test(producto.id)
-  const nombre = producto.nombre
-  const material = producto.material
-  const descripcion = producto.descripcion
+  const nombre = campoTraducido(producto, 'nombre', lang)
+  const material = campoTraducido(producto, 'material', lang)
+  const descripcion = campoTraducido(producto, 'descripcion', lang)
   const galeria = [producto.imagen, ...(producto.imagenes ?? [])].filter(Boolean)
 
   return (
@@ -164,7 +165,13 @@ export default function ProductDetail() {
           <div className="mt-6">
             <p className="font-mono text-[11px] tracking-widest text-muted uppercase mb-2">
               {t('productDetail.color')}
-              {colorSeleccionado ? `: ${colorSeleccionado}` : ''}
+              {colorSeleccionado
+                ? `: ${campoTraducido(
+                    producto.colores.find((c) => c.nombre === colorSeleccionado) ?? {},
+                    'nombre',
+                    lang
+                  )}`
+                : ''}
             </p>
             <div className="flex flex-wrap items-center gap-2">
               {producto.colores.map((color) => (
@@ -172,7 +179,7 @@ export default function ProductDetail() {
                   key={color.nombre}
                   type="button"
                   onClick={() => setColorSeleccionado(color.nombre)}
-                  title={color.nombre}
+                  title={campoTraducido(color, 'nombre', lang)}
                   style={{ backgroundColor: color.hex }}
                   className={`w-7 h-7 rounded-full border-2 transition-colors shrink-0 ${
                     colorSeleccionado === color.nombre ? 'border-brass' : 'border-transparent hover:border-line'

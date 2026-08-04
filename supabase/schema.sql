@@ -4,14 +4,17 @@
 create table if not exists productos (
   id uuid primary key default gen_random_uuid(),
   nombre text not null,
+  nombre_en text,
   categoria text not null,
   material text,
-  ancho integer,      -- cm
-  alto integer,       -- cm
-  profundidad integer,-- cm
+  material_en text,
+  ancho integer,      -- in
+  alto integer,       -- in
+  profundidad integer,-- in
   precio_desde numeric,
   imagen text,
   descripcion text,
+  descripcion_en text,
   creado_en timestamptz default now()
 );
 
@@ -822,3 +825,29 @@ as $$
 $$;
 
 grant execute on function public.get_carrito_orden_by_session(text) to anon, authenticated;
+
+-- === Traducción al inglés de nombre/material/descripción (agregado 2026-08-04) ===
+-- Campos opcionales que el admin llena a mano en el formulario de producto.
+-- Si el sitio está en inglés y el campo _en tiene texto, se muestra ese;
+-- si está vacío, se sigue mostrando el texto en español (fallback).
+-- El nombre en inglés de cada color va dentro de productos.colores (jsonb):
+-- {"nombre": "Azul", "nombre_en": "Blue", "hex": "#...", "stock": 5} — no
+-- requiere cambio de esquema, es solo una clave más en cada elemento.
+
+alter table productos add column if not exists nombre_en text;
+alter table productos add column if not exists material_en text;
+alter table productos add column if not exists descripcion_en text;
+
+-- === Conversión de dimensiones existentes de centímetros a pulgadas (agregado 2026-08-04) ===
+-- El sitio ya muestra ancho/alto/profundidad con la etiqueta "in", pero los
+-- valores guardados de productos creados antes de este cambio siguen en cm.
+-- Ejecuta esto UNA sola vez para convertir los productos ya existentes.
+-- (Los productos nuevos se capturan directamente en pulgadas desde el admin,
+-- así que no vuelvas a correr esto después.)
+
+update public.productos
+set
+  ancho = round(ancho * 0.393701)::integer,
+  alto = round(alto * 0.393701)::integer,
+  profundidad = round(profundidad * 0.393701)::integer
+where ancho is not null or alto is not null or profundidad is not null;
