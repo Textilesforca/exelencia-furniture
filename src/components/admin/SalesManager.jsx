@@ -5,18 +5,17 @@ import { useLanguage } from '../../i18n/LanguageContext'
 import { traducirCategoria, traducirSubcategoria } from '../../i18n/translations'
 import { cargarImagenComoDataUrl } from '../../lib/cargarImagenComoDataUrl'
 
-function dibujarEncabezadoEmpresa(doc, margenX, anchoUtil, logoDataUrl) {
+function dibujarEncabezadoEmpresa(doc, margenX, anchoUtil, logo) {
   let textoX = margenX
-  if (logoDataUrl) {
-    doc.addImage(logoDataUrl, 'JPEG', margenX, 18, 46, 46)
-    textoX = margenX + 56
+  if (logo) {
+    const alturaLogo = 34
+    const anchoLogo = (logo.width / logo.height) * alturaLogo
+    doc.addImage(logo.dataUrl, 'JPEG', margenX, 12, anchoLogo, alturaLogo)
+    textoX = margenX + anchoLogo + 12
   }
-  doc.setFont(undefined, 'bold')
-  doc.setFontSize(14)
-  doc.text('THE EXELENCIA FURNITURE', textoX, 36)
   doc.setFont(undefined, 'normal')
   doc.setFontSize(9)
-  doc.text('14709 S Western Ave, Gardena, CA 90249', textoX, 51)
+  doc.text('14709 S Western Ave, Gardena, CA 90249', textoX, 33)
   doc.setLineWidth(0.5)
   doc.line(margenX, 66, margenX + anchoUtil, 66)
 }
@@ -121,7 +120,7 @@ export default function SalesManager() {
     return t('salesManager.anio')
   }
 
-  async function handleGenerarPdfDinero(logoDataUrl) {
+  async function handleGenerarPdfDinero(logo) {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' })
     const margenX = 40
     const anchoUtil = 612 - margenX * 2
@@ -136,7 +135,7 @@ export default function SalesManager() {
 
     function encabezado() {
       if (esPrimeraPagina) {
-        dibujarEncabezadoEmpresa(doc, margenX, anchoUtil, logoDataUrl)
+        dibujarEncabezadoEmpresa(doc, margenX, anchoUtil, logo)
         y = 88
         esPrimeraPagina = false
       } else {
@@ -203,7 +202,7 @@ export default function SalesManager() {
     doc.save(`ventas-${filtro}-${Date.now()}.pdf`)
   }
 
-  async function handleGenerarPdfPiezas(logoDataUrl) {
+  async function handleGenerarPdfPiezas(logo) {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' })
     const margenX = 40
     const anchoUtil = 612 - margenX * 2
@@ -215,7 +214,7 @@ export default function SalesManager() {
 
     function encabezado() {
       if (esPrimeraPagina) {
-        dibujarEncabezadoEmpresa(doc, margenX, anchoUtil, logoDataUrl)
+        dibujarEncabezadoEmpresa(doc, margenX, anchoUtil, logo)
         y = 88
         esPrimeraPagina = false
       } else {
@@ -290,16 +289,16 @@ export default function SalesManager() {
   async function handleGenerarPdf() {
     setGenerandoPdf(true)
 
-    let logoDataUrl = null
+    let logo = null
     try {
-      const { dataUrl } = await cargarImagenComoDataUrl('/logo.png')
-      logoDataUrl = dataUrl
+      const { dataUrl, width, height } = await cargarImagenComoDataUrl('/logo.jpg')
+      logo = { dataUrl, width, height }
     } catch {
       // seguimos sin logo si no carga
     }
 
-    if (ventasFiltradas.length > 0) await handleGenerarPdfDinero(logoDataUrl)
-    if (piezasPorCategoria.length > 0) await handleGenerarPdfPiezas(logoDataUrl)
+    if (ventasFiltradas.length > 0) await handleGenerarPdfDinero(logo)
+    if (piezasPorCategoria.length > 0) await handleGenerarPdfPiezas(logo)
 
     setGenerandoPdf(false)
   }

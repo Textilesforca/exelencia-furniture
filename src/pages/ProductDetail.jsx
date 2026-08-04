@@ -300,7 +300,7 @@ function Dimension({ label, valor }) {
   return (
     <div className="border border-line rounded-sm px-3 py-3 text-center">
       <p className="text-muted text-[11px] uppercase tracking-widest">{label}</p>
-      <p className="text-parchment mt-1">{valor} cm</p>
+      <p className="text-parchment mt-1">{valor}"</p>
     </div>
   )
 }

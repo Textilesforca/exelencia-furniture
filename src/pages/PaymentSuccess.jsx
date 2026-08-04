@@ -67,19 +67,17 @@ async function generarRemision(tipo, resultado, sessionId, t) {
 
   let textoX = margenX
   try {
-    const { dataUrl } = await cargarImagenComoDataUrl('/logo.png')
-    doc.addImage(dataUrl, 'JPEG', margenX, 22, 58, 58)
-    textoX = margenX + 70
+    const { dataUrl, width, height } = await cargarImagenComoDataUrl('/logo.jpg')
+    const alturaLogo = 44
+    const anchoLogo = (width / height) * alturaLogo
+    doc.addImage(dataUrl, 'JPEG', margenX, 18, anchoLogo, alturaLogo)
+    textoX = margenX + anchoLogo + 14
   } catch {
     // si el logo no carga, seguimos sin él
   }
 
   let y = 44
 
-  doc.setFont(undefined, 'bold')
-  doc.setFontSize(16)
-  doc.text('THE EXELENCIA FURNITURE', textoX, y)
-  y += 18
   doc.setFont(undefined, 'normal')
   doc.setFontSize(9)
   doc.text('14709 S Western Ave, Gardena, CA 90249', textoX, y)

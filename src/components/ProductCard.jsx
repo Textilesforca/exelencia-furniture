@@ -31,15 +31,15 @@ export default function ProductCard({ producto }) {
         <div className="grid grid-cols-3 gap-2 font-mono text-xs text-parchment/80 mt-4 max-w-xs">
           <div>
             <p className="text-muted">{t('productCard.ancho')}</p>
-            <p>{producto.ancho} cm</p>
+            <p>{producto.ancho}"</p>
           </div>
           <div>
             <p className="text-muted">{t('productCard.alto')}</p>
-            <p>{producto.alto} cm</p>
+            <p>{producto.alto}"</p>
           </div>
           <div>
             <p className="text-muted">{t('productCard.fondo')}</p>
-            <p>{producto.profundidad} cm</p>
+            <p>{producto.profundidad}"</p>
           </div>
         </div>
 

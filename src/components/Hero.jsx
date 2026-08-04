@@ -51,7 +51,7 @@ export default function Hero() {
             <line x1="310" y1="295" x2="310" y2="305" stroke="#C9A227" strokeWidth="1" />
           </g>
           <text x="190" y="320" textAnchor="middle" fontFamily="Space Mono, monospace" fontSize="12" fill="#C9A227">
-            90 cm
+            35"
           </text>
 
           {/* línea de acotación vertical (alto) */}
@@ -61,7 +61,7 @@ export default function Hero() {
             <line x1="330" y1="270" x2="340" y2="270" stroke="#C9A227" strokeWidth="1" />
           </g>
           <text x="352" y="200" textAnchor="middle" fontFamily="Space Mono, monospace" fontSize="12" fill="#C9A227" transform="rotate(90 352 200)">
-            85 cm
+            33"
           </text>
 
           {/* etiqueta de nota */}
