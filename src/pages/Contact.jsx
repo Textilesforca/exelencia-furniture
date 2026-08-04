@@ -1,9 +1,16 @@
 import QuoteForm from '../components/QuoteForm'
 import BlueprintDivider from '../components/BlueprintDivider'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useDocumentHead } from '../hooks/useDocumentHead'
 
 export default function Contact() {
   const { t } = useLanguage()
+
+  useDocumentHead({
+    titulo: 'Cotizar y contacto | Custom & Designs — The Exelencia Furniture',
+    descripcion: 'Pide una cotización de tu mueble a la medida en Gardena, CA. Visitamos tu hogar en el área de Los Ángeles o recibimos tus medidas.',
+    ruta: '/contacto',
+  })
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16 grid sm:grid-cols-2 gap-12">

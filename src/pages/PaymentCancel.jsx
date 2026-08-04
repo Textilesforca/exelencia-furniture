@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useDocumentHead } from '../hooks/useDocumentHead'
 
 export default function PaymentCancel() {
   const { t } = useLanguage()
+
+  useDocumentHead({ titulo: 'Pago cancelado | Custom & Designs', ruta: '/pago/cancelado', noindex: true })
 
   return (
     <section className="max-w-2xl mx-auto px-6 py-24 text-center">

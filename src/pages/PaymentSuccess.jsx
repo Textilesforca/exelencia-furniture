@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useCart } from '../cart/CartContext'
 import { cargarImagenComoDataUrl } from '../lib/cargarImagenComoDataUrl'
+import { useDocumentHead } from '../hooks/useDocumentHead'
 
 function itemsDeResultado(tipo, resultado, t) {
   if (tipo === 'cotizacion') {
@@ -175,6 +176,8 @@ export default function PaymentSuccess() {
   const [cargando, setCargando] = useState(true)
   const { vaciar } = useCart()
   const descargadaRef = useRef(false)
+
+  useDocumentHead({ titulo: 'Pago confirmado | Custom & Designs', ruta: '/pago/exito', noindex: true })
 
   useEffect(() => {
     if (!sessionId) {

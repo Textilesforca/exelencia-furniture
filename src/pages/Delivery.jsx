@@ -1,7 +1,14 @@
 import { useLanguage } from '../i18n/LanguageContext'
+import { useDocumentHead } from '../hooks/useDocumentHead'
 
 export default function Delivery() {
   const { t } = useLanguage()
+
+  useDocumentHead({
+    titulo: 'Entregas y recolección | Custom & Designs — The Exelencia Furniture',
+    descripcion: 'Recoge tu mueble en nuestro Show Room en Gardena, CA o pide entrega profesional en el sur de California.',
+    ruta: '/entrega',
+  })
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-16">

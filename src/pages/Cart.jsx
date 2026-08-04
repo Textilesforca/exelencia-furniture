@@ -4,10 +4,13 @@ import { useCart } from '../cart/CartContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import { supabase } from '../lib/supabaseClient'
 import { useMontoFlete } from '../hooks/useMontoFlete'
+import { useDocumentHead } from '../hooks/useDocumentHead'
 import EnvioOpcion from '../components/EnvioOpcion'
 
 export default function Cart() {
   const { t } = useLanguage()
+
+  useDocumentHead({ titulo: 'Carrito | Custom & Designs', ruta: '/carrito', noindex: true })
   const { items, quitar, actualizarCantidad } = useCart()
   const montoFlete = useMontoFlete()
   const [pagando, setPagando] = useState(false)

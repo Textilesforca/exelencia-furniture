@@ -6,10 +6,18 @@ import ProductCard from '../components/ProductCard'
 import { sampleProducts } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useDocumentHead } from '../hooks/useDocumentHead'
 
 export default function Home() {
   const { t } = useLanguage()
   const [destacados, setDestacados] = useState(sampleProducts.slice(0, 3))
+
+  useDocumentHead({
+    titulo: 'Custom & Designs — The Exelencia Furniture | Muebles a la medida en Gardena, CA',
+    descripcion:
+      'Muebles hechos a la medida en Gardena, California. Salas, comedores, recámaras y piezas personalizadas. Recolección en tienda o entrega en el sur de California.',
+    ruta: '/',
+  })
 
   useEffect(() => {
     async function cargarDestacados() {

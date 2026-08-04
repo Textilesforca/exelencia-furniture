@@ -12,9 +12,12 @@ import InventoryManager from '../components/admin/InventoryManager'
 import SalesManager from '../components/admin/SalesManager'
 import ShippingManager from '../components/admin/ShippingManager'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useDocumentHead } from '../hooks/useDocumentHead'
 
 export default function Admin() {
   const { t } = useLanguage()
+
+  useDocumentHead({ titulo: 'Admin | Custom & Designs', ruta: '/admin', noindex: true })
   const { session, cargando } = useSession()
   const { profile, cargando: cargandoPerfil } = useProfile(session)
   const [tab, setTab] = useState(null)

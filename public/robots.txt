@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /carrito
+Disallow: /pago/
+
+Sitemap: https://exelencia-furniture.vercel.app/sitemap.xml

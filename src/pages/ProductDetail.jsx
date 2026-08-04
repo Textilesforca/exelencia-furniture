@@ -7,6 +7,7 @@ import ImageLightbox from '../components/ImageLightbox'
 import { useLanguage } from '../i18n/LanguageContext'
 import { traducirCategoria } from '../i18n/translations'
 import { campoTraducido } from '../lib/campoTraducido'
+import { useDocumentHead } from '../hooks/useDocumentHead'
 import { useCart } from '../cart/CartContext'
 import { useMontoFlete } from '../hooks/useMontoFlete'
 import EnvioOpcion from '../components/EnvioOpcion'
@@ -93,6 +94,16 @@ export default function ProductDetail() {
     setAgregado(true)
     setTimeout(() => setAgregado(false), 2000)
   }
+
+  const nombreParaTitulo = producto ? campoTraducido(producto, 'nombre', lang) : ''
+  useDocumentHead({
+    titulo: producto
+      ? `${nombreParaTitulo} | Custom & Designs — The Exelencia Furniture`
+      : undefined,
+    descripcion: producto ? campoTraducido(producto, 'descripcion', lang) || undefined : undefined,
+    ruta: `/catalogo/${id}`,
+    imagen: producto?.imagen || '/logo.jpg',
+  })
 
   if (cargando) {
     return <p className="max-w-6xl mx-auto px-6 py-16 font-mono text-sm text-muted">{t('productDetail.cargando')}</p>

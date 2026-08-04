@@ -6,6 +6,7 @@ import { sampleProducts, categorias } from '../data/products'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../i18n/LanguageContext'
 import { traducirCategoria } from '../i18n/translations'
+import { useDocumentHead } from '../hooks/useDocumentHead'
 
 const categoriasGrid = categorias.filter((c) => c !== 'Todos')
 
@@ -46,6 +47,15 @@ export default function Catalog() {
   const busqueda = searchParams.get('buscar') || ''
 
   const mostrarSelector = activa === 'Todos' && !busqueda
+
+  useDocumentHead({
+    titulo:
+      activa === 'Todos'
+        ? 'Catálogo de muebles | Custom & Designs — The Exelencia Furniture'
+        : `${traducirCategoria(activa, lang)} | Custom & Designs — The Exelencia Furniture`,
+    descripcion: 'Catálogo de muebles hechos a la medida y de línea: salas, comedores, recámaras y piezas personalizadas.',
+    ruta: '/catalogo',
+  })
 
   const porCategoria =
     activa === 'Todos' ? productos : productos.filter((p) => p.categoria === activa)
