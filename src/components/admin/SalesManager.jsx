@@ -8,9 +8,9 @@ import { cargarImagenComoDataUrl } from '../../lib/cargarImagenComoDataUrl'
 function dibujarEncabezadoEmpresa(doc, margenX, anchoUtil, logo) {
   let textoX = margenX
   if (logo) {
-    const alturaLogo = 34
+    const alturaLogo = 48
     const anchoLogo = (logo.width / logo.height) * alturaLogo
-    doc.addImage(logo.dataUrl, 'JPEG', margenX, 12, anchoLogo, alturaLogo)
+    doc.addImage(logo.dataUrl, 'JPEG', margenX, 8, anchoLogo, alturaLogo)
     textoX = margenX + anchoLogo + 12
   }
   doc.setFont(undefined, 'normal')

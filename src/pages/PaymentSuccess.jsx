@@ -68,9 +68,9 @@ async function generarRemision(tipo, resultado, sessionId, t) {
   let textoX = margenX
   try {
     const { dataUrl, width, height } = await cargarImagenComoDataUrl('/logo.jpg')
-    const alturaLogo = 44
+    const alturaLogo = 62
     const anchoLogo = (width / height) * alturaLogo
-    doc.addImage(dataUrl, 'JPEG', margenX, 18, anchoLogo, alturaLogo)
+    doc.addImage(dataUrl, 'JPEG', margenX, 10, anchoLogo, alturaLogo)
     textoX = margenX + anchoLogo + 14
   } catch {
     // si el logo no carga, seguimos sin él

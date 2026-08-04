@@ -136,9 +136,9 @@ export default function Navbar() {
 
   return (
     <header className="relative sticky top-0 z-40 bg-ink/90 backdrop-blur border-b border-line">
-      <nav className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-3 sm:gap-6">
+      <nav className="max-w-6xl mx-auto px-4 sm:px-6 h-28 flex items-center justify-between gap-3 sm:gap-6">
         <Link to="/" className="flex items-center shrink-0">
-          <img src="/logo.jpg" alt="Custom & Designs — The Exelencia Furniture" className="h-14 w-auto shrink-0" />
+          <img src="/logo.jpg" alt="Custom & Designs — The Exelencia Furniture" className="h-24 w-auto shrink-0" />
         </Link>
 
         <div ref={buscadorRef} className="relative hidden sm:block flex-1 max-w-sm">
