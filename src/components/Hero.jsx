@@ -65,8 +65,9 @@ export default function Hero() {
           </text>
 
           {/* etiqueta de nota */}
-          <text x="20" y="30" fontFamily="Space Mono, monospace" fontSize="11" fill="#9A9186">
-            {t('hero.refSillon')}
+          <text x="20" y="24" fontFamily="Space Mono, monospace" fontSize="11" fill="#9A9186">
+            <tspan x="20" dy="0">{t('hero.refSillonL1')}</tspan>
+            <tspan x="20" dy="14">{t('hero.refSillonL2')}</tspan>
           </text>
         </svg>
       </div>
