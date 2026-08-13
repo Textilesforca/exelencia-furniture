@@ -2,9 +2,14 @@ name: Mantener Supabase activo
 
 on:
   schedule:
-    # Cada 4 días a las 12:00 UTC — el proyecto gratuito de Supabase se
-    # pausa tras 7 días sin actividad, esto evita que llegue a ese límite.
-    - cron: '0 12 */4 * *'
+    # Dos veces al día — el proyecto gratuito de Supabase se pausa tras 7
+    # días sin actividad. Los cron de GitHub Actions no tienen horario
+    # garantizado (se pueden retrasar o saltar una corrida bajo carga alta),
+    # así que con solo una corrida cada varios días un salto ya es
+    # suficiente para llegar al límite. Corriendo 2 veces al día queda
+    # mucho margen aunque falle alguna.
+    - cron: '0 6 * * *'
+    - cron: '0 18 * * *'
   workflow_dispatch: {}
 
 jobs:
